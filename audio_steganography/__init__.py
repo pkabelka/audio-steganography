@@ -1,6 +1,7 @@
 from .argument_parsing import parse_args
 from .methods.method import Method
 from .mode import Mode
+from .exceptions import OutputFileExists
 import sys
 import typing
 import numpy as np
@@ -25,6 +26,7 @@ class AudioSteganography:
         self.data_to_decode = np.empty(0)
 
     def encode(self, *args, **kwargs):
+        self.check_filename()
 
         self.file_to_encode = kwargs['file_to_encode']
         self.text_to_encode = kwargs['text_to_encode']
@@ -38,6 +40,8 @@ class AudioSteganography:
         self.write_output(output)
 
     def decode(self, *args, **kwargs):
+        self.check_filename()
+
         self.prepare_data()
         output = self.method.value(self.source_data, self.mode).decode(*args, **kwargs)
 
@@ -59,23 +63,31 @@ class AudioSteganography:
                 )
 
     def write_output(self, output: np.ndarray):
-        name, ext = os.path.splitext(self.source)
-        fname = f'{name}_{self.method.name}.out'
-
-        if self.mode == Mode.encode:
-            fname = f'{name}_{self.method.name}.{ext}'
-
-        if self.output_file is not None:
-            fname = self.output_file
-
-        if os.path.exists(fname) and not self.overwrite:
-            raise Exception('Output file already exists!')
+        fname = self.check_filename()
 
         if self.mode == Mode.encode:
             scipy.io.wavfile.write(fname, self.source_sr, output)
         else:
             with open(fname, 'wb') as f:
                 f.write(np.packbits(output).tobytes())
+
+    def check_filename(self) -> str:
+        name, ext = os.path.splitext(self.source)
+        # Filename when decoding
+        fname = f'{name}_{self.method.name}.out'
+
+        # Filename when encoding
+        if self.mode == Mode.encode:
+            fname = f'{name}_{self.method.name}{ext}'
+
+        # Override filename with the user specified one
+        if self.output_file is not None:
+            fname = self.output_file
+
+        if os.path.exists(fname) and not self.overwrite:
+            raise OutputFileExists('Output file already exists!')
+
+        return fname
 
 
 def main():
@@ -105,8 +117,12 @@ def main():
         args.output,
         args.overwrite)
 
-    if method == Method.echo_single_kernel:
-        if mode == Mode.encode:
-            steganography.encode(file_to_encode=args.file, text_to_encode=args.text)
-        else:
-            steganography.decode(d0=args.d0, d1=args.d1, l=args.len)
+    try:
+        if method == Method.echo_single_kernel:
+            if mode == Mode.encode:
+                steganography.encode(file_to_encode=args.file, text_to_encode=args.text)
+            else:
+                steganography.decode(d0=args.d0, d1=args.d1, l=args.len)
+    except OutputFileExists:
+        print(f'{sys.argv[0]}: error: output file already exists', file=sys.stderr)
+        sys.exit(1)

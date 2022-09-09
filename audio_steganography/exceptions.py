@@ -1,0 +1,2 @@
+class OutputFileExists(Exception):
+    pass
