@@ -81,7 +81,8 @@ class Echo_single_kernel(MethodBase):
     @staticmethod
     def get_decode_args() -> typing.List[typing.Tuple[typing.List, typing.Dict]]:
         args = []
-        args.append((['-d0'], {
+        args.append((['-d0'],
+                     {
                          'action': 'store',
                          'type': int,
                          'required': True
