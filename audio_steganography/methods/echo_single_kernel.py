@@ -1,4 +1,5 @@
 from .method_base import MethodBase
+import typing
 import numpy as np
 import scipy.signal
 
@@ -21,7 +22,8 @@ class Echo_single_kernel(MethodBase):
 
         delay_pairs = []
         end = False
-        x = np.array([])
+        x = np.empty(0)
+        x_f = np.empty(0)
         for d0 in range(250, 350):
             h0 = np.append(np.zeros(d0), [1])
             for d1 in range(d0, d0+100):
@@ -44,7 +46,7 @@ class Echo_single_kernel(MethodBase):
                 self.d0 = d0
                 self.d1 = d1
 
-                if np.all(self.decode() == self.data_to_encode):
+                if np.all(self.decode(d0, d1, self.secret_len) == self.data_to_encode):
                     delay_pairs.append((d0, d1))
                     end = True
                     break
@@ -53,15 +55,16 @@ class Echo_single_kernel(MethodBase):
                 break
 
         print('d0 and d1:', delay_pairs)
-        return x
+        print('bit length:', self.secret_len)
+        return x_f
 
 
-    def decode(self) -> np.ndarray:
+    def decode(self, d0: int, d1: int, l: int) -> np.ndarray:
         decoded = []
-        split = seg_split(self.data_to_decode, self.secret_len+1)[:-1]
+        split = seg_split(self.data_to_decode, l+1)[:-1]
         for seg in split:
             cn = np.fft.ifft(np.log(np.abs(np.fft.fft(seg))))
-            if cn[self.d0+1] > cn[self.d1+1]:
+            if cn[d0+1] > cn[d1+1]:
                 decoded.append(0)
             else:
                 decoded.append(1)
@@ -74,3 +77,26 @@ class Echo_single_kernel(MethodBase):
         # print(decoded_message)
 
         return(decoded)
+
+    @staticmethod
+    def get_decode_args() -> typing.List[typing.Tuple[typing.List, typing.Dict]]:
+        args = []
+        args.append((['-d0'], {
+                         'action': 'store',
+                         'type': int,
+                         'required': True
+                     }))
+        args.append((['-d1'],
+                     {
+                         'action': 'store',
+                         'type': int,
+                         'required': True
+                     }))
+        args.append((['-l', '--len'],
+                     {
+                         'action': 'store',
+                         'type': int,
+                         'required': True,
+                         'help': 'encoded data length'
+                     }))
+        return args
