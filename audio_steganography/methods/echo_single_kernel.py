@@ -8,7 +8,7 @@ def seg_split(sig, nseg):
 class Echo_single_kernel(MethodBase):
     def encode(self) -> np.ndarray:
         self.secret_len = len(self.data_to_encode)
-        mixer = seg_split(np.ones(len(self.cover)), self.secret_len+1)
+        mixer = seg_split(np.ones(len(self.cover_data)), self.secret_len+1)
         # print('Mixer len:', len(mixer))
         # print('Seg sample len:', len(mixer[0]))
 
@@ -28,10 +28,10 @@ class Echo_single_kernel(MethodBase):
 
                 h1 = np.append(np.zeros(d1), [1])
 
-                k0 = scipy.signal.fftconvolve(h0, self.cover)
-                k1 = scipy.signal.fftconvolve(h1, self.cover)
+                k0 = scipy.signal.fftconvolve(h0, self.cover_data)
+                k1 = scipy.signal.fftconvolve(h1, self.cover_data)
 
-                sp = np.pad(np.array(self.cover), (0, len(k1)-len(self.cover)))
+                sp = np.pad(np.array(self.cover_data), (0, len(k1)-len(self.cover_data)))
                 x = np.zeros(len(sp))
                 x = sp[:len(mixer)]+k1[:len(mixer)] * mixer + sp[:len(mixer)]+k0[:len(mixer)] * (1-mixer)
 

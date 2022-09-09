@@ -13,6 +13,7 @@ class AudioSteganography:
                  cover_file: str,
                  file_to_encode: typing.Optional[str] = None,
                  text_to_encode: typing.Optional[str] = None,
+                 file_to_decode: typing.Optional[str] = None,
                  output_file: typing.Optional[str] = None,
                  overwrite: bool = False):
         self.method = method
@@ -20,6 +21,7 @@ class AudioSteganography:
         self.cover_file = cover_file
         self.file_to_encode = file_to_encode
         self.text_to_encode = text_to_encode
+        self.file_to_decode = file_to_decode
         self.output_file = output_file
         self.overwrite = overwrite
         self.data_to_encode = np.empty(0)
@@ -27,11 +29,14 @@ class AudioSteganography:
 
     def encode(self):
         self.prepare_data()
-        self.method.value(self.cover_data, self.data_to_encode, self.mode).encode()
+        method = self.method.value(self.cover_data, self.data_to_encode, self.mode)
+        method.set_cover_data(self.cover_data)
+        method.encode()
 
     def decode(self):
         self.prepare_data()
         self.method.value(self.cover_data, self.data_to_decode, self.mode).decode()
+        print(self.file_to_decode)
 
     def prepare_data(self):
         self.cover_sr, self.cover_data = scipy.io.wavfile.read(self.cover_file)
@@ -150,6 +155,7 @@ def main():
         args.cover,
         args.file,
         args.text,
+        args.file,
         args.output,
         args.overwrite)
 
