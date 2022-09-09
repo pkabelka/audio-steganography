@@ -22,20 +22,20 @@ class AudioSteganography:
         self.output_file = output_file
         self.overwrite = overwrite
 
+        self.text_to_encode = None
+        self.file_to_encode = None
+
         self.data_to_encode = np.empty(0)
         self.data_to_decode = np.empty(0)
 
     def encode(self, *args, **kwargs):
         self.check_filename()
 
-        self.file_to_encode = kwargs['file_to_encode']
-        self.text_to_encode = kwargs['text_to_encode']
-
         self.prepare_data()
 
         method = self.method.value(self.data_to_encode, self.mode)
         method.set_cover_data(self.source_data)
-        output = method.encode()
+        output = method.encode(*args, **kwargs)
 
         self.write_output(output)
 
@@ -46,6 +46,12 @@ class AudioSteganography:
         output = self.method.value(self.source_data, self.mode).decode(*args, **kwargs)
 
         self.write_output(output)
+
+    def set_text_to_encode(self, text_to_encode: typing.Optional[str]):
+        self.text_to_encode = text_to_encode
+
+    def set_file_to_encode(self, file_to_encode: typing.Optional[str]):
+        self.file_to_encode = file_to_encode
 
     def prepare_data(self):
         self.source_sr, self.source_data = scipy.io.wavfile.read(self.source)
@@ -117,10 +123,14 @@ def main():
         args.output,
         args.overwrite)
 
+    if mode == Mode.encode:
+        steganography.set_text_to_encode(args.text)
+        steganography.set_file_to_encode(args.file)
+
     try:
         if method == Method.echo_single_kernel:
             if mode == Mode.encode:
-                steganography.encode(file_to_encode=args.file, text_to_encode=args.text)
+                steganography.encode()
             else:
                 steganography.decode(d0=args.d0, d1=args.d1, l=args.len)
     except OutputFileExists:
