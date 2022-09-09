@@ -28,6 +28,7 @@ class AudioSteganography:
         self.data_to_encode = np.empty(0)
         self.data_to_decode = np.empty(0)
 
+
     def encode(self, *args, **kwargs):
         self.check_filename()
 
@@ -39,6 +40,7 @@ class AudioSteganography:
 
         self.write_output(output)
 
+
     def decode(self, *args, **kwargs):
         self.check_filename()
 
@@ -47,11 +49,14 @@ class AudioSteganography:
 
         self.write_output(output)
 
+
     def set_text_to_encode(self, text_to_encode: typing.Optional[str]):
         self.text_to_encode = text_to_encode
 
+
     def set_file_to_encode(self, file_to_encode: typing.Optional[str]):
         self.file_to_encode = file_to_encode
+
 
     def prepare_data(self):
         self.source_sr, self.source_data = scipy.io.wavfile.read(self.source)
@@ -68,6 +73,7 @@ class AudioSteganography:
                     np.fromfile(self.file_to_encode, np.uint8)
                 )
 
+
     def write_output(self, output: np.ndarray):
         fname = self.check_filename()
 
@@ -76,6 +82,7 @@ class AudioSteganography:
         else:
             with open(fname, 'wb') as f:
                 f.write(np.packbits(output).tobytes())
+
 
     def check_filename(self) -> str:
         name, ext = os.path.splitext(self.source)
@@ -133,6 +140,7 @@ def main():
                 steganography.encode()
             else:
                 steganography.decode(d0=args.d0, d1=args.d1, l=args.len)
+
     except OutputFileExists:
         print(f'{sys.argv[0]}: error: output file already exists', file=sys.stderr)
         sys.exit(1)
