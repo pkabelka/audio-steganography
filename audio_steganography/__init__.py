@@ -26,7 +26,6 @@ class AudioSteganography:
         self.file_to_encode = None
 
         self.data_to_encode = np.empty(0)
-        self.data_to_decode = np.empty(0)
 
 
     def encode(self, *args, **kwargs):
