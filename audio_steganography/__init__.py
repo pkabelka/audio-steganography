@@ -1,5 +1,6 @@
 from .argument_parsing import parse_args
 from .methods.method import Method
+from .methods.method_base import MethodBase
 from .mode import Mode
 from .exceptions import OutputFileExists
 import sys
@@ -33,7 +34,7 @@ class AudioSteganography:
 
         self.prepare_data()
 
-        method = self.method.value(self.data_to_encode, self.mode)
+        method: MethodBase = self.method.value(self.data_to_encode, self.mode)
         method.set_cover_data(self.source_data)
         output = method.encode(*args, **kwargs)
 
@@ -44,7 +45,9 @@ class AudioSteganography:
         self.check_filename()
 
         self.prepare_data()
-        output = self.method.value(self.source_data, self.mode).decode(*args, **kwargs)
+
+        method: MethodBase = self.method.value(self.source_data, self.mode)
+        output = method.decode(*args, **kwargs)
 
         self.write_output(output)
 
