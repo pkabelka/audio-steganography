@@ -32,15 +32,13 @@ def main():
         args.output,
         args.overwrite)
 
-    if mode == Mode.encode:
-        steganography.set_text_to_encode(args.text)
-        steganography.set_file_to_encode(args.file)
-
     try:
-        if method == Method.echo_single_kernel:
-            if mode == Mode.encode:
-                steganography.encode()
-            else:
+        if mode == Mode.encode:
+            steganography.set_text_to_encode(args.text)
+            steganography.set_file_to_encode(args.file)
+            steganography.encode()
+        else:
+            if method == Method.echo_single_kernel:
                 steganography.decode(d0=args.d0, d1=args.d1, l=args.len)
 
     except OutputFileExists as e:
