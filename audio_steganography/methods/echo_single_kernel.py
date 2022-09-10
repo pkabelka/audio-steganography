@@ -8,8 +8,8 @@ def seg_split(sig, nseg):
 
 class Echo_single_kernel(MethodBase):
     def encode(self) -> np.ndarray:
-        self.secret_len = len(self._secret_data)
-        mixer = seg_split(np.ones(len(self._source_data)), self.secret_len+1)
+        secret_len = len(self._secret_data)
+        mixer = seg_split(np.ones(len(self._source_data)), secret_len+1)
         # print('Mixer len:', len(mixer))
         # print('Seg sample len:', len(mixer[0]))
 
@@ -43,11 +43,8 @@ class Echo_single_kernel(MethodBase):
                 # scipy.io.wavfile.write('echo.wav', sr, x_f)
 
                 # Decode to verify delay pair
-                self.d0 = d0
-                self.d1 = d1
-
                 test_decoder = Echo_single_kernel(x_f)
-                if np.all(test_decoder.decode(d0, d1, self.secret_len) == self._secret_data):
+                if np.all(test_decoder.decode(d0, d1, secret_len) == self._secret_data):
                     delay_pairs.append((d0, d1))
                     end = True
                     break
@@ -56,7 +53,7 @@ class Echo_single_kernel(MethodBase):
                 break
 
         print('d0 and d1:', delay_pairs)
-        print('bit length:', self.secret_len)
+        print('bit length:', secret_len)
         return x_f
 
 
