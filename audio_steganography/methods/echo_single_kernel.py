@@ -7,7 +7,7 @@ def seg_split(sig, nseg):
     return np.array_split(sig, nseg)[:-1] + [sig[-int(round(len(sig)/nseg)):]]
 
 class Echo_single_kernel(MethodBase):
-    def encode(self) -> np.ndarray:
+    def encode(self) -> typing.Tuple[np.ndarray, typing.Dict[str, typing.Any]]:
         secret_len = len(self._secret_data)
         mixer = seg_split(np.ones(len(self._source_data)), secret_len+1)
         # print('Mixer len:', len(mixer))
@@ -44,7 +44,7 @@ class Echo_single_kernel(MethodBase):
 
                 # Decode to verify delay pair
                 test_decoder = Echo_single_kernel(x_f)
-                if np.all(test_decoder.decode(d0, d1, secret_len) == self._secret_data):
+                if np.all(test_decoder.decode(d0, d1, secret_len)[0] == self._secret_data):
                     delay_pairs.append((d0, d1))
                     end = True
                     break
@@ -52,12 +52,14 @@ class Echo_single_kernel(MethodBase):
             if end:
                 break
 
-        print('d0 and d1:', delay_pairs)
-        print('bit length:', secret_len)
-        return x_f
+        return x_f, {
+            'd0': delay_pairs[0][0],
+            'd1': delay_pairs[0][1],
+            'l': secret_len,
+        }
 
 
-    def decode(self, d0: int, d1: int, l: int) -> np.ndarray:
+    def decode(self, d0: int, d1: int, l: int) -> typing.Tuple[np.ndarray, typing.Dict[str, typing.Any]]:
         decoded = []
         split = seg_split(self._source_data, l+1)[:-1]
         for seg in split:
@@ -74,7 +76,7 @@ class Echo_single_kernel(MethodBase):
             decoded_message += chr(int(''.join([str(x) for x in decoded[i:i+8]]), 2))
         # print(decoded_message)
 
-        return(decoded)
+        return decoded, {}
 
     @staticmethod
     def get_decode_args() -> typing.List[typing.Tuple[typing.List, typing.Dict]]:

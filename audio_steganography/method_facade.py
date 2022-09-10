@@ -27,27 +27,29 @@ class MethodFacade:
         self.data_to_encode = np.empty(0)
 
 
-    def encode(self, *args, **kwargs):
+    def encode(self, *args, **kwargs) -> typing.Dict[str, typing.Any]:
         self.check_filename()
 
         self.prepare_data()
 
         method: MethodBase = self.method.value(self.source_data)
         method.set_secret_data(self.data_to_encode)
-        output = method.encode(*args, **kwargs)
+        output, additional_output = method.encode(*args, **kwargs)
 
         self.write_output(output)
+        return additional_output
 
 
-    def decode(self, *args, **kwargs):
+    def decode(self, *args, **kwargs) -> typing.Dict[str, typing.Any]:
         self.check_filename()
 
         self.prepare_data()
 
         method: MethodBase = self.method.value(self.source_data)
-        output = method.decode(*args, **kwargs)
+        output, additional_output = method.decode(*args, **kwargs)
 
         self.write_output(output)
+        return additional_output
 
 
     def set_text_to_encode(self, text_to_encode: typing.Optional[str]):

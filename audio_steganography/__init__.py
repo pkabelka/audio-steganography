@@ -6,6 +6,7 @@ from .exceptions import OutputFileExists
 from .utils import error_exit
 from .exit_codes import ExitCode
 import sys
+import json
 
 def main():
     args, parser = parse_args()
@@ -32,16 +33,19 @@ def main():
         args.output,
         args.overwrite)
 
+    additional_output = {}
     try:
         if mode == Mode.encode:
             steganography.set_text_to_encode(args.text)
             steganography.set_file_to_encode(args.file)
-            steganography.encode()
+            additional_output = steganography.encode()
         else:
             if method == Method.echo_single_kernel:
-                steganography.decode(d0=args.d0, d1=args.d1, l=args.len)
+                additional_output = steganography.decode(d0=args.d0, d1=args.d1, l=args.len)
 
     except OutputFileExists as e:
         error_exit(str(e), ExitCode.OutputFileExists)
     except FileNotFoundError as e:
         error_exit(str(e), ExitCode.FileNotFound)
+
+    print(json.dumps(additional_output))

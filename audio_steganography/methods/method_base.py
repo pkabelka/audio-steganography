@@ -8,11 +8,11 @@ class MethodBase(abc.ABC):
         self._secret_data = np.empty(0)
 
     @abc.abstractmethod
-    def encode(self) -> np.ndarray:
+    def encode(self) -> typing.Tuple[np.ndarray, typing.Dict[str, typing.Any]]:
         raise NotImplementedError('Inherited steganography method must implement this function')
 
     @abc.abstractmethod
-    def decode(self) -> np.ndarray:
+    def decode(self) -> typing.Tuple[np.ndarray, typing.Dict[str, typing.Any]]:
         raise NotImplementedError('Inherited steganography method must implement this function')
 
     @staticmethod
