@@ -103,7 +103,7 @@ class AudioSteganography:
             fname = self.output_file
 
         if os.path.exists(fname) and not self.overwrite:
-            raise OutputFileExists('Output file already exists!')
+            raise OutputFileExists('output file already exists')
 
         return fname
 
@@ -146,8 +146,8 @@ def main():
             else:
                 steganography.decode(d0=args.d0, d1=args.d1, l=args.len)
 
-    except OutputFileExists:
-        print(f'{sys.argv[0]}: error: output file already exists', file=sys.stderr)
+    except OutputFileExists as e:
+        print(f'{sys.argv[0]}: error: {e}', file=sys.stderr)
         sys.exit(1)
     except FileNotFoundError as e:
         print(f'{sys.argv[0]}: error: {e}', file=sys.stderr)
