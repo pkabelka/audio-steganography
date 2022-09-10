@@ -34,8 +34,8 @@ class AudioSteganography:
 
         self.prepare_data()
 
-        method: MethodBase = self.method.value(self.data_to_encode, self.mode)
-        method.set_cover_data(self.source_data)
+        method: MethodBase = self.method.value(self.source_data)
+        method.set_secret_data(self.data_to_encode)
         output = method.encode(*args, **kwargs)
 
         self.write_output(output)
@@ -46,7 +46,7 @@ class AudioSteganography:
 
         self.prepare_data()
 
-        method: MethodBase = self.method.value(self.source_data, self.mode)
+        method: MethodBase = self.method.value(self.source_data)
         output = method.decode(*args, **kwargs)
 
         self.write_output(output)
