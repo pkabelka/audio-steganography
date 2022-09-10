@@ -60,21 +60,16 @@ class Echo_single_kernel(MethodBase):
 
 
     def decode(self, d0: int, d1: int, l: int) -> typing.Tuple[np.ndarray, typing.Dict[str, typing.Any]]:
-        decoded = []
         split = seg_split(self._source_data, l+1)[:-1]
+        decoded = np.zeros(len(split), dtype=int)
+        i = 0
         for seg in split:
             cn = np.fft.ifft(np.log(np.abs(np.fft.fft(seg))))
             if cn[d0+1] > cn[d1+1]:
-                decoded.append(0)
+                decoded[i] = 0
             else:
-                decoded.append(1)
-
-        decoded = np.array(decoded)
-        # print(decoded)
-        decoded_message = ''
-        for i in range(0, len(decoded), 8):
-            decoded_message += chr(int(''.join([str(x) for x in decoded[i:i+8]]), 2))
-        # print(decoded_message)
+                decoded[i] = 1
+            i += 1
 
         return decoded, {}
 
