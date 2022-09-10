@@ -34,9 +34,10 @@ class Echo_single_kernel(MethodBase):
                 k1 = scipy.signal.fftconvolve(h1, self._source_data)
 
                 sp = np.pad(np.array(self._source_data), (0, len(k1)-len(self._source_data)))
-                x = np.zeros(len(sp))
                 x = sp[:len(mixer)]+k1[:len(mixer)] * mixer + sp[:len(mixer)]+k0[:len(mixer)] * (1-mixer)
 
+                if np.abs(x).max() == 0:
+                    continue
                 x_f = x - np.mean(x)
                 x_f = x_f / np.abs(x_f).max()
                 # scipy.io.wavfile.write('echo.wav', sr, x_f)
