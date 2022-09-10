@@ -61,7 +61,10 @@ class AudioSteganography:
 
 
     def prepare_data(self):
-        self.source_sr, self.source_data = scipy.io.wavfile.read(self.source)
+        try:
+            self.source_sr, self.source_data = scipy.io.wavfile.read(self.source)
+        except FileNotFoundError:
+            raise FileNotFoundError('source file not found')
         self.source_sr: int = self.source_sr
         self.source_data: np.ndarray[typing.Any, np.dtype[np.int16]] = self.source_data
 
@@ -145,4 +148,7 @@ def main():
 
     except OutputFileExists:
         print(f'{sys.argv[0]}: error: output file already exists', file=sys.stderr)
+        sys.exit(1)
+    except FileNotFoundError as e:
+        print(f'{sys.argv[0]}: error: {e}', file=sys.stderr)
         sys.exit(1)
