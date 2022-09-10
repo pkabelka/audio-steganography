@@ -3,6 +3,8 @@ from .methods.method import Method
 from .methods.method_base import MethodBase
 from .mode import Mode
 from .exceptions import OutputFileExists
+from .utils import error_exit
+from .exit_codes import ExitCode
 import sys
 import typing
 import numpy as np
@@ -112,21 +114,19 @@ def main():
     args, parser = parse_args()
     if args.method is None:
         parser.print_help(sys.stderr)
-        sys.exit(1)
+        sys.exit(ExitCode.Ok.value)
 
     # Check if the method is valid
     try:
         method = Method[args.method]
     except KeyError:
-        print(f'{sys.argv[0]}: error: invalid method specified', file=sys.stderr)
-        sys.exit(1)
+        error_exit('invalid method specified', ExitCode.InvalidMethod)
 
     # Check if the mode is valid
     try:
         mode = Mode[args.mode]
     except KeyError:
-        print(f'{sys.argv[0]}: error: invalid mode specified', file=sys.stderr)
-        sys.exit(1)
+        error_exit('invalid mode specified', ExitCode.InvalidMode)
 
     steganography = AudioSteganography(
         method,
@@ -147,8 +147,6 @@ def main():
                 steganography.decode(d0=args.d0, d1=args.d1, l=args.len)
 
     except OutputFileExists as e:
-        print(f'{sys.argv[0]}: error: {e}', file=sys.stderr)
-        sys.exit(1)
+        error_exit(str(e), ExitCode.OutputFileExists)
     except FileNotFoundError as e:
-        print(f'{sys.argv[0]}: error: {e}', file=sys.stderr)
-        sys.exit(1)
+        error_exit(str(e), ExitCode.FileNotFound)
