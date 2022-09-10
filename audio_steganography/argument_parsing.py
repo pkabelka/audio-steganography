@@ -19,7 +19,7 @@ def parse_args():
         '--output',
         metavar='OUTPUT_FILE',
         action='store',
-        help='without -o, -e produces a file with _METHOD appended; -d produces SOURCE.out',
+        help='without -o, -e produces a file with _METHOD appended and -d produces SOURCE.out; -o - outputs bytes to STDOUT only in decode mode',
         default=None)
 
     parent_parser.add_argument(

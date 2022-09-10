@@ -80,14 +80,22 @@ class MethodFacade:
     def write_output(self, output: np.ndarray):
         fname = self.check_filename()
 
+        # -o - works only in decode mode
         if self.mode == Mode.encode:
             scipy.io.wavfile.write(fname, self.source_sr, output)
         else:
-            with open(fname, 'wb') as f:
-                f.write(np.packbits(output).tobytes())
+            bytes = np.packbits(output).tobytes()
+            if self.output_file == '-':
+                print(bytes)
+            else:
+                with open(fname, 'wb') as f:
+                    f.write(bytes)
 
 
     def check_filename(self) -> str:
+        if self.output_file == '-':
+            return self.output_file
+
         name, ext = os.path.splitext(self.source)
         # Filename when decoding
         fname = f'{name}_{self.method.name}.out'
