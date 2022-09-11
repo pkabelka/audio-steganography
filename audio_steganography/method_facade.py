@@ -1,7 +1,7 @@
 from .methods.method_base import MethodBase
 from .methods.method import Method
 from .mode import Mode
-from .exceptions import OutputFileExists
+from .exceptions import OutputFileExists, WavReadError
 import typing
 import numpy as np
 import scipy.io.wavfile
@@ -65,6 +65,8 @@ class MethodFacade:
             self.source_sr, self.source_data = scipy.io.wavfile.read(self.source)
         except FileNotFoundError:
             raise FileNotFoundError('source file not found')
+        except ValueError as e:
+            raise WavReadError(str(e))
 
         self._source_dtype = self.source_data.dtype
         self.source_sr: int = self.source_sr

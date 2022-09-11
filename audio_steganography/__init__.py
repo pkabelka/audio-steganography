@@ -2,7 +2,7 @@ from .argument_parsing import parse_args
 from .methods.method import Method
 from .method_facade import MethodFacade
 from .mode import Mode
-from .exceptions import OutputFileExists
+from .exceptions import OutputFileExists, WavReadError
 from .utils import error_exit
 from .exit_codes import ExitCode
 import sys
@@ -47,5 +47,7 @@ def main():
         error_exit(str(e), ExitCode.OutputFileExists)
     except FileNotFoundError as e:
         error_exit(str(e), ExitCode.FileNotFound)
+    except WavReadError as e:
+        error_exit(str(e), ExitCode.WavReadError)
 
     print(json.dumps(additional_output))

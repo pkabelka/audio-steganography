@@ -6,3 +6,4 @@ class ExitCode(Enum):
     InvalidMode = 2
     OutputFileExists = 3
     FileNotFound = 4
+    WavReadError = 5
