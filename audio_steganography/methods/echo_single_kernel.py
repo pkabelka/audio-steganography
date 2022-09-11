@@ -23,7 +23,6 @@ class Echo_single_kernel(MethodBase):
         delay_pairs = []
         end = False
         x = np.empty(0)
-        x_f = np.empty(0)
         for d0 in range(250, 350):
             h0 = np.append(np.zeros(d0), [1])
             for d1 in range(d0, d0+100):
@@ -38,12 +37,9 @@ class Echo_single_kernel(MethodBase):
 
                 if np.abs(x).max() == 0:
                     continue
-                x_f = x - np.mean(x)
-                x_f = x_f / np.abs(x_f).max()
-                # scipy.io.wavfile.write('echo.wav', sr, x_f)
 
                 # Decode to verify delay pair
-                test_decoder = Echo_single_kernel(x_f)
+                test_decoder = Echo_single_kernel(x)
                 if np.all(test_decoder.decode(d0, d1, secret_len)[0] == self._secret_data):
                     delay_pairs.append((d0, d1))
                     end = True
@@ -52,7 +48,7 @@ class Echo_single_kernel(MethodBase):
             if end:
                 break
 
-        return x_f, {
+        return x, {
             'd0': delay_pairs[0][0],
             'd1': delay_pairs[0][1],
             'l': secret_len,

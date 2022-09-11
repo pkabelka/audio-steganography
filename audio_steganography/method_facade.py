@@ -65,8 +65,10 @@ class MethodFacade:
             self.source_sr, self.source_data = scipy.io.wavfile.read(self.source)
         except FileNotFoundError:
             raise FileNotFoundError('source file not found')
+
         self.source_sr: int = self.source_sr
-        self.source_data: np.ndarray[typing.Any, np.dtype[np.int16]] = self.source_data
+        # normalize to float64 [-1; 1]
+        self.source_data: np.ndarray[typing.Any, np.dtype[np.float64]] = self.source_data / 2**15
 
         if self.mode == Mode.encode:
             if self.text_to_encode is not None:
@@ -84,6 +86,11 @@ class MethodFacade:
 
         # -o - works only in decode mode
         if self.mode == Mode.encode:
+            # center and normalize to int16 [-32768; 32767]
+            output = output - np.mean(output)
+            output = output / np.abs(output).max()
+            output = output * 2**15
+            output = output.astype(np.int16)
             scipy.io.wavfile.write(fname, self.source_sr, output)
         else:
             bytes = np.packbits(output).tobytes()
