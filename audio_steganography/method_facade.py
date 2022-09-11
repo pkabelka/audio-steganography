@@ -68,8 +68,14 @@ class MethodFacade:
         except ValueError as e:
             raise WavReadError(str(e))
 
+        # TODO: option to use both tracks
+        # TODO: output same number of tracks as input
+        if self.source_data.ndim > 1:
+            self.source_data = self.source_data[:, 0]
+
         self._source_dtype = self.source_data.dtype
         self.source_sr: int = self.source_sr
+
         # normalize to float64 [-1; 1]
         self.source_data: np.ndarray[
             typing.Any,
