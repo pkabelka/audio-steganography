@@ -5,7 +5,7 @@ import numpy as np
 class MethodBase(abc.ABC):
     def __init__(self, source_data: np.ndarray):
         self._source_data = source_data
-        self._secret_data = np.empty(0)
+        self._secret_data = np.empty(0, dtype=np.uint8)
 
     @abc.abstractmethod
     def encode(self) -> typing.Tuple[np.ndarray, typing.Dict[str, typing.Any]]:
@@ -23,5 +23,5 @@ class MethodBase(abc.ABC):
     def get_decode_args() -> typing.List[typing.Tuple[typing.List, typing.Dict]]:
         return []
 
-    def set_secret_data(self, secret_data: np.ndarray):
+    def set_secret_data(self, secret_data: np.ndarray[typing.Any, np.dtype[np.uint8]]):
         self._secret_data = secret_data

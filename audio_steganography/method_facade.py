@@ -24,7 +24,7 @@ class MethodFacade:
         self.text_to_encode = None
         self.file_to_encode = None
 
-        self.data_to_encode = np.empty(0)
+        self.data_to_encode = np.empty(0, dtype=np.uint8)
 
 
     def encode(self, *args, **kwargs) -> typing.Dict[str, typing.Any]:
@@ -82,14 +82,14 @@ class MethodFacade:
             np.dtype[np.float64]] = self.source_data / np.abs(self.source_data).max()
 
         if self.mode == Mode.encode:
+
             if self.text_to_encode is not None:
                 self.data_to_encode = np.unpackbits(
-                    np.frombuffer(self.text_to_encode.encode('utf8'), np.uint8)
-                )
+                    np.frombuffer(self.text_to_encode.encode('utf8'), np.uint8))
+
             elif self.file_to_encode is not None:
                 self.data_to_encode = np.unpackbits(
-                    np.fromfile(self.file_to_encode, np.uint8)
-                )
+                    np.fromfile(self.file_to_encode, np.uint8))
 
 
     def write_output(self, output: np.ndarray):
