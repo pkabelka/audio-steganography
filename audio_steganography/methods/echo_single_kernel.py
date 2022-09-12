@@ -1,5 +1,5 @@
 from .method_base import MethodBase
-import typing
+from typing import Tuple, Dict, List, Any
 import numpy as np
 import scipy.signal
 
@@ -7,7 +7,7 @@ def seg_split(sig, nseg):
     return np.array_split(sig, nseg)[:-1] + [sig[-int(round(len(sig)/nseg)):]]
 
 class Echo_single_kernel(MethodBase):
-    def encode(self) -> typing.Tuple[np.ndarray, typing.Dict[str, typing.Any]]:
+    def encode(self) -> Tuple[np.ndarray, Dict[str, Any]]:
         secret_len = len(self._secret_data)
         mixer = seg_split(np.ones(len(self._source_data)), secret_len+1)
         # print('Mixer len:', len(mixer))
@@ -55,7 +55,7 @@ class Echo_single_kernel(MethodBase):
         }
 
 
-    def decode(self, d0: int, d1: int, l: int) -> typing.Tuple[np.ndarray, typing.Dict[str, typing.Any]]:
+    def decode(self, d0: int, d1: int, l: int) -> Tuple[np.ndarray, Dict[str, Any]]:
         split = seg_split(self._source_data, l+1)[:-1]
         decoded = np.zeros(len(split), dtype=int)
         i = 0
@@ -70,7 +70,7 @@ class Echo_single_kernel(MethodBase):
         return decoded, {}
 
     @staticmethod
-    def get_decode_args() -> typing.List[typing.Tuple[typing.List, typing.Dict]]:
+    def get_decode_args() -> List[Tuple[List, Dict]]:
         args = []
         args.append((['-d0'],
                      {
