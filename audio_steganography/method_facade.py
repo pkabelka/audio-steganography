@@ -79,7 +79,8 @@ class MethodFacade:
         # normalize to float64 [-1; 1]
         self.source_data: np.ndarray[
             typing.Any,
-            np.dtype[np.float64]] = self.source_data / np.abs(self.source_data).max()
+            np.dtype[np.float64]] = (self.source_data /
+                np.abs(self.source_data).max()).astype(np.float64)
 
         if self.mode == Mode.encode:
 
