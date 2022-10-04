@@ -14,6 +14,9 @@ class MethodBase(abc.ABC):
     """All method classes must inherit this class and implement the encode and
     decode method.
 
+    For encoding, the called must use `set_secret_data` method to set the data
+    to encode into the source.
+
     Custom arguments for encoding and decoding can be specified by overriding
     `get_encode_args` and `get_decode_args` methods.
     """
