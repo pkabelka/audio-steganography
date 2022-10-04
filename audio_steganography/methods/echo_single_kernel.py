@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
 
+# File: echo_single_kernel.py
+# Author: Petr Kabelka <xkabel09 at stud.fit.vutbr.cz>
+
+"""This module contains the Echo_single_kernel class
+"""
+
 from .method_base import MethodBase
 from typing import Tuple, Dict, List, Any
 import numpy as np

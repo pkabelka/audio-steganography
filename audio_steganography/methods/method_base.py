@@ -1,10 +1,22 @@
 # -*- coding: utf-8 -*-
 
+# File: method_base.py
+# Author: Petr Kabelka <xkabel09 at stud.fit.vutbr.cz>
+
+"""This module contains the abstract class MethodBase which all methods inherit
+"""
+
 import typing
 import abc
 import numpy as np
 
 class MethodBase(abc.ABC):
+    """All method classes must inherit this class and implement the encode and
+    decode method.
+
+    Custom arguments for encoding and decoding can be specified by overriding
+    `get_encode_args` and `get_decode_args` methods.
+    """
     def __init__(self, source_data: np.ndarray):
         self._source_data = source_data
         self._secret_data = np.empty(0, dtype=np.uint8)

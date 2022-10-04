@@ -1,5 +1,12 @@
 # -*- coding: utf-8 -*-
 
+# File: __init__.py
+# Author: Petr Kabelka <xkabel09 at stud.fit.vutbr.cz>
+
+"""This module contains the main() function, parses arguments and uses
+MethodsFacade class to run encoding and decoding.
+"""
+
 from .argument_parsing import parse_args
 from .methods.method import Method
 from .method_facade import MethodFacade

@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
 
+# File: exit_codes.py
+# Author: Petr Kabelka <xkabel09 at stud.fit.vutbr.cz>
+
+"""This module contains all program's exit codes.
+"""
+
 from enum import Enum
 
 class ExitCode(Enum):

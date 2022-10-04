@@ -1,5 +1,12 @@
 # -*- coding: utf-8 -*-
 
+# File: method_facade.py
+# Author: Petr Kabelka <xkabel09 at stud.fit.vutbr.cz>
+
+"""This module contains the MethodFacade which manages input, output, encoding
+and decoding of files.
+"""
+
 from .methods.method_base import MethodBase
 from .methods.method import Method
 from .mode import Mode

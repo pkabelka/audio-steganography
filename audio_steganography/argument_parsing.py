@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
 
+# File: argument_parsing.py
+# Author: Petr Kabelka <xkabel09 at stud.fit.vutbr.cz>
+
+"""This module contains the parse_args function.
+"""
+
 from .methods.method import Method
 from .mode import Mode
 import argparse
