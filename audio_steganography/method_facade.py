@@ -17,12 +17,14 @@ import scipy.io.wavfile
 import os.path
 
 class MethodFacade:
-    def __init__(self,
-                 method: Method,
-                 mode: Mode,
-                 source: str,
-                 output_file: typing.Optional[str] = None,
-                 overwrite: bool = False):
+    def __init__(
+            self,
+            method: Method,
+            mode: Mode,
+            source: str,
+            output_file: typing.Optional[str] = None,
+            overwrite: bool = False
+        ):
 
         self.method = method
         self.mode = mode
