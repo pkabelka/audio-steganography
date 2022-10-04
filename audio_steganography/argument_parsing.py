@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from .methods.method import Method
 from .mode import Mode
 import argparse

@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from .argument_parsing import parse_args
 from .methods.method import Method
 from .method_facade import MethodFacade

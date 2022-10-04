@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from .methods.method_base import MethodBase
 from .methods.method import Method
 from .mode import Mode

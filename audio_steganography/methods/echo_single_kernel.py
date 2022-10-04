@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from .method_base import MethodBase
 from typing import Tuple, Dict, List, Any
 import numpy as np

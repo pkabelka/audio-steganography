@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from enum import Enum
 from .echo_single_kernel import Echo_single_kernel
 

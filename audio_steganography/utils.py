@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from .exit_codes import ExitCode
 import sys
 
