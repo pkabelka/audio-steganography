@@ -17,6 +17,10 @@ import scipy.io.wavfile
 import os.path
 
 class MethodFacade:
+    """This class prepares the input data, encodes/decodes them with the
+    specified Method and writes the output to the specified file or prints it
+    to STDOUT.
+    """
     def __init__(
             self,
             method: Method,
@@ -39,6 +43,9 @@ class MethodFacade:
 
 
     def encode(self, *args, **kwargs) -> typing.Dict[str, typing.Any]:
+        """This function encodes the secret data into the source using the
+        specified Method.
+        """
         self.check_filename()
 
         self.prepare_data()
@@ -52,6 +59,9 @@ class MethodFacade:
 
 
     def decode(self, *args, **kwargs) -> typing.Dict[str, typing.Any]:
+        """This function decodes the secret data from the source using the
+        specified Method.
+        """
         self.check_filename()
 
         self.prepare_data()
@@ -64,14 +74,34 @@ class MethodFacade:
 
 
     def set_text_to_encode(self, text_to_encode: typing.Optional[str]):
+        """Setter for the text to be encoded.
+
+        Parameters
+        ----------
+        text_to_encode : str | None
+            String to encode. If None then `set_file_to_encode` should be
+            used.
+        """
         self.text_to_encode = text_to_encode
 
 
     def set_file_to_encode(self, file_to_encode: typing.Optional[str]):
+        """Setter for the file to be encoded.
+
+        Parameters
+        ----------
+        file_to_encode : str | None
+            Path to the file to encode. If None then `set_text_to_encode`
+            should be used.
+        """
         self.file_to_encode = file_to_encode
 
 
     def prepare_data(self):
+        """Reads the source file into self.source_data and self.source_sr.
+        The source data is normalized to float64 [-1, 1]. The secret data is
+        read and converted to uint8 bit array.
+        """
         try:
             self.source_sr, self.source_data = scipy.io.wavfile.read(self.source)
         except FileNotFoundError:
@@ -105,6 +135,13 @@ class MethodFacade:
 
 
     def write_output(self, output: np.ndarray):
+        """Writes the output NumPy array to a file or STDOUT.
+
+        Parameters
+        ----------
+        output : numpy.ndarray
+            Array containing the output of encode/decode methods.
+        """
         fname = self.check_filename()
 
         if self.mode == Mode.encode:
@@ -128,6 +165,12 @@ class MethodFacade:
 
 
     def check_filename(self) -> str:
+        """Creates the output file name according to the used method or uses
+        the user specified file name and checks if the file already exists.
+
+        If the file already exists and `self.overwrite` is not used, raises
+        `OutputFileExists` exception.
+        """
         if self.output_file == '-':
             return self.output_file
 
