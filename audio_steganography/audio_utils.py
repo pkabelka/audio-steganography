@@ -21,8 +21,8 @@ def seg_split(input: np.ndarray, n: int) -> List[np.ndarray]:
 
     Returns
     -------
-    out : numpy.ndarray
-        NumPy ndarray with N arrays.
+    out : List
+        A list containing input split into N NumPy arrays.
     """
     return np.array_split(input, n)[:-1] + [input[-int(round(len(input)/n)):]]
 
