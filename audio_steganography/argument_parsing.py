@@ -9,8 +9,25 @@
 from .methods.method import Method
 from .mode import Mode
 import argparse
+from typing import Tuple, Any
 
-def parse_args():
+def parse_args() -> Tuple[Any, argparse.ArgumentParser]:
+    """This function parses the arguments when ran from the command line.
+
+    The argparse package is used for parsing. The common arguments are added to
+    the parser first. Then are added arguments specific to the steganography
+    methods by calling their `get_encode_args` and `get_decode_args` methods.
+
+    Lastly the function parses the arguments and returns the parsed object and
+    the argument parser.
+
+    Returns
+    -------
+    args : Namespace
+        Parsed arguments object.
+    parser : argparse.ArgumentParser
+        The argument parser object.
+    """
 
     # Add common args
     parent_parser = argparse.ArgumentParser(add_help=False)
