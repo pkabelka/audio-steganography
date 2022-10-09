@@ -18,6 +18,16 @@ import sys
 import json
 
 def main():
+    """The main function of the program.
+
+    The function first parses user arguments and checks if they are valid.
+    Then the MethodFacade class is used encode/decode using the specified
+    method. Known exceptions are caught and presented as errors and program
+    exits with an appropriate exit code.
+
+    Any additional output arising from encode/decode functions is printed to
+    STDOUT in JSON format.
+    """
     args, parser = parse_args()
     if args.method is None:
         parser.print_help(sys.stderr)
