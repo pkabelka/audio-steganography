@@ -41,4 +41,13 @@ class MethodBase(abc.ABC):
         return []
 
     def set_secret_data(self, secret_data: np.ndarray[typing.Any, np.dtype[np.uint8]]):
+        """Setter for secret_data array.
+
+        If not used, secret_data will be an empty NumPy array with dtype uint8.
+
+        Parameters
+        ----------
+        secret_data : numpy.ndarray
+            The data to encode into the source.
+        """
         self._secret_data = secret_data
