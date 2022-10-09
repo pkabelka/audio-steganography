@@ -174,6 +174,11 @@ class MethodFacade:
 
         If the file already exists and `self.overwrite` is not used, raises
         `OutputFileExists` exception.
+
+        Returns
+        -------
+        fname : str
+            New file name.
         """
         if self.output_file == '-':
             return self.output_file
