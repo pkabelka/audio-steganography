@@ -137,6 +137,10 @@ class MethodFacade:
     def write_output(self, output: np.ndarray):
         """Writes the output NumPy array to a file or STDOUT.
 
+        If the specified file name is `-` and decode mode is used, prints the
+        output to STDOUT, otherwise in encode mode, writes the output to
+        a file.
+
         Parameters
         ----------
         output : numpy.ndarray
