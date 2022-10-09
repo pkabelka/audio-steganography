@@ -15,7 +15,7 @@ import scipy.signal
 class Echo_single_kernel(MethodBase):
     def encode(self) -> Tuple[np.ndarray, Dict[str, Any]]:
         secret_len = len(self._secret_data)
-        mixer = seg_split(np.ones(len(self._source_data)), secret_len+1)
+        mixer = seg_split(np.ones(len(self._source_data)), secret_len + 1)
         # print('Mixer len:', len(mixer))
         # print('Seg sample len:', len(mixer[0]))
 
@@ -29,17 +29,21 @@ class Echo_single_kernel(MethodBase):
         delay_pairs = []
         end = False
         x = np.empty(0)
-        for d0 in range(250, 350):
-            h0 = np.append(np.zeros(d0), [1])
-            for d1 in range(d0, d0+100):
+        alpha = 0.5
+        decay_rate = 0.85
+        for d0 in range(150, 250):
+            # echo kernel for binary 0
+            k0 = np.append(np.zeros(d0), [1]) * alpha
+            for d1 in range(d0, d0+50):
 
-                h1 = np.append(np.zeros(d1), [1])
+                # echo kernel for binary 1
+                k1 = np.append(np.zeros(d1), [1]) * alpha * decay_rate
 
-                k0 = scipy.signal.fftconvolve(h0, self._source_data)
-                k1 = scipy.signal.fftconvolve(h1, self._source_data)
+                h0 = scipy.signal.fftconvolve(k0, self._source_data)
+                h1 = scipy.signal.fftconvolve(k1, self._source_data)
 
-                sp = np.pad(np.array(self._source_data), (0, len(k1)-len(self._source_data)))
-                x = sp[:len(mixer)]+k1[:len(mixer)] * mixer + sp[:len(mixer)]+k0[:len(mixer)] * (1-mixer)
+                sp = np.pad(np.array(self._source_data), (0, len(h1)-len(self._source_data)))
+                x = sp[:len(mixer)] + h1[:len(mixer)] * mixer + h0[:len(mixer)] * np.abs(1-mixer)
 
                 if np.abs(x).max() == 0:
                     continue
