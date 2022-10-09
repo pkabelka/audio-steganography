@@ -7,12 +7,10 @@
 """
 
 from .method_base import MethodBase
+from ..audio_utils import seg_split
 from typing import Tuple, Dict, List, Any
 import numpy as np
 import scipy.signal
-
-def seg_split(sig, nseg):
-    return np.array_split(sig, nseg)[:-1] + [sig[-int(round(len(sig)/nseg)):]]
 
 class Echo_single_kernel(MethodBase):
     def encode(self) -> Tuple[np.ndarray, Dict[str, Any]]:
