@@ -7,7 +7,7 @@
 """
 
 from .method_base import MethodBase
-from ..audio_utils import seg_split
+from ..audio_utils import seg_split, mixer_sig
 from typing import Tuple, Dict, List, Any
 import numpy as np
 import scipy.signal
@@ -15,16 +15,7 @@ import scipy.signal
 class Echo_single_kernel(MethodBase):
     def encode(self, d0: int = 100, d1: int = 150) -> Tuple[np.ndarray, Dict[str, Any]]:
         secret_len = len(self._secret_data)
-        mixer = seg_split(np.ones(len(self._source_data)), secret_len + 1)
-        # print('Mixer len:', len(mixer))
-        # print('Seg sample len:', len(mixer[0]))
-
-        for i in range(len(self._secret_data)):
-            mixer[i] = mixer[i] * self._secret_data[i]
-
-        mixer = np.hstack(mixer)
-        # print(mixer)
-        # print('Mixer len:', len(mixer))
+        mixer = mixer_sig(self._secret_data, len(self._source_data))
 
         delay_pairs = []
         end = False
