@@ -53,14 +53,25 @@ def main():
         args.overwrite)
 
     additional_output = {}
+    options = {}
     try:
         if mode == Mode.encode:
             steganography.set_text_to_encode(args.text)
             steganography.set_file_to_encode(args.file)
-            additional_output = steganography.encode()
+            if method == Method.echo_single_kernel:
+                options = {
+                    'd0': args.d0,
+                    'd1': args.d1,
+                }
+            additional_output = steganography.encode(**options)
         else:
             if method == Method.echo_single_kernel:
-                additional_output = steganography.decode(d0=args.d0, d1=args.d1, l=args.len)
+                options = {
+                    'd0': args.d0,
+                    'd1': args.d1,
+                    'l': args.len,
+                }
+            additional_output = steganography.decode(**options)
 
     except OutputFileExists as e:
         error_exit(str(e), ExitCode.OutputFileExists)
