@@ -12,6 +12,9 @@ from typing import Tuple, Dict, List, Any, Optional
 import numpy as np
 import scipy.signal
 
+from ..stat_utils import ber_percent
+import scipy.optimize
+
 class Echo_single_kernel(MethodBase):
     def _encode(
             self,
@@ -48,11 +51,14 @@ class Echo_single_kernel(MethodBase):
             d1: Optional[int] = None
         ) -> Tuple[np.ndarray, Dict[str, Any]]:
 
+        if d0 is None:
+            d0 = 150
+
         secret_len = len(self._secret_data)
         delay_pairs = []
         end = False
         x = np.empty(0)
-        for d0 in range(150, 250):
+        for d0 in range(d0, d0+100):
             for d1 in range(d0, d0+50):
 
                 x, _ = self._encode(d0, d1)
@@ -73,6 +79,41 @@ class Echo_single_kernel(MethodBase):
         return x, {
             'd0': delay_pairs[0][0],
             'd1': delay_pairs[0][1],
+            'l': secret_len,
+        }
+
+    def _optimize_encode(self, x):
+        encoded, params = self._encode(int(x[0]), int(x[1]))
+        test_decoder = Echo_single_kernel(encoded)
+        ber = ber_percent(test_decoder.decode(**params)[0], self._secret_data)
+        return ber
+
+    def _encode_basinhopping(
+            self,
+            d0: Optional[int] = None,
+            d1: Optional[int] = None
+        ) -> Tuple[np.ndarray, Dict[str, Any]]:
+
+        def bounds(**kwargs):
+            x = kwargs['x_new']
+            return x[0] < x[1]
+
+        res = scipy.optimize.basinhopping(
+            func=self._optimize_encode,
+            x0=[d0, d1],
+            niter=100,
+            T=3.0,
+            stepsize=8.0,
+            accept_test=bounds,
+            callback=lambda x, f, accept: True if f == 0.0 else None,
+        )
+
+        secret_len = len(self._secret_data)
+
+        x, _ = self._encode(int(res.x[0]), int(res.x[1]))
+        return x, {
+            'd0': int(res.x[0]),
+            'd1': int(res.x[1]),
             'l': secret_len,
         }
 
