@@ -58,6 +58,11 @@ def main():
         if mode == Mode.encode:
             steganography.set_text_to_encode(args.text)
             steganography.set_file_to_encode(args.file)
+            if method == Method.echo_single_kernel:
+                options = {
+                    'd0': args.d0,
+                    'd1': args.d1,
+                }
             additional_output = steganography.encode(**options)
         else:
             if method == Method.echo_single_kernel:

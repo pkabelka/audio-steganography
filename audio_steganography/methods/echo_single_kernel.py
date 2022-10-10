@@ -8,33 +8,54 @@
 
 from .method_base import MethodBase
 from ..audio_utils import seg_split, mixer_sig
-from typing import Tuple, Dict, List, Any
+from typing import Tuple, Dict, List, Any, Optional
 import numpy as np
 import scipy.signal
 
 class Echo_single_kernel(MethodBase):
-    def encode(self, d0: int = 100, d1: int = 150) -> Tuple[np.ndarray, Dict[str, Any]]:
+    def _encode(
+            self,
+            d0: int,
+            d1: int,
+        ) -> Tuple[np.ndarray, Dict[str, Any]]:
+
         secret_len = len(self._secret_data)
         mixer = mixer_sig(self._secret_data, len(self._source_data))
 
+        alpha = 0.5
+        decay_rate = 0.85
+
+        # echo kernel for binary 0
+        k0 = np.append(np.zeros(d0), [1]) * alpha
+        # echo kernel for binary 1
+        k1 = np.append(np.zeros(d1), [1]) * alpha * decay_rate
+
+        h0 = scipy.signal.fftconvolve(k0, self._source_data)
+        h1 = scipy.signal.fftconvolve(k1, self._source_data)
+
+        sp = np.pad(np.array(self._source_data), (0, len(h1)-len(self._source_data)))
+        x = sp[:len(mixer)] + h1[:len(mixer)] * mixer + h0[:len(mixer)] * np.abs(1-mixer)
+
+        return x, {
+            'd0': d0,
+            'd1': d1,
+            'l': secret_len,
+        }
+
+    def encode(
+            self,
+            d0: Optional[int] = None,
+            d1: Optional[int] = None
+        ) -> Tuple[np.ndarray, Dict[str, Any]]:
+
+        secret_len = len(self._secret_data)
         delay_pairs = []
         end = False
         x = np.empty(0)
-        alpha = 0.5
-        decay_rate = 0.85
         for d0 in range(150, 250):
-            # echo kernel for binary 0
-            k0 = np.append(np.zeros(d0), [1]) * alpha
             for d1 in range(d0, d0+50):
 
-                # echo kernel for binary 1
-                k1 = np.append(np.zeros(d1), [1]) * alpha * decay_rate
-
-                h0 = scipy.signal.fftconvolve(k0, self._source_data)
-                h1 = scipy.signal.fftconvolve(k1, self._source_data)
-
-                sp = np.pad(np.array(self._source_data), (0, len(h1)-len(self._source_data)))
-                x = sp[:len(mixer)] + h1[:len(mixer)] * mixer + h0[:len(mixer)] * np.abs(1-mixer)
+                x, _ = self._encode(d0, d1)
 
                 if np.abs(x).max() == 0:
                     continue
@@ -69,6 +90,23 @@ class Echo_single_kernel(MethodBase):
             i += 1
 
         return decoded, {}
+
+    @staticmethod
+    def get_encode_args() -> List[Tuple[List, Dict]]:
+        args = []
+        args.append((['-d0'],
+                     {
+                         'action': 'store',
+                         'type': int,
+                         'default': None,
+                     }))
+        args.append((['-d1'],
+                     {
+                         'action': 'store',
+                         'type': int,
+                         'default': None,
+                     }))
+        return args
 
     @staticmethod
     def get_decode_args() -> List[Tuple[List, Dict]]:
