@@ -6,8 +6,8 @@
 """This module contains the abstract class MethodBase which all methods inherit
 """
 
-import typing
 import abc
+from typing import Tuple, Dict, List, Any
 import numpy as np
 
 class MethodBase(abc.ABC):
@@ -25,22 +25,22 @@ class MethodBase(abc.ABC):
         self._secret_data = np.empty(0, dtype=np.uint8)
 
     @abc.abstractmethod
-    def encode(self) -> typing.Tuple[np.ndarray, typing.Dict[str, typing.Any]]:
+    def encode(self) -> Tuple[np.ndarray, Dict[str, Any]]:
         raise NotImplementedError('Inherited steganography method must implement this function')
 
     @abc.abstractmethod
-    def decode(self) -> typing.Tuple[np.ndarray, typing.Dict[str, typing.Any]]:
+    def decode(self) -> Tuple[np.ndarray, Dict[str, Any]]:
         raise NotImplementedError('Inherited steganography method must implement this function')
 
     @staticmethod
-    def get_encode_args() -> typing.List[typing.Tuple[typing.List, typing.Dict]]:
+    def get_encode_args() -> List[Tuple[List, Dict]]:
         return []
 
     @staticmethod
-    def get_decode_args() -> typing.List[typing.Tuple[typing.List, typing.Dict]]:
+    def get_decode_args() -> List[Tuple[List, Dict]]:
         return []
 
-    def set_secret_data(self, secret_data: np.ndarray[typing.Any, np.dtype[np.uint8]]):
+    def set_secret_data(self, secret_data: np.ndarray[Any, np.dtype[np.uint8]]):
         """Setter for secret_data array.
 
         If not used, secret_data will be an empty NumPy array with dtype uint8.
