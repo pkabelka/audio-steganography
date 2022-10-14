@@ -16,6 +16,11 @@ from ..stat_utils import ber_percent
 import scipy.optimize
 
 class Echo_single_kernel(MethodBase):
+    def __init__(self, source_data: np.ndarray):
+        super().__init__(source_data)
+        self._alpha = 0.5
+        self._decay_rate = 0.85
+
     def _encode(
             self,
             d0: int,
@@ -25,13 +30,10 @@ class Echo_single_kernel(MethodBase):
         secret_len = len(self._secret_data)
         mixer = mixer_sig(self._secret_data, len(self._source_data))
 
-        alpha = 0.5
-        decay_rate = 0.85
-
         # echo kernel for binary 0
-        k0 = np.append(np.zeros(d0), [1]) * alpha
+        k0 = np.append(np.zeros(d0), [1]) * self._alpha
         # echo kernel for binary 1
-        k1 = np.append(np.zeros(d1), [1]) * alpha * decay_rate
+        k1 = np.append(np.zeros(d1), [1]) * self._alpha * self._decay_rate
 
         h0 = scipy.signal.fftconvolve(k0, self._source_data)
         h1 = scipy.signal.fftconvolve(k1, self._source_data)
@@ -129,6 +131,12 @@ class Echo_single_kernel(MethodBase):
             'd1': int(res.x[1]),
             'l': secret_len,
         }
+
+    def set_alpha(self, alpha):
+        self._alpha = alpha
+
+    def set_decay_rate(self, decay_rate):
+        self._decay_rate = decay_rate
 
 
     def decode(self, d0: int, d1: int, l: int) -> Tuple[np.ndarray, Dict[str, Any]]:
