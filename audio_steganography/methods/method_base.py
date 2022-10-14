@@ -10,6 +10,8 @@ import abc
 from typing import Tuple, Dict, List, Any
 import numpy as np
 
+EncodeDecodeReturn = Tuple[np.ndarray, Dict[str, Any]]
+
 class MethodBase(abc.ABC):
     """All method classes must inherit this class and implement the encode and
     decode method.

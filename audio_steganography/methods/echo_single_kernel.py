@@ -6,7 +6,7 @@
 """This module contains the Echo_single_kernel class
 """
 
-from .method_base import MethodBase
+from .method_base import MethodBase, EncodeDecodeReturn
 from ..audio_utils import seg_split, mixer_sig
 from typing import Tuple, Dict, List, Any, Optional
 import numpy as np
@@ -25,7 +25,7 @@ class Echo_single_kernel(MethodBase):
             self,
             d0: int,
             d1: int,
-        ) -> Tuple[np.ndarray, Dict[str, Any]]:
+        ) -> EncodeDecodeReturn:
 
         secret_len = len(self._secret_data)
         mixer = mixer_sig(self._secret_data, len(self._source_data))
@@ -52,7 +52,7 @@ class Echo_single_kernel(MethodBase):
             d0: Optional[int] = None,
             d1: Optional[int] = None,
             delay_search = '',
-        ) -> Tuple[np.ndarray, Dict[str, Any]]:
+        ) -> EncodeDecodeReturn:
 
         if d0 is None:
             d0 = 150
@@ -71,7 +71,7 @@ class Echo_single_kernel(MethodBase):
             self,
             d0: int,
             d1: int,
-        ) -> Tuple[np.ndarray, Dict[str, Any]]:
+        ) -> EncodeDecodeReturn:
 
         encoded = np.empty(0)
         for d0 in range(d0, d0+100):
@@ -107,7 +107,7 @@ class Echo_single_kernel(MethodBase):
             self,
             d0: int,
             d1: int,
-        ) -> Tuple[np.ndarray, Dict[str, Any]]:
+        ) -> EncodeDecodeReturn:
 
         def bounds(**kwargs):
             x = kwargs['x_new']
@@ -139,7 +139,7 @@ class Echo_single_kernel(MethodBase):
         self._decay_rate = decay_rate
 
 
-    def decode(self, d0: int, d1: int, l: int) -> Tuple[np.ndarray, Dict[str, Any]]:
+    def decode(self, d0: int, d1: int, l: int) -> EncodeDecodeReturn:
         split = seg_split(self._source_data, l+1)[:-1]
         decoded = np.zeros(len(split), dtype=int)
         i = 0
