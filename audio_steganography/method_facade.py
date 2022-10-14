@@ -11,6 +11,7 @@ from .methods.method_base import MethodBase
 from .methods.method import Method
 from .mode import Mode
 from .exceptions import OutputFileExists, WavReadError
+from .audio_utils import to_dtype
 import typing
 import numpy as np
 import scipy.io.wavfile
@@ -154,9 +155,8 @@ class MethodFacade:
             output = output / np.abs(output).max()
 
             if self._source_dtype in [np.uint8, np.int16, np.int32]:
-                output = output * np.iinfo(self._source_dtype).max
+                output = to_dtype(output, self._source_dtype)
 
-            output = output.astype(self._source_dtype)
             scipy.io.wavfile.write(fname, self.source_sr, output)
         else:
             bytes = np.packbits(output).tobytes()

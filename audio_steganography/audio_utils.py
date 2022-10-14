@@ -49,3 +49,43 @@ def mixer_sig(secret_data: np.ndarray[Any, np.dtype[np.uint8]], signal_length: i
         mixer[i] = mixer[i] * secret_data[i]
 
     return np.hstack(mixer)
+
+def to_float64(input: np.ndarray, dtype: np.dtype) -> np.ndarray:
+    """Converts values in input array to float64 values.
+
+    Parameters
+    ----------
+    input : numpy.ndarray
+        Input array to convert to float64 values.
+    dtype : numpy.dtype
+        Input array values dtype.
+
+    Returns
+    -------
+    out : numpy.ndarray
+        Array with values converted to float64 dtype.
+    """
+    input = np.asanyarray(input)
+    out = input / np.iinfo(dtype).max
+    out = out.astype(np.float64)
+    return out
+
+def to_dtype(input: np.ndarray, dtype: np.dtype) -> np.ndarray:
+    """Converts values in input array to specified dtype values.
+
+    Parameters
+    ----------
+    input : numpy.ndarray
+        Input array to convert.
+    dtype : numpy.dtype
+        Output array values dtype.
+
+    Returns
+    -------
+    out : numpy.ndarray
+        Array with values converted to specified dtype.
+    """
+    input = np.asanyarray(input)
+    out = input * np.iinfo(dtype).max
+    out = out.astype(dtype)
+    return out
