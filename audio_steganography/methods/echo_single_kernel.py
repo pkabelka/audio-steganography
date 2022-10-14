@@ -48,38 +48,51 @@ class Echo_single_kernel(MethodBase):
     def encode(
             self,
             d0: Optional[int] = None,
-            d1: Optional[int] = None
+            d1: Optional[int] = None,
+            delay_search = '',
         ) -> Tuple[np.ndarray, Dict[str, Any]]:
 
         if d0 is None:
             d0 = 150
+        if d1 is None:
+            d1 = d0 + 50
 
-        secret_len = len(self._secret_data)
-        delay_pairs = []
-        end = False
-        x = np.empty(0)
+        if delay_search == 'bruteforce':
+            return self._encode_bruteforce(d0, d1)
+
+        if delay_search == 'basinhopping':
+            return self._encode_basinhopping(d0, d1)
+
+        return self._encode(d0, d1)
+
+    def _encode_bruteforce(
+            self,
+            d0: int,
+            d1: int,
+        ) -> Tuple[np.ndarray, Dict[str, Any]]:
+
+        encoded = np.empty(0)
         for d0 in range(d0, d0+100):
             for d1 in range(d0, d0+50):
 
-                x, _ = self._encode(d0, d1)
+                encoded, params = self._encode(d0, d1)
 
-                if np.abs(x).max() == 0:
+                if np.abs(encoded).max() == 0:
                     continue
 
                 # Decode to verify delay pair
-                test_decoder = Echo_single_kernel(x)
-                if np.all(test_decoder.decode(d0, d1, secret_len)[0] == self._secret_data):
-                    delay_pairs.append((d0, d1))
-                    end = True
-                    break
+                test_decoder = Echo_single_kernel(encoded)
+                if np.all(test_decoder.decode(d0, d1, params['l'])[0] == self._secret_data):
+                    return encoded, {
+                        'd0': d0,
+                        'd1': d1,
+                        'l': params['l'],
+                    }
 
-            if end:
-                break
-
-        return x, {
-            'd0': delay_pairs[0][0],
-            'd1': delay_pairs[0][1],
-            'l': secret_len,
+        return encoded, {
+            'd0': -1,
+            'd1': -1,
+            'l': -1,
         }
 
     def _optimize_encode(self, x):
@@ -90,8 +103,8 @@ class Echo_single_kernel(MethodBase):
 
     def _encode_basinhopping(
             self,
-            d0: Optional[int] = None,
-            d1: Optional[int] = None
+            d0: int,
+            d1: int,
         ) -> Tuple[np.ndarray, Dict[str, Any]]:
 
         def bounds(**kwargs):
@@ -146,6 +159,13 @@ class Echo_single_kernel(MethodBase):
                          'action': 'store',
                          'type': int,
                          'default': None,
+                     }))
+        args.append((['--delay_search'],
+                     {
+                         'action': 'store',
+                         'type': str,
+                         'default': '',
+                         'choices': ['bruteforce', 'basinhopping'],
                      }))
         return args
 

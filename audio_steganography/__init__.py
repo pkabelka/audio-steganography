@@ -62,6 +62,7 @@ def main():
                 options = {
                     'd0': args.d0,
                     'd1': args.d1,
+                    'delay_search': args.delay_search,
                 }
             additional_output = steganography.encode(**options)
         else:
