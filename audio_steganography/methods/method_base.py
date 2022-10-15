@@ -15,17 +15,19 @@ EncodeDecodeArgsReturn = List[Tuple[List, Dict]]
 
 class MethodBase(abc.ABC):
     """All method classes must inherit this class and implement the encode and
-    decode method.
-
-    For encoding, the called must use `set_secret_data` method to set the data
-    to encode into the source.
+    decode method. For correct function in CLI mode, the method needs to be
+    added in the `Method` enum.
 
     Custom arguments for encoding and decoding can be specified by overriding
     `get_encode_args` and `get_decode_args` methods.
     """
-    def __init__(self, source_data: np.ndarray):
+    def __init__(
+            self,
+            source_data: np.ndarray,
+            secret_data: np.ndarray[Any, np.dtype[np.uint8]] = np.empty(0, dtype=np.uint8)
+        ):
         self._source_data = source_data
-        self._secret_data = np.empty(0, dtype=np.uint8)
+        self._secret_data = secret_data
 
     @abc.abstractmethod
     def encode(self) -> EncodeDecodeReturn:
@@ -42,15 +44,3 @@ class MethodBase(abc.ABC):
     @staticmethod
     def get_decode_args() -> EncodeDecodeArgsReturn:
         return []
-
-    def set_secret_data(self, secret_data: np.ndarray[Any, np.dtype[np.uint8]]):
-        """Setter for secret_data array.
-
-        If not used, secret_data will be an empty NumPy array with dtype uint8.
-
-        Parameters
-        ----------
-        secret_data : numpy.ndarray
-            The data to encode into the source.
-        """
-        self._secret_data = secret_data

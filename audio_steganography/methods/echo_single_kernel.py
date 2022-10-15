@@ -8,7 +8,7 @@
 
 from .method_base import MethodBase, EncodeDecodeReturn, EncodeDecodeArgsReturn
 from ..audio_utils import seg_split, mixer_sig
-from typing import Optional
+from typing import Any, Optional
 import numpy as np
 import scipy.signal
 
@@ -16,8 +16,12 @@ from ..stat_utils import ber_percent
 import scipy.optimize
 
 class Echo_single_kernel(MethodBase):
-    def __init__(self, source_data: np.ndarray):
-        super().__init__(source_data)
+    def __init__(
+            self,
+            source_data: np.ndarray,
+            secret_data: np.ndarray[Any, np.dtype[np.uint8]] = np.empty(0, dtype=np.uint8)
+        ):
+        super().__init__(source_data, secret_data)
         self._alpha = 0.5
         self._decay_rate = 0.85
 

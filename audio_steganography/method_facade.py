@@ -51,8 +51,7 @@ class MethodFacade:
 
         self.prepare_data()
 
-        method: MethodBase = self.method.value(self.source_data)
-        method.set_secret_data(self.data_to_encode)
+        method: MethodBase = self.method.value(self.source_data, self.data_to_encode)
         output, additional_output = method.encode(*args, **kwargs)
 
         self.write_output(output)
