@@ -11,6 +11,7 @@ from typing import Tuple, Dict, List, Any
 import numpy as np
 
 EncodeDecodeReturn = Tuple[np.ndarray, Dict[str, Any]]
+EncodeDecodeArgsReturn = List[Tuple[List, Dict]]
 
 class MethodBase(abc.ABC):
     """All method classes must inherit this class and implement the encode and
@@ -27,19 +28,19 @@ class MethodBase(abc.ABC):
         self._secret_data = np.empty(0, dtype=np.uint8)
 
     @abc.abstractmethod
-    def encode(self) -> Tuple[np.ndarray, Dict[str, Any]]:
+    def encode(self) -> EncodeDecodeReturn:
         raise NotImplementedError('Inherited steganography method must implement this function')
 
     @abc.abstractmethod
-    def decode(self) -> Tuple[np.ndarray, Dict[str, Any]]:
+    def decode(self) -> EncodeDecodeReturn:
         raise NotImplementedError('Inherited steganography method must implement this function')
 
     @staticmethod
-    def get_encode_args() -> List[Tuple[List, Dict]]:
+    def get_encode_args() -> EncodeDecodeArgsReturn:
         return []
 
     @staticmethod
-    def get_decode_args() -> List[Tuple[List, Dict]]:
+    def get_decode_args() -> EncodeDecodeArgsReturn:
         return []
 
     def set_secret_data(self, secret_data: np.ndarray[Any, np.dtype[np.uint8]]):

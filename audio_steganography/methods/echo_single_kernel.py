@@ -6,9 +6,9 @@
 """This module contains the Echo_single_kernel class
 """
 
-from .method_base import MethodBase, EncodeDecodeReturn
+from .method_base import MethodBase, EncodeDecodeReturn, EncodeDecodeArgsReturn
 from ..audio_utils import seg_split, mixer_sig
-from typing import Tuple, Dict, List, Any, Optional
+from typing import Optional
 import numpy as np
 import scipy.signal
 
@@ -154,7 +154,7 @@ class Echo_single_kernel(MethodBase):
         return decoded, {}
 
     @staticmethod
-    def get_encode_args() -> List[Tuple[List, Dict]]:
+    def get_encode_args() -> EncodeDecodeArgsReturn:
         args = []
         args.append((['-d0'],
                      {
@@ -178,7 +178,7 @@ class Echo_single_kernel(MethodBase):
         return args
 
     @staticmethod
-    def get_decode_args() -> List[Tuple[List, Dict]]:
+    def get_decode_args() -> EncodeDecodeArgsReturn:
         args = []
         args.append((['-d0'],
                      {
