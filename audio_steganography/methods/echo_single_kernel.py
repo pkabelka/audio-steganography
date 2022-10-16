@@ -16,6 +16,24 @@ from ..stat_utils import ber_percent
 import scipy.optimize
 
 class Echo_single_kernel(MethodBase):
+    """This is an implementation of echo hiding method using a kernel for each
+    of the hidden bits. So two kernels in total for binary 0 and 1.
+
+    Examples
+    --------
+    Encode "42" to source array.
+
+    >>> import numpy as np
+    >>> secret = np.array([0,0,1,1,0,1,0,0,0,0,1,1,0,0,1,0], dtype=np.uint8)
+    >>> source = np.random.rand(len(secret) * 8192, 1)
+    >>> echo_method = Echo_single_kernel(source, secret)
+    >>> encoded = echo_method.encode(250, 350)
+
+    Decode
+    >>> echo_method = Echo_single_kernel(encoded)
+    >>> echo_method.decode(250, 350)
+    """
+
     def __init__(
             self,
             source_data: np.ndarray,
@@ -57,6 +75,22 @@ class Echo_single_kernel(MethodBase):
             d1: Optional[int] = None,
             delay_search = '',
         ) -> EncodeDecodeReturn:
+        """Encodes the secret data into source. If the returned d0, d1 and l
+        are all -1, then the method failed to encode correctly.
+
+        Parameters
+        ----------
+        d0 : int | None
+            Echo delay for binary 0. Default value is 150.
+        d1 : int | None
+            Echo delay for binary 1. Default value is d0 + 50
+        delay_search : str
+            Method for searching optimal d0 and d1. Valid options are:
+            - '' : do not search, encode with the supplied values
+            - 'basinhopping' : search using scipy.optimize.basinhopping method,
+              stops at 50 iterations and returns the best values found
+            - 'bruteforce' : loop through 5000 possible values
+        """
 
         if d0 is None:
             d0 = 150
@@ -76,6 +110,15 @@ class Echo_single_kernel(MethodBase):
             d0: int,
             d1: int,
         ) -> EncodeDecodeReturn:
+        """Bruteforce the d0 and d1 values for 5000 iterations.
+
+        Parameters
+        ----------
+        d0 : int
+            Echo delay for binary 0.
+        d1 : int
+            Echo delay for binary 1.
+        """
 
         encoded = np.empty(0)
         for d0 in range(d0, d0+100):
@@ -112,6 +155,16 @@ class Echo_single_kernel(MethodBase):
             d0: int,
             d1: int,
         ) -> EncodeDecodeReturn:
+        """Find the d0 and d1 values using scipy.optimize.basinhopping method,
+        stops at 50 iterations and returns the best values found.
+
+        Parameters
+        ----------
+        d0 : int
+            Echo delay for binary 0.
+        d1 : int
+            Echo delay for binary 1.
+        """
 
         def bounds(**kwargs):
             x = kwargs['x_new']
@@ -144,6 +197,18 @@ class Echo_single_kernel(MethodBase):
 
 
     def decode(self, d0: int, d1: int, l: int) -> EncodeDecodeReturn:
+        """Decode with the supplied d0, d1 and l values.
+
+        Parameters
+        ----------
+        d0 : int
+            Echo delay for binary 0.
+        d1 : int
+            Echo delay for binary 1.
+        l : int
+            Number of bits encoded in the source.
+        """
+
         split = seg_split(self._source_data, l+1)[:-1]
         decoded = np.zeros(len(split), dtype=int)
         i = 0
