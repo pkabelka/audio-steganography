@@ -9,8 +9,10 @@ to a name in the enum.
 
 from enum import Enum
 from .echo_single_kernel import Echo_single_kernel
+from .lsb import LSB
 
 class Method(Enum):
     """This enum contains implemented steganography methods.
     """
     echo_single_kernel = Echo_single_kernel
+    lsb = LSB

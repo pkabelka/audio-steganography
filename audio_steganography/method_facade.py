@@ -150,8 +150,9 @@ class MethodFacade:
 
         if self.mode == Mode.encode:
             # center and normalize range to the original dtype
-            output = output - np.mean(output)
-            output = output / np.abs(output).max()
+            # FIXME: this breaks LSB method
+            # output = output - np.mean(output)
+            # output = output / np.abs(output).max()
 
             if self._source_dtype in [np.uint8, np.int16, np.int32]:
                 output = to_dtype(output, self._source_dtype)

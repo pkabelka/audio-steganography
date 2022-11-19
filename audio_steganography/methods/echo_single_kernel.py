@@ -63,6 +63,10 @@ class Echo_single_kernel(MethodBase):
         sp = np.pad(np.array(self._source_data), (0, len(h1)-len(self._source_data)))
         x = sp[:len(mixer)] + h1[:len(mixer)] * mixer + h0[:len(mixer)] * np.abs(1-mixer)
 
+        # center and normalize range to the original dtype
+        x = x - np.mean(x)
+        x = x / np.abs(x).max()
+
         return x, {
             'd0': d0,
             'd1': d1,
