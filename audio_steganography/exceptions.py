@@ -10,3 +10,5 @@ class OutputFileExists(Exception):
     pass
 class WavReadError(Exception):
     pass
+class SecretSizeTooLarge(Exception):
+    pass

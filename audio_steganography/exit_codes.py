@@ -15,3 +15,4 @@ class ExitCode(Enum):
     OutputFileExists = 3
     FileNotFound = 4
     WavReadError = 5
+    SecretSizeTooLarge = 6

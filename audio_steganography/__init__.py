@@ -11,7 +11,7 @@ from .argument_parsing import parse_args
 from .methods.method import Method
 from .method_facade import MethodFacade
 from .mode import Mode
-from .exceptions import OutputFileExists, WavReadError
+from .exceptions import OutputFileExists, WavReadError, SecretSizeTooLarge
 from .utils import error_exit
 from .exit_codes import ExitCode
 import sys
@@ -80,5 +80,7 @@ def main():
         error_exit(str(e), ExitCode.FileNotFound)
     except WavReadError as e:
         error_exit(str(e), ExitCode.WavReadError)
+    except SecretSizeTooLarge as e:
+        error_exit(str(e), ExitCode.SecretSizeTooLarge)
 
     print(json.dumps(additional_output))
