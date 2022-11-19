@@ -7,6 +7,7 @@
 """
 
 import numpy as np
+from numpy.typing import DTypeLike
 from typing import List, Any
 
 def seg_split(input: np.ndarray, n: int) -> List[np.ndarray]:
@@ -50,28 +51,11 @@ def mixer_sig(secret_data: np.ndarray[Any, np.dtype[np.uint8]], signal_length: i
 
     return np.hstack(mixer)
 
-def to_float64(input: np.ndarray, dtype: np.dtype) -> np.ndarray:
-    """Converts values in input array to float64 values.
-
-    Parameters
-    ----------
-    input : numpy.ndarray
-        Input array to convert to float64 values.
-    dtype : numpy.dtype
-        Input array values dtype.
-
-    Returns
-    -------
-    out : numpy.ndarray
-        Array with values converted to float64 dtype.
-    """
-    input = np.asanyarray(input)
-    out = input / np.iinfo(dtype).max
-    out = out.astype(np.float64)
-    return out
-
-def to_dtype(input: np.ndarray, dtype: np.dtype) -> np.ndarray:
+def to_dtype(input: np.ndarray, dtype: DTypeLike) -> np.ndarray:
     """Converts values in input array to specified dtype values.
+
+    The values in `input` are converted to `numpy.float64` dtype and then
+    converted to the dtype specified in `dtype`.
 
     Parameters
     ----------
@@ -85,7 +69,23 @@ def to_dtype(input: np.ndarray, dtype: np.dtype) -> np.ndarray:
     out : numpy.ndarray
         Array with values converted to specified dtype.
     """
+
     input = np.asanyarray(input)
-    out = input * np.iinfo(dtype).max
+    max = 1.0
+    try:
+        max = np.iinfo(input.dtype).max
+    except ValueError:
+        # already float type
+        pass
+    out = input / max
+    out = out.astype(np.float64)
+
+    max = 1.0
+    try:
+        max = np.iinfo(dtype).max
+    except ValueError:
+        # already float type
+        pass
+    out = out * max
     out = out.astype(dtype)
     return out
