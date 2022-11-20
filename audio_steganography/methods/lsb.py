@@ -6,9 +6,10 @@
 """This module contains the LSB method implementation
 """
 
-from .method_base import MethodBase, EncodeDecodeReturn
+from .method_base import MethodBase, EncodeDecodeReturn, EncodeDecodeArgsReturn
 from ..exceptions import SecretSizeTooLarge
 from ..audio_utils import to_dtype
+from typing import Optional
 import numpy as np
 
 class LSB(MethodBase):
@@ -52,13 +53,32 @@ class LSB(MethodBase):
             )
         )
         encoded = to_dtype(encoded, np.float64)
-        return encoded, {}
+        return encoded, {
+            'l': len(self._secret_data),
+        }
 
 
-    def decode(self) -> EncodeDecodeReturn:
+    def decode(self, l: Optional[int] = None) -> EncodeDecodeReturn:
         """Decode using plain least significant bit substitution.
         """
 
-        decoded = to_dtype(self._source_data, np.int16)
-        decoded = np.bitwise_and(decoded, 1)
+        _len = len(self._source_data)
+        if l is not None:
+            _len = l
+
+        decoded = np.bitwise_and(self._source_data[:_len], 1)
         return decoded, {}
+
+
+    @staticmethod
+    def get_decode_args() -> EncodeDecodeArgsReturn:
+        args = []
+        args.append((['-l', '--len'],
+                     {
+                         'action': 'store',
+                         'type': int,
+                         'required': False,
+                         'help': 'encoded data length; decode only this many bits',
+                         'default': None,
+                     }))
+        return args

@@ -72,6 +72,10 @@ def main():
                     'd1': args.d1,
                     'l': args.len,
                 }
+            elif method == Method.lsb:
+                options = {
+                    'l': args.len,
+                }
             additional_output = steganography.decode(**options)
 
     except OutputFileExists as e:
