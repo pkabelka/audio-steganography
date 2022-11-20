@@ -234,12 +234,14 @@ class Echo_single_kernel(MethodBase):
                          'action': 'store',
                          'type': int,
                          'default': None,
+                         'help': 'offset for binary 0; default 150 samples',
                      }))
         args.append((['-d1'],
                      {
                          'action': 'store',
                          'type': int,
                          'default': None,
+                         'help': 'offset for binary 1; default 200 samples',
                      }))
         args.append((['--delay_search'],
                      {
@@ -247,6 +249,8 @@ class Echo_single_kernel(MethodBase):
                          'type': str,
                          'default': '',
                          'choices': ['bruteforce', 'basinhopping'],
+                         'help': 'method for searching offsets resulting in '+
+                             '0 bit error rate',
                      }))
         return args
 
@@ -257,19 +261,19 @@ class Echo_single_kernel(MethodBase):
                      {
                          'action': 'store',
                          'type': int,
-                         'required': True
+                         'required': True,
                      }))
         args.append((['-d1'],
                      {
                          'action': 'store',
                          'type': int,
-                         'required': True
+                         'required': True,
                      }))
         args.append((['-l', '--len'],
                      {
                          'action': 'store',
                          'type': int,
                          'required': True,
-                         'help': 'encoded data length'
+                         'help': 'number of encoded bits',
                      }))
         return args
