@@ -40,9 +40,13 @@ class LSB(MethodBase):
                 f'len(secret) = {len(self._secret_data)}, capacity(source) = '+
                 f'{len(self._source_data)}')
 
-        encoded = to_dtype(self._source_data, np.int16)
+        # convert float dtypes to int64
+        source = self._source_data
+        if source.dtype in [np.float16, np.float32, np.float64]:
+            source = to_dtype(source, np.int64)
+
         # zero out LSB
-        encoded = np.bitwise_and(encoded, np.bitwise_not(1))
+        encoded = np.bitwise_and(source, np.bitwise_not(1))
 
         # encode secret data to LSB
         encoded = np.bitwise_or(
@@ -66,7 +70,12 @@ class LSB(MethodBase):
         if l is not None:
             _len = l
 
-        decoded = np.bitwise_and(self._source_data[:_len], 1)
+        # convert float dtypes to int64
+        source = self._source_data
+        if source.dtype in [np.float16, np.float32, np.float64]:
+            source = to_dtype(source, np.int64)
+
+        decoded = np.bitwise_and(source[:_len], 1)
         return decoded, {}
 
 
