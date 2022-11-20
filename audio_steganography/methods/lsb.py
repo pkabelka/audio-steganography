@@ -36,7 +36,7 @@ class LSB(MethodBase):
         """
 
         if len(self._secret_data) > len(self._source_data):
-            raise SecretSizeTooLarge('secret data cannot fit in source: ' +
+            raise SecretSizeTooLarge('secret data cannot fit in source: '+
                 f'len(secret) = {len(self._secret_data)}, capacity(source) = '+
                 f'{len(self._source_data)}')
 
@@ -78,7 +78,8 @@ class LSB(MethodBase):
                          'action': 'store',
                          'type': int,
                          'required': False,
-                         'help': 'encoded data length; decode only this many bits',
+                         'help': 'encoded data length; decode only this many '+
+                             'bits',
                          'default': None,
                      }))
         return args
