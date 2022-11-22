@@ -7,6 +7,7 @@
 """
 
 from .method_base import MethodBase, EncodeDecodeReturn, EncodeDecodeArgsReturn
+from ..exceptions import SecretSizeTooLarge
 from ..audio_utils import seg_split, mixer_sig, to_dtype
 from typing import Any, Optional
 import numpy as np
@@ -85,6 +86,9 @@ class Echo_single_kernel(MethodBase):
         """Encodes the secret data into source. If the returned d0, d1 and l
         are all -1, then the method failed to encode correctly.
 
+        If the secret data is bigger than source capacity, a
+        `SecretSizeTooLarge` exception is raised.
+
         Parameters
         ----------
         d0 : int | None
@@ -112,6 +116,12 @@ class Echo_single_kernel(MethodBase):
             d0 = 150
         if d1 is None:
             d1 = d0 + 50
+
+        # require at least 1024 samples per encoded bit
+        if len(self._secret_data) * 1024 > len(self._source_data):
+            raise SecretSizeTooLarge('secret data cannot fit in source: '+
+                f'len(secret) = {len(self._secret_data)}, capacity(source) = '+
+                f'{len(self._source_data)}')
 
         if delay_search == 'bruteforce':
             return self._encode_bruteforce(d0, d1)
