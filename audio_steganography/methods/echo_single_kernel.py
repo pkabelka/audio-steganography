@@ -103,8 +103,9 @@ class Echo_single_kernel(MethodBase):
         Returns
         -------
         out : method_base.EncodeDecodeReturn
-            NumPy array of samples with secret data encoded using echo single
-            kernel method.
+            Tuple containing NumPy array of samples with secret data encoded
+            using echo single kernel method and additional output needed for
+            decoding.
         """
 
         if d0 is None:

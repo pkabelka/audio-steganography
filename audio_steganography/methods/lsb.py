@@ -42,8 +42,9 @@ class LSB(MethodBase):
         Returns
         -------
         out : method_base.EncodeDecodeReturn
-            NumPy array of samples with secret data encoded least significant
-            bit substitution method.
+            Tuple containing NumPy array of samples with secret data encoded
+            least significant bit substitution method and additional output
+            needed for decoding.
         """
 
         if len(self._secret_data) > len(self._source_data):
