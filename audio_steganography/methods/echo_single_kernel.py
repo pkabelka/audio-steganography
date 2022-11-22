@@ -30,7 +30,8 @@ class Echo_single_kernel(MethodBase):
     >>> encoded = echo_method.encode(250, 350)
 
     Decode
-    >>> echo_method = Echo_single_kernel(encoded)
+
+    >>> echo_method = Echo_single_kernel(encoded[0])
     >>> echo_method.decode(250, 350)
     """
 
@@ -94,6 +95,8 @@ class Echo_single_kernel(MethodBase):
             - 'basinhopping' : search using scipy.optimize.basinhopping method,
               stops at 50 iterations and returns the best values found
             - 'bruteforce' : loop through 5000 possible values
+            This searching can take a very long time depending on the length of
+            `source`.
         """
 
         if d0 is None:

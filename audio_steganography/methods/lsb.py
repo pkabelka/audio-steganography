@@ -21,18 +21,22 @@ class LSB(MethodBase):
 
     >>> import numpy as np
     >>> secret = np.array([0,0,1,1,0,1,0,0,0,0,1,1,0,0,1,0], dtype=np.uint8)
-    >>> source = np.random.rand(len(secret) * 8192, 1)
+    >>> source = np.random.rand(len(secret) * 32)
     >>> LSB_method = LSB(source, secret)
     >>> encoded = LSB_method.encode()
 
     Decode
-    >>> LSB_method = LSB(encoded)
+
+    >>> LSB_method = LSB(encoded[0])
     >>> LSB_method.decode()
     """
 
     def encode(self) -> EncodeDecodeReturn:
         """Encodes the secret data into source using least significant bit
         substitution.
+
+        If the secret data is bigger than source capacity, a
+        `SecretSizeTooLarge` exception is raised.
         """
 
         if len(self._secret_data) > len(self._source_data):
@@ -75,6 +79,7 @@ class LSB(MethodBase):
         if source.dtype in [np.float16, np.float32, np.float64]:
             source = to_dtype(source, np.int64)
 
+        # read last significant bit
         decoded = np.bitwise_and(source[:_len], 1)
         return decoded, {}
 
