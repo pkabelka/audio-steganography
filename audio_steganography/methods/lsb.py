@@ -46,7 +46,8 @@ class LSB(MethodBase):
 
         # convert float dtypes to int64
         source = self._source_data
-        if source.dtype in [np.float16, np.float32, np.float64]:
+        source_dtype = source.dtype
+        if source_dtype in [np.float16, np.float32, np.float64]:
             source = to_dtype(source, np.int32)
 
         # zero out LSB
@@ -60,8 +61,8 @@ class LSB(MethodBase):
                 (0, len(self._source_data) - len(self._secret_data))
             )
         )
-        if source.dtype in [np.float16, np.float32, np.float64]:
-            encoded = to_dtype(encoded, source.dtype)
+        if source_dtype in [np.float16, np.float32, np.float64]:
+            encoded = to_dtype(encoded, source_dtype)
         return encoded, {
             'l': len(self._secret_data),
         }
