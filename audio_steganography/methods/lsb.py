@@ -20,6 +20,7 @@ class LSB(MethodBase):
     Encode "42" to source array.
 
     >>> import numpy as np
+    >>> from audio_steganography.methods.lsb import LSB
     >>> secret = np.array([0,0,1,1,0,1,0,0,0,0,1,1,0,0,1,0], dtype=np.uint8)
     >>> source = np.random.rand(len(secret) * 32)
     >>> LSB_method = LSB(source, secret)

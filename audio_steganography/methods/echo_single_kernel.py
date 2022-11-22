@@ -24,6 +24,7 @@ class Echo_single_kernel(MethodBase):
     Encode "42" to source array.
 
     >>> import numpy as np
+    >>> from audio_steganography.methods.echo_single_kernel import Echo_single_kernel
     >>> secret = np.array([0,0,1,1,0,1,0,0,0,0,1,1,0,0,1,0], dtype=np.uint8)
     >>> source = np.random.rand(len(secret) * 8192, 1)
     >>> echo_method = Echo_single_kernel(source, secret)
