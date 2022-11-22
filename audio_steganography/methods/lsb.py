@@ -83,7 +83,7 @@ class LSB(MethodBase):
 
         # read last significant bit
         decoded = np.bitwise_and(source[:_len], 1)
-        return decoded, {}
+        return decoded.astype(np.uint8), {}
 
 
     @staticmethod

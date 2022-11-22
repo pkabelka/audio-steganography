@@ -217,7 +217,7 @@ class Echo_single_kernel(MethodBase):
         """
 
         split = seg_split(self._source_data, l+1)[:-1]
-        decoded = np.zeros(len(split), dtype=int)
+        decoded = np.zeros(len(split), dtype=np.uint8)
         i = 0
         for seg in split:
             cn = np.fft.ifft(np.log(np.abs(np.fft.fft(seg))))
