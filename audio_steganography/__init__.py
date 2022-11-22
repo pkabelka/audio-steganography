@@ -64,6 +64,10 @@ def main():
                     'd1': args.d1,
                     'delay_search': args.delay_search,
                 }
+            elif method == Method.lsb:
+                options = {
+                    'depth': args.depth,
+                }
             additional_output = steganography.encode(**options)
         else:
             if method == Method.echo_single_kernel:
@@ -74,6 +78,7 @@ def main():
                 }
             elif method == Method.lsb:
                 options = {
+                    'depth': args.depth,
                     'l': args.len,
                 }
             additional_output = steganography.decode(**options)

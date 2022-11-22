@@ -27,6 +27,23 @@ def seg_split(input: np.ndarray, n: int) -> List[np.ndarray]:
     """
     return np.array_split(input, n)[:-1] + [input[-int(round(len(input)/n)):]]
 
+def seg_split_len_n(input: np.ndarray, n: int) -> List[np.ndarray]:
+    """Splits the input array into segments of length N
+
+    Parameters
+    ----------
+    input : numpy.ndarray
+        The array to split into N segments.
+    n : int
+        Segment length.
+
+    Returns
+    -------
+    out : List
+        A list containing input split into NumPy arrays of length N.
+    """
+    return np.array_split(input, np.ceil(len(input) / n))
+
 def mixer_sig(secret_data: np.ndarray[Any, np.dtype[np.uint8]], signal_length: int) -> np.ndarray:
     """Creates a mixer signal by spliting the input array into segments of
     secret_data length + 1.
