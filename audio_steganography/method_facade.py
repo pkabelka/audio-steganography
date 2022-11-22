@@ -155,8 +155,8 @@ class MethodFacade:
             # output = output - np.mean(output)
             # output = output / np.abs(output).max()
 
-            if self._source_dtype in [np.uint8, np.int16, np.int32]:
-                output = to_dtype(output, self._source_dtype)
+            # if self._source_dtype in [np.uint8, np.int16, np.int32]:
+            #     output = to_dtype(output, self._source_dtype)
 
             scipy.io.wavfile.write(fname, self.source_sr, output)
         else:

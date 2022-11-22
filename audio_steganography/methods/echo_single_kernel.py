@@ -7,7 +7,7 @@
 """
 
 from .method_base import MethodBase, EncodeDecodeReturn, EncodeDecodeArgsReturn
-from ..audio_utils import seg_split, mixer_sig
+from ..audio_utils import seg_split, mixer_sig, to_dtype
 from typing import Any, Optional
 import numpy as np
 import scipy.signal
@@ -65,9 +65,10 @@ class Echo_single_kernel(MethodBase):
         sp = np.pad(np.array(self._source_data), (0, len(h1)-len(self._source_data)))
         x = sp[:len(mixer)] + h1[:len(mixer)] * mixer + h0[:len(mixer)] * np.abs(1-mixer)
 
-        # center and normalize range to the original dtype
+        # center, normalize range and convert to the original dtype
         x = x - np.mean(x)
         x = x / np.abs(x).max()
+        x = to_dtype(x, self._source_data.dtype)
 
         return x, {
             'd0': d0,
@@ -102,8 +103,8 @@ class Echo_single_kernel(MethodBase):
         Returns
         -------
         out : method_base.EncodeDecodeReturn
-            NumPy array of float64 samples with secret data encoded using echo
-            single kernel method.
+            NumPy array of samples with secret data encoded using echo single
+            kernel method.
         """
 
         if d0 is None:
