@@ -98,6 +98,12 @@ class Echo_single_kernel(MethodBase):
             - 'bruteforce' : loop through 5000 possible values
             This searching can take a very long time depending on the length of
             `source`.
+
+        Returns
+        -------
+        out : method_base.EncodeDecodeReturn
+            NumPy array of float64 samples with secret data encoded using echo
+            single kernel method.
         """
 
         if d0 is None:
@@ -118,15 +124,6 @@ class Echo_single_kernel(MethodBase):
             d0: int,
             d1: int,
         ) -> EncodeDecodeReturn:
-        """Bruteforce the d0 and d1 values for 5000 iterations.
-
-        Parameters
-        ----------
-        d0 : int
-            Echo delay for binary 0.
-        d1 : int
-            Echo delay for binary 1.
-        """
 
         encoded = np.empty(0)
         for d0 in range(d0, d0+100):
@@ -163,16 +160,6 @@ class Echo_single_kernel(MethodBase):
             d0: int,
             d1: int,
         ) -> EncodeDecodeReturn:
-        """Find the d0 and d1 values using scipy.optimize.basinhopping method,
-        stops at 50 iterations and returns the best values found.
-
-        Parameters
-        ----------
-        d0 : int
-            Echo delay for binary 0.
-        d1 : int
-            Echo delay for binary 1.
-        """
 
         def bounds(**kwargs):
             x = kwargs['x_new']
@@ -215,6 +202,12 @@ class Echo_single_kernel(MethodBase):
             Echo delay for binary 1.
         l : int
             Number of bits encoded in the source.
+
+        Returns
+        -------
+        out : method_base.EncodeDecodeReturn
+            NumPy array of uint8 zeros and ones representing the bits decoded
+            using echo single kernel method.
         """
 
         split = seg_split(self._source_data, l+1)[:-1]

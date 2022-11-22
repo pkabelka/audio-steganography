@@ -38,6 +38,12 @@ class LSB(MethodBase):
 
         If the secret data is bigger than source capacity, a
         `SecretSizeTooLarge` exception is raised.
+
+        Returns
+        -------
+        out : method_base.EncodeDecodeReturn
+            NumPy array of samples with secret data encoded least significant
+            bit substitution method.
         """
 
         if len(self._secret_data) > len(self._source_data):
@@ -71,6 +77,18 @@ class LSB(MethodBase):
 
     def decode(self, l: Optional[int] = None) -> EncodeDecodeReturn:
         """Decode using plain least significant bit substitution.
+
+        Parameters
+        ----------
+        l : int | None
+            Number of bits encoded in the source. If `l` is set to `None`, then
+            decode will return all least significant bits.
+
+        Returns
+        -------
+        out : method_base.EncodeDecodeReturn
+            NumPy array of uint8 zeros and ones representing the bits decoded
+            using least significant bit substitution method.
         """
 
         _len = len(self._source_data)
