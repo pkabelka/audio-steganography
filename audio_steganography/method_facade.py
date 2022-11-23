@@ -13,7 +13,7 @@ from .mode import Mode
 from .exceptions import OutputFileExists, WavReadError
 from .audio_utils import to_dtype
 from .stat_utils import snr_db, mse, rmsd, psnr_db, ber_percent
-import typing
+from typing import Optional, Dict
 import numpy as np
 import scipy.io.wavfile
 import os.path
@@ -28,7 +28,7 @@ class MethodFacade:
             method: Method,
             mode: Mode,
             source: str,
-            output_file: typing.Optional[str] = None,
+            output_file: Optional[str] = None,
             overwrite: bool = False,
         ):
 
@@ -72,7 +72,7 @@ class MethodFacade:
         return output, additional_output
 
 
-    def set_text_to_encode(self, text_to_encode: typing.Optional[str]):
+    def set_text_to_encode(self, text_to_encode: Optional[str]):
         """Setter for the text to be encoded.
 
         Parameters
@@ -84,7 +84,7 @@ class MethodFacade:
         self.text_to_encode = text_to_encode
 
 
-    def set_file_to_encode(self, file_to_encode: typing.Optional[str]):
+    def set_file_to_encode(self, file_to_encode: Optional[str]):
         """Setter for the file to be encoded.
 
         Parameters
@@ -119,7 +119,7 @@ class MethodFacade:
         # normalize to float64 [-1; 1]
         # FIXME: this breaks LSB method
         # self.source_data: np.ndarray[
-        #     typing.Any,
+        #     Any,
         #     np.dtype[np.float64]] = (self.source_data /
         #         np.abs(self.source_data).max()).astype(np.float64)
 
@@ -200,7 +200,7 @@ class MethodFacade:
 
         return fname
 
-    def get_stats(self, output: np.ndarray) -> typing.Dict:
+    def get_stats(self, output: np.ndarray) -> Dict:
         """Compute and return statistical tests on source and `encode` method
         output and also `source`, `secret` and `output` lengths.
 
