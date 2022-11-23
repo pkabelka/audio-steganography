@@ -57,19 +57,21 @@ class LSB(MethodBase):
         if depth < 1 or depth > 8:
             raise ValueError('bit depth must be between 1 and 8')
 
-        # pad secret data to nearest bit depth multiple
-        secret_padded_to_bit_depth = np.pad(
-            self._secret_data,
-            (0, np.ceil(len(self._secret_data) / depth).
-                 astype(np.uint32) * depth - len(self._secret_data)))
+        secret = self._secret_data
+        if depth > 1:
+            # pad secret data to nearest bit depth multiple
+            secret_padded_to_bit_depth = np.pad(
+                self._secret_data,
+                (0, np.ceil(len(self._secret_data) / depth).
+                     astype(np.uint32) * depth - len(self._secret_data)))
 
-        # split to bit depth long arrays
-        secret_split_by_depth = np.array(
-            seg_split_len_n(secret_padded_to_bit_depth, depth), dtype=np.uint8)
+            # split to bit depth long arrays
+            secret = np.array(
+                seg_split_len_n(secret_padded_to_bit_depth, depth), dtype=np.uint8)
 
-        if len(secret_split_by_depth) > len(self._source_data):
+        if len(secret) > len(self._source_data):
             raise SecretSizeTooLarge('secret data cannot fit in source: '+
-                f'len(secret) = {len(secret_split_by_depth)}, '+
+                f'len(secret) = {len(secret)}, '+
                 f'capacity(source) = {len(self._source_data)}')
 
         # convert float dtypes to int64
@@ -79,10 +81,11 @@ class LSB(MethodBase):
             source = to_dtype(source, np.int32)
 
         # convert bits to uint8 numbers
-        secret_packed = np.packbits(
-            secret_split_by_depth,
-            axis=-1,
-            bitorder='little').flatten()
+        if depth > 1:
+            secret = np.packbits(
+                secret,
+                axis=-1,
+                bitorder='little').flatten()
 
         # zero out LSB
         encoded = np.bitwise_and(source, np.bitwise_not(2**depth - 1))
@@ -91,8 +94,8 @@ class LSB(MethodBase):
         encoded = np.bitwise_or(
             encoded,
             np.pad(
-                secret_packed,
-                (0, len(self._source_data) - len(secret_packed))
+                secret,
+                (0, len(self._source_data) - len(secret))
             )
         )
 
