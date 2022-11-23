@@ -201,7 +201,8 @@ class MethodFacade:
         return fname
 
     def get_stats(self, output: np.ndarray) -> typing.Dict:
-        """Compute statistical tests on source and `encode` method output.
+        """Compute and return statistical tests on source and `encode` method
+        output and also `source`, `secret` and `output` lengths.
 
         Parameters
         ----------
