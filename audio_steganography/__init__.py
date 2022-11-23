@@ -12,7 +12,7 @@ from .methods.method import Method
 from .method_facade import MethodFacade
 from .mode import Mode
 from .exceptions import OutputFileExists, WavReadError, SecretSizeTooLarge
-from .utils import error_exit
+from .utils import error_exit, get_attr
 from .exit_codes import ExitCode
 import sys
 import json
@@ -53,35 +53,26 @@ def main():
         args.overwrite)
 
     additional_output = {}
-    options = {}
+    options = {
+        Method.lsb: {
+            (a:='depth'): get_attr(args, a),
+            'l': get_attr(args, 'len'),
+        },
+        Method.echo_single_kernel: {
+            (a:='d0'): get_attr(args, a),
+            (a:='d1'): get_attr(args, a),
+            (a:='delay_search'): get_attr(args, a),
+            'l': get_attr(args, 'len'),
+        },
+    }
+
     try:
         if mode == Mode.encode:
             steganography.set_text_to_encode(args.text)
             steganography.set_file_to_encode(args.file)
-            if method == Method.echo_single_kernel:
-                options = {
-                    'd0': args.d0,
-                    'd1': args.d1,
-                    'delay_search': args.delay_search,
-                }
-            elif method == Method.lsb:
-                options = {
-                    'depth': args.depth,
-                }
-            additional_output = steganography.encode(**options)
+            additional_output = steganography.encode(**options[method])
         else:
-            if method == Method.echo_single_kernel:
-                options = {
-                    'd0': args.d0,
-                    'd1': args.d1,
-                    'l': args.len,
-                }
-            elif method == Method.lsb:
-                options = {
-                    'depth': args.depth,
-                    'l': args.len,
-                }
-            additional_output = steganography.decode(**options)
+            additional_output = steganography.decode(**options[method])
 
     except OutputFileExists as e:
         error_exit(str(e), ExitCode.OutputFileExists)

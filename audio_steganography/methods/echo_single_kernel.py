@@ -82,6 +82,7 @@ class Echo_single_kernel(MethodBase):
             d0: Optional[int] = None,
             d1: Optional[int] = None,
             delay_search = '',
+            **kwargs,
         ) -> EncodeDecodeReturn:
         """Encodes the secret data into source. If the returned d0, d1 and l
         are all -1, then the method failed to encode correctly.
@@ -203,7 +204,7 @@ class Echo_single_kernel(MethodBase):
         self._decay_rate = decay_rate
 
 
-    def decode(self, d0: int, d1: int, l: int) -> EncodeDecodeReturn:
+    def decode(self, d0: int, d1: int, l: int, **kwargs) -> EncodeDecodeReturn:
         """Decode with the supplied d0, d1 and l values.
 
         Parameters

@@ -30,11 +30,11 @@ class MethodBase(abc.ABC):
         self._secret_data = secret_data
 
     @abc.abstractmethod
-    def encode(self) -> EncodeDecodeReturn:
+    def encode(self, **kwargs) -> EncodeDecodeReturn:
         raise NotImplementedError('Inherited steganography method must implement this function')
 
     @abc.abstractmethod
-    def decode(self) -> EncodeDecodeReturn:
+    def decode(self, **kwargs) -> EncodeDecodeReturn:
         raise NotImplementedError('Inherited steganography method must implement this function')
 
     @staticmethod

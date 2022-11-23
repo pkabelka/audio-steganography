@@ -32,7 +32,7 @@ class LSB(MethodBase):
     >>> LSB_method.decode()
     """
 
-    def encode(self, depth: int = 1) -> EncodeDecodeReturn:
+    def encode(self, depth: int = 1, **kwargs) -> EncodeDecodeReturn:
         """Encodes the secret data into source using least significant bit
         substitution.
 
@@ -107,7 +107,8 @@ class LSB(MethodBase):
     def decode(
             self,
             depth: int = 1,
-            l: Optional[int] = None
+            l: Optional[int] = None,
+            **kwargs,
         ) -> EncodeDecodeReturn:
         """Decode using plain least significant bit substitution.
 
