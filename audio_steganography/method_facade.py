@@ -227,5 +227,8 @@ class MethodFacade:
             'rmsd': rmsd(self.source_data, output),
             'psnr_db': psnr_db(self.source_data, output),
             'ber_percent': ber_percent(source_bits, output_bits),
+            'source_sample_len': len(self.source_data),
+            'secret_bit_len': len(self.data_to_encode),
+            'output_sample_len': len(output),
         }
         return stats
