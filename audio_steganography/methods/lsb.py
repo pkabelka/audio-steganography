@@ -57,13 +57,15 @@ class LSB(MethodBase):
         if depth < 1 or depth > 8:
             raise ValueError('bit depth must be between 1 and 8')
 
+        # pad secret data to nearest bit depth multiple
         secret_padded_to_bit_depth = np.pad(
             self._secret_data,
             (0, np.ceil(len(self._secret_data) / depth).
                  astype(np.uint32) * depth - len(self._secret_data)))
 
+        # split to bit depth long arrays
         secret_split_by_depth = seg_split_len_n(secret_padded_to_bit_depth,
-                                                    depth)
+                                                depth)
 
         if len(secret_split_by_depth) > len(self._source_data):
             raise SecretSizeTooLarge('secret data cannot fit in source: '+
@@ -134,13 +136,13 @@ class LSB(MethodBase):
         if source.dtype in [np.float16, np.float32, np.float64]:
             source = to_dtype(source, np.int32)
 
-        # read last significant bit
+        # get least significant bits up to bit depth
         lsb = np.bitwise_and(source[:_len], 2**depth - 1).astype(np.uint8)
 
         # unpack bytes to bits
         unpacked = np.unpackbits(lsb, bitorder='little')
 
-        # extract up to bit depth in each array
+        # split to byte size arrays and extract up to bit depth in each array
         unpacked_split = np.array(seg_split_len_n(unpacked, 8))[:, :depth]
 
         return unpacked_split.flatten()[:_len], {}
