@@ -69,8 +69,8 @@ class LSB(MethodBase):
 
         if len(secret_split_by_depth) > len(self._source_data):
             raise SecretSizeTooLarge('secret data cannot fit in source: '+
-                f'len(secret) = {len(secret_split_by_depth)}, capacity(source) = '+
-                f'{len(self._source_data)}')
+                f'len(secret) = {len(secret_split_by_depth)}, '+
+                f'capacity(source) = {len(self._source_data)}')
 
         # convert float dtypes to int64
         source = self._source_data
@@ -104,7 +104,11 @@ class LSB(MethodBase):
         }
 
 
-    def decode(self, depth: int = 1, l: Optional[int] = None) -> EncodeDecodeReturn:
+    def decode(
+            self,
+            depth: int = 1,
+            l: Optional[int] = None
+        ) -> EncodeDecodeReturn:
         """Decode using plain least significant bit substitution.
 
         Parameters
