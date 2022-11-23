@@ -52,7 +52,7 @@ def mse(x: np.ndarray | List, y: np.ndarray | List) -> float:
     n = len(x)
     if n != len(y):
         raise
-    return 1/n * np.sum((x - y)**2)
+    return float(1/n * np.sum((x - y)**2))
 
 def rmsd(x: np.ndarray | List, y: np.ndarray | List) -> float:
     """Calculates the root mean square deviation of clean signal and noisy
