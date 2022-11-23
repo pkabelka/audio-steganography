@@ -7,7 +7,7 @@
 and decoding of files.
 """
 
-from .methods.method_base import MethodBase
+from .methods.method_base import MethodBase, EncodeDecodeReturn
 from .methods.method import Method
 from .mode import Mode
 from .exceptions import OutputFileExists, WavReadError
@@ -30,7 +30,6 @@ class MethodFacade:
             source: str,
             output_file: typing.Optional[str] = None,
             overwrite: bool = False,
-            stats: bool = False,
         ):
 
         self.method = method
@@ -38,7 +37,6 @@ class MethodFacade:
         self.source = source
         self.output_file = output_file
         self.overwrite = overwrite
-        self.stats = stats
 
         self.text_to_encode = None
         self.file_to_encode = None
@@ -46,7 +44,7 @@ class MethodFacade:
         self.data_to_encode = np.empty(0, dtype=np.uint8)
 
 
-    def encode(self, *args, **kwargs) -> typing.Dict[str, typing.Any]:
+    def encode(self, *args, **kwargs) -> EncodeDecodeReturn:
         """This function encodes the secret data into the source using the
         specified Method.
         """
@@ -57,16 +55,10 @@ class MethodFacade:
         method: MethodBase = self.method.value(self.source_data, self.data_to_encode)
         output, additional_output = method.encode(*args, **kwargs)
 
-        self.write_output(output)
-
-        stats = {}
-        if self.stats:
-            stats = self.get_stats(output)
-
-        return {**additional_output, **stats}
+        return output, additional_output
 
 
-    def decode(self, *args, **kwargs) -> typing.Dict[str, typing.Any]:
+    def decode(self, *args, **kwargs) -> EncodeDecodeReturn:
         """This function decodes the secret data from the source using the
         specified Method.
         """
@@ -77,8 +69,7 @@ class MethodFacade:
         method: MethodBase = self.method.value(self.source_data)
         output, additional_output = method.decode(*args, **kwargs)
 
-        self.write_output(output)
-        return additional_output
+        return output, additional_output
 
 
     def set_text_to_encode(self, text_to_encode: typing.Optional[str]):
@@ -210,7 +201,18 @@ class MethodFacade:
         return fname
 
     def get_stats(self, output: np.ndarray) -> typing.Dict:
-        print(self.source_data, output)
+        """Compute statistical tests on source and `encode` method output.
+
+        Parameters
+        ----------
+        output : numpy.ndarray
+            Output of `encode` method.
+
+        Returns
+        -------
+        stats : Dict
+            Results of statistical functions.
+        """
         source_bits = np.unpackbits(
             np.array(bytearray(self.source_data.tobytes()), dtype=np.uint8),
             bitorder='little')

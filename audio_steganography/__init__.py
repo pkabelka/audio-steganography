@@ -51,7 +51,6 @@ def main():
         args.source,
         args.output,
         args.overwrite,
-        args.stats,
     )
 
     additional_output = {}
@@ -72,9 +71,14 @@ def main():
         if mode == Mode.encode:
             steganography.set_text_to_encode(args.text)
             steganography.set_file_to_encode(args.file)
-            additional_output = steganography.encode(**options[method])
+            output, additional_output = steganography.encode(**options[method])
+
+            stats = {}
+            if args.stats:
+                stats = steganography.get_stats(output)
+            additional_output = {**additional_output, **stats}
         else:
-            additional_output = steganography.decode(**options[method])
+            output, additional_output = steganography.decode(**options[method])
 
     except OutputFileExists as e:
         error_exit(str(e), ExitCode.OutputFileExists)
@@ -84,5 +88,7 @@ def main():
         error_exit(str(e), ExitCode.WavReadError)
     except SecretSizeTooLarge as e:
         error_exit(str(e), ExitCode.SecretSizeTooLarge)
+
+    steganography.write_output(output)
 
     print(json.dumps(additional_output))
