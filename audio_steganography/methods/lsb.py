@@ -64,8 +64,8 @@ class LSB(MethodBase):
                  astype(np.uint32) * depth - len(self._secret_data)))
 
         # split to bit depth long arrays
-        secret_split_by_depth = seg_split_len_n(secret_padded_to_bit_depth,
-                                                depth)
+        secret_split_by_depth = np.array(
+            seg_split_len_n(secret_padded_to_bit_depth, depth), dtype=np.uint8)
 
         if len(secret_split_by_depth) > len(self._source_data):
             raise SecretSizeTooLarge('secret data cannot fit in source: '+

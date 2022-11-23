@@ -42,6 +42,8 @@ def seg_split_len_n(input: np.ndarray, n: int) -> List[np.ndarray]:
     out : List
         A list containing input split into NumPy arrays of length N.
     """
+    if len(input) == 0:
+        return [np.empty(0)]
     return np.array_split(input, np.ceil(len(input) / n))
 
 def mixer_sig(secret_data: np.ndarray[Any, np.dtype[np.uint8]], signal_length: int) -> np.ndarray:
