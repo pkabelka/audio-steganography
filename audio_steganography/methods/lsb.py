@@ -67,7 +67,8 @@ class LSB(MethodBase):
 
             # split to bit depth long arrays
             secret = np.array(
-                seg_split_len_n(secret_padded_to_bit_depth, depth), dtype=np.uint8)
+                seg_split_len_n(secret_padded_to_bit_depth, depth),
+                dtype=np.uint8)
 
         if len(secret) > len(self._source_data):
             raise SecretSizeTooLarge('secret data cannot fit in source: '+
@@ -80,8 +81,8 @@ class LSB(MethodBase):
         if source_dtype in [np.float16, np.float32, np.float64]:
             source = to_dtype(source, np.int32)
 
-        # convert bits to uint8 numbers
         if depth > 1:
+            # convert bits to uint8 numbers
             secret = np.packbits(
                 secret,
                 axis=-1,
