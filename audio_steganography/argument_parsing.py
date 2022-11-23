@@ -36,7 +36,8 @@ def parse_args() -> Tuple[Any, argparse.ArgumentParser]:
         '-s',
         '--source', metavar='SOURCE',
         action='store',
-        help='combined with encode, specify cover file; combined with decode, specify file to decode',
+        help='combined with encode, specify cover file; combined with '+
+            'decode, specify file to decode',
         required=True)
 
     parent_parser.add_argument(
@@ -44,7 +45,9 @@ def parse_args() -> Tuple[Any, argparse.ArgumentParser]:
         '--output',
         metavar='OUTPUT_FILE',
         action='store',
-        help='without -o, -e produces a file with _METHOD appended and -d produces SOURCE.out; -o - outputs bytes to STDOUT only in decode mode',
+        help='without -o, -e produces a file with _METHOD appended and -d '+
+            'produces SOURCE.out; -o - outputs bytes to STDOUT only in '+
+            'decode mode',
         default=None)
 
     parent_parser.add_argument(
