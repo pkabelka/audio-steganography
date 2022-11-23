@@ -50,7 +50,9 @@ def main():
         mode,
         args.source,
         args.output,
-        args.overwrite)
+        args.overwrite,
+        args.stats,
+    )
 
     additional_output = {}
     options = {

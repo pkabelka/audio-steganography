@@ -91,6 +91,12 @@ def parse_args() -> Tuple[Any, argparse.ArgumentParser]:
             help='text to encode in SOURCE',
             default=None)
 
+        encode_subparser.add_argument(
+            '--stats',
+            action='store_true',
+            help='output results of statistical tests after encoding',
+            default=False)
+
         args = m.value.get_encode_args()
         for arg in args:
             encode_subparser.add_argument(*arg[0], **arg[1])

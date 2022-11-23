@@ -12,6 +12,7 @@ from .methods.method import Method
 from .mode import Mode
 from .exceptions import OutputFileExists, WavReadError
 from .audio_utils import to_dtype
+from .stat_utils import snr_db, mse, rmsd, psnr_db, ber_percent
 import typing
 import numpy as np
 import scipy.io.wavfile
@@ -28,7 +29,8 @@ class MethodFacade:
             mode: Mode,
             source: str,
             output_file: typing.Optional[str] = None,
-            overwrite: bool = False
+            overwrite: bool = False,
+            stats: bool = False,
         ):
 
         self.method = method
@@ -36,6 +38,7 @@ class MethodFacade:
         self.source = source
         self.output_file = output_file
         self.overwrite = overwrite
+        self.stats = stats
 
         self.text_to_encode = None
         self.file_to_encode = None
@@ -55,7 +58,12 @@ class MethodFacade:
         output, additional_output = method.encode(*args, **kwargs)
 
         self.write_output(output)
-        return additional_output
+
+        stats = {}
+        if self.stats:
+            stats = self.get_stats(output)
+
+        return {**additional_output, **stats}
 
 
     def decode(self, *args, **kwargs) -> typing.Dict[str, typing.Any]:
@@ -200,3 +208,22 @@ class MethodFacade:
             raise OutputFileExists('output file already exists')
 
         return fname
+
+    def get_stats(self, output: np.ndarray) -> typing.Dict:
+        print(self.source_data, output)
+        source_bits = np.unpackbits(
+            np.array(bytearray(self.source_data.tobytes()), dtype=np.uint8),
+            bitorder='little')
+
+        output_bits = np.unpackbits(
+            np.array(bytearray(output.tobytes()), dtype=np.uint8),
+            bitorder='little')
+
+        stats = {
+            'snr_db': snr_db(self.source_data, output),
+            'mse': mse(self.source_data, output),
+            'rmsd': rmsd(self.source_data, output),
+            'psnr_db': psnr_db(self.source_data, output),
+            'ber_percent': ber_percent(source_bits, output_bits),
+        }
+        return stats
