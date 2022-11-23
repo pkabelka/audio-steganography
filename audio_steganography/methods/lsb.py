@@ -52,10 +52,10 @@ class LSB(MethodBase):
             needed for decoding.
         """
 
-        # TODO: support more than 8
         depth = int(depth)
-        if depth < 1 or depth > 8:
-            raise ValueError('bit depth must be between 1 and 8')
+        if depth < 1 or depth > np.iinfo(self._source_data.dtype).bits:
+            raise ValueError(f'bit depth must be between 1 and '+
+                             f'{np.iinfo(self._source_data.dtype).bits}')
 
         secret = self._secret_data
         if depth > 1:
@@ -131,10 +131,10 @@ class LSB(MethodBase):
             using least significant bit substitution method.
         """
 
-        # TODO: support more than 8
         depth = int(depth)
-        if depth < 1 or depth > 8:
-            raise ValueError('bit depth must be between 1 and 8')
+        if depth < 1 or depth > np.iinfo(self._source_data.dtype).bits:
+            raise ValueError(f'bit depth must be between 1 and '+
+                             f'{np.iinfo(self._source_data.dtype).bits}')
 
         _len = len(self._source_data)
         if l is not None:
@@ -151,8 +151,18 @@ class LSB(MethodBase):
         # unpack bytes to bits
         unpacked = np.unpackbits(lsb, bitorder='little')
 
-        # split to byte size arrays and extract up to bit depth in each array
-        unpacked_split = np.array(seg_split_len_n(unpacked, 8))[:, :depth]
+        # when encoding, bits representing larger numbers than 255 will get
+        # split to multiple bytes
+        # chunk_size stores number of bits of those bytes
+        chunk_size = int(np.ceil(depth / 8) * 8)
+        padded = np.pad(
+            unpacked,
+            (0, np.ceil(len(unpacked) / chunk_size).
+                 astype(np.uint32) * chunk_size - len(unpacked)))
+
+        # split to chunk size arrays and extract up to bit depth in each array
+        unpacked_split = np.array(
+            seg_split_len_n(padded, chunk_size))[:, :depth]
 
         return unpacked_split.flatten()[:_len], {}
 
