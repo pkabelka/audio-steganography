@@ -75,7 +75,7 @@ def main():
 
             stats = {}
             if args.stats:
-                stats = steganography.get_stats(output)
+                stats = steganography.get_stats(output, additional_output)
             additional_output = {**additional_output, **stats}
         else:
             output, additional_output = steganography.decode(**options[method])

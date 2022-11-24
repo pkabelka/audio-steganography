@@ -13,7 +13,7 @@ from .mode import Mode
 from .exceptions import OutputFileExists, WavReadError
 from .audio_utils import to_dtype
 from .stat_utils import snr_db, mse, rmsd, psnr_db, ber_percent
-from typing import Optional, Dict
+from typing import Optional, Dict, Any
 import numpy as np
 import scipy.io.wavfile
 import os.path
@@ -200,7 +200,7 @@ class MethodFacade:
 
         return fname
 
-    def get_stats(self, output: np.ndarray) -> Dict:
+    def get_stats(self, output: np.ndarray, additional_output: Dict[str, Any]) -> Dict:
         """Compute and return statistical tests on source and `encode` method
         output and also `source`, `secret` and `output` lengths.
 
@@ -214,20 +214,24 @@ class MethodFacade:
         stats : Dict
             Results of statistical functions.
         """
-        source_bits = np.unpackbits(
-            np.array(bytearray(self.source_data.tobytes()), dtype=np.uint8),
-            bitorder='little')
+        # source_bits = np.unpackbits(
+        #     np.array(bytearray(self.source_data.tobytes()), dtype=np.uint8),
+        #     bitorder='little')
 
-        output_bits = np.unpackbits(
-            np.array(bytearray(output.tobytes()), dtype=np.uint8),
-            bitorder='little')
+        # output_bits = np.unpackbits(
+        #     np.array(bytearray(output.tobytes()), dtype=np.uint8),
+        #     bitorder='little')
+
+        method: MethodBase = self.method.value(output)
+        encoded_secret, _ = method.decode(**additional_output)
 
         stats = {
             'snr_db': snr_db(self.source_data, output),
             'mse': mse(self.source_data, output),
             'rmsd': rmsd(self.source_data, output),
             'psnr_db': psnr_db(self.source_data, output),
-            'ber_percent': ber_percent(source_bits, output_bits),
+            # 'ber_percent_source_output': ber_percent(source_bits, output_bits),
+            'ber_percent_secret_encoded': ber_percent(self.data_to_encode, encoded_secret),
             'source_sample_len': len(self.source_data),
             'secret_bit_len': len(self.data_to_encode),
             'output_sample_len': len(output),
