@@ -200,7 +200,11 @@ class MethodFacade:
 
         return fname
 
-    def get_stats(self, output: np.ndarray, additional_output: Dict[str, Any]) -> Dict:
+    def get_stats(
+            self,
+            output: np.ndarray,
+            additional_output: Dict[str, Any]
+        ) -> Dict:
         """Compute and return statistical tests on source and `encode` method
         output and also `source`, `secret` and `output` lengths.
 
@@ -231,7 +235,8 @@ class MethodFacade:
             'rmsd': rmsd(self.source_data, output),
             'psnr_db': psnr_db(self.source_data, output),
             # 'ber_percent_source_output': ber_percent(source_bits, output_bits),
-            'ber_percent_secret_encoded': ber_percent(self.data_to_encode, encoded_secret),
+            'ber_percent_secret_encoded': ber_percent(self.data_to_encode,
+                                                      encoded_secret),
             'source_sample_len': len(self.source_data),
             'secret_bit_len': len(self.data_to_encode),
             'output_sample_len': len(output),
