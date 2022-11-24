@@ -36,6 +36,9 @@ class LSB(MethodBase):
         """Encodes the secret data into source using least significant bit
         substitution.
 
+        If `depth` is less than 1 or more than the number of bits the source
+        dtype provides, a `ValueError` exception is raised.
+
         If the secret data is bigger than source capacity, a
         `SecretSizeTooLarge` exception is raised.
 
@@ -116,6 +119,9 @@ class LSB(MethodBase):
             **kwargs,
         ) -> EncodeDecodeReturn:
         """Decode using plain least significant bit substitution.
+
+        If `depth` is less than 1 or more than the number of bits the source
+        dtype provides, a `ValueError` exception is raised.
 
         Parameters
         ----------
