@@ -12,6 +12,12 @@ from ..audio_utils import to_dtype, seg_split_len_n
 from typing import Optional
 import numpy as np
 
+dtype_conv = {
+    np.dtype(np.float64): np.int64,
+    np.dtype(np.float32): np.int32,
+    np.dtype(np.float16): np.int16,
+}
+
 class LSB(MethodBase):
     """This is an implementation of least significant bit substitution method.
 
@@ -55,10 +61,16 @@ class LSB(MethodBase):
             needed for decoding.
         """
 
+        # convert float dtypes to int dtypes
+        source = self._source_data
+        source_dtype = source.dtype
+        if source.dtype in dtype_conv:
+            source = to_dtype(source, dtype_conv[source.dtype])
+
         depth = int(depth)
-        if depth < 1 or depth > np.iinfo(self._source_data.dtype).bits:
+        if depth < 1 or depth > np.iinfo(source.dtype).bits:
             raise ValueError(f'bit depth must be between 1 and '+
-                             f'{np.iinfo(self._source_data.dtype).bits}')
+                             f'{np.iinfo(source.dtype).bits}')
 
         secret = self._secret_data
         if depth > 1:
@@ -73,16 +85,10 @@ class LSB(MethodBase):
                 seg_split_len_n(secret_padded_to_bit_depth, depth),
                 dtype=np.uint8)
 
-        if secret.size > self._source_data.size:
+        if secret.size > source.size:
             raise SecretSizeTooLarge('secret data cannot fit in source: '+
                 f'secret.size = {secret.size}, '+
-                f'capacity(source) = {self._source_data.size}')
-
-        # convert float dtypes to int64
-        source = self._source_data
-        source_dtype = source.dtype
-        if source_dtype in [np.float16, np.float32, np.float64]:
-            source = to_dtype(source, np.int32)
+                f'capacity(source) = {source.size}')
 
         if depth > 1:
             # convert bits to uint8 numbers
@@ -99,11 +105,11 @@ class LSB(MethodBase):
             encoded,
             np.pad(
                 secret,
-                (0, self._source_data.size - secret.size)
+                (0, source.size - secret.size)
             )
         )
 
-        if source_dtype in [np.float16, np.float32, np.float64]:
+        if source_dtype in dtype_conv:
             encoded = to_dtype(encoded, source_dtype)
 
         return encoded, {
