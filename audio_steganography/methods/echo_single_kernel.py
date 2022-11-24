@@ -52,8 +52,8 @@ class Echo_single_kernel(MethodBase):
             d1: int,
         ) -> EncodeDecodeReturn:
 
-        secret_len = len(self._secret_data)
-        mixer = mixer_sig(self._secret_data, len(self._source_data))
+        secret_len = self._secret_data.size
+        mixer = mixer_sig(self._secret_data, self._source_data.size)
 
         # echo kernel for binary 0
         k0 = np.append(np.zeros(d0), [1]) * self._alpha
@@ -63,7 +63,7 @@ class Echo_single_kernel(MethodBase):
         h0 = scipy.signal.fftconvolve(k0, self._source_data)
         h1 = scipy.signal.fftconvolve(k1, self._source_data)
 
-        sp = np.pad(np.array(self._source_data), (0, len(h1)-len(self._source_data)))
+        sp = np.pad(np.array(self._source_data), (0, len(h1)-self._source_data.size))
         x = sp[:len(mixer)] + h1[:len(mixer)] * mixer + h0[:len(mixer)] * np.abs(1-mixer)
 
         # center, normalize range and convert to the original dtype
@@ -119,10 +119,10 @@ class Echo_single_kernel(MethodBase):
             d1 = d0 + 50
 
         # require at least 1024 samples per encoded bit
-        if len(self._secret_data) * 1024 > len(self._source_data):
+        if self._secret_data.size * 1024 > self._source_data.size:
             raise SecretSizeTooLarge('secret data cannot fit in source: '+
-                f'len(secret) = {len(self._secret_data)}, capacity(source) = '+
-                f'{len(self._source_data)}')
+                f'len(secret) = {self._secret_data.size}, capacity(source) = '+
+                f'{self._source_data.size}')
 
         if delay_search == 'bruteforce':
             return self._encode_bruteforce(d0, d1)
@@ -188,7 +188,7 @@ class Echo_single_kernel(MethodBase):
             callback=lambda x, f, accept: True if f == 0.0 else None,
         )
 
-        secret_len = len(self._secret_data)
+        secret_len = self._secret_data.size
 
         x, _ = self._encode(int(res.x[0]), int(res.x[1]))
         return x, {

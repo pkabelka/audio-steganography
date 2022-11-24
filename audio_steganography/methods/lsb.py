@@ -22,7 +22,7 @@ class LSB(MethodBase):
     >>> import numpy as np
     >>> from audio_steganography.methods.lsb import LSB
     >>> secret = np.array([0,0,1,1,0,1,0,0,0,0,1,1,0,0,1,0], dtype=np.uint8)
-    >>> source = np.random.rand(len(secret) * 2)
+    >>> source = np.random.rand(secret.size * 2)
     >>> LSB_method = LSB(source, secret)
     >>> encoded = LSB_method.encode()
 
@@ -73,10 +73,10 @@ class LSB(MethodBase):
                 seg_split_len_n(secret_padded_to_bit_depth, depth),
                 dtype=np.uint8)
 
-        if len(secret) > len(self._source_data):
+        if secret.size > self._source_data.size:
             raise SecretSizeTooLarge('secret data cannot fit in source: '+
-                f'len(secret) = {len(secret)}, '+
-                f'capacity(source) = {len(self._source_data)}')
+                f'secret.size = {secret.size}, '+
+                f'capacity(source) = {self._source_data.size}')
 
         # convert float dtypes to int64
         source = self._source_data
@@ -99,7 +99,7 @@ class LSB(MethodBase):
             encoded,
             np.pad(
                 secret,
-                (0, len(self._source_data) - len(secret))
+                (0, self._source_data.size - secret.size)
             )
         )
 
@@ -143,7 +143,7 @@ class LSB(MethodBase):
             raise ValueError(f'bit depth must be between 1 and '+
                              f'{np.iinfo(self._source_data.dtype).bits}')
 
-        _len = len(self._source_data)
+        _len = self._source_data.size
         if l is not None:
             _len = l
 
