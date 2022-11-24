@@ -105,6 +105,7 @@ class LSB(MethodBase):
 
         return encoded, {
             'l': len(self._secret_data),
+            'depth': depth,
         }
 
 
