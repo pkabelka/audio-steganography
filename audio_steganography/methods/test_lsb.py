@@ -1,4 +1,5 @@
 import unittest
+import numpy as np
 from ..test import *
 from .lsb import LSB
 from ..exceptions import SecretSizeTooLarge
@@ -39,7 +40,7 @@ class TestLSB(unittest.TestCase):
         output, additional_output = lsb.encode()
 
         self.assertEqual(output.size, source_uint8_len_32.size)
-        assert np.all(output == zeroed_lsb_reference)
+        np.testing.assert_equal(output, zeroed_lsb_reference)
         self.assertEqual(additional_output['l'], secret_uint8_empty.size)
 
     def testWrongTypeSource(self):
@@ -54,7 +55,7 @@ class TestLSB(unittest.TestCase):
         output, additional_output = lsb.encode()
 
         self.assertEqual(output.size, source_int16_empty.size)
-        assert np.all(output == source_int16_empty)
+        np.testing.assert_equal(output, source_int16_empty)
         self.assertEqual(additional_output['l'], secret_uint8_empty.size)
 
     def testEmptySourceEncode(self):
@@ -85,4 +86,4 @@ class TestLSB(unittest.TestCase):
 
         lsb = LSB(output)
         output, additional_output = lsb.decode()
-        assert np.all(output[:secret_uint8_42.size] == secret_uint8_42)
+        np.testing.assert_equal(output[:secret_uint8_42.size], secret_uint8_42)
