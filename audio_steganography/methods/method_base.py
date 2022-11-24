@@ -26,6 +26,10 @@ class MethodBase(abc.ABC):
             source_data: np.ndarray,
             secret_data: np.ndarray[Any, np.dtype[np.uint8]] = np.empty(0, dtype=np.uint8)
         ):
+
+        if secret_data.dtype != np.uint8:
+            raise TypeError("secret_data must be of type numpy.uint8")
+
         self._source_data = source_data
         self._secret_data = secret_data
 
