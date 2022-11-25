@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from ...test import *
+from ...tests_common import *
 from ..lsb import LSB
 from ...exceptions import SecretSizeTooLarge
 

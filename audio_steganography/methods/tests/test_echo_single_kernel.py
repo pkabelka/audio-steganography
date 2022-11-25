@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from ...test import *
+from ...tests_common import *
 from ..echo_single_kernel import Echo_single_kernel
 from ...exceptions import SecretSizeTooLarge
 from ...stat_utils import ber_percent
