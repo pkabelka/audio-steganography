@@ -7,12 +7,12 @@
 and decoding of files.
 """
 
-from .methods.method_base import MethodBase, EncodeDecodeReturn
-from .methods.method import Method
+from ..methods.method_base import MethodBase, EncodeDecodeReturn
+from ..methods.method import Method
 from .mode import Mode
-from .exceptions import OutputFileExists, WavReadError
-from .audio_utils import to_dtype
-from .stat_utils import snr_db, mse, rmsd, psnr_db, ber_percent
+from ..exceptions import OutputFileExists, WavReadError
+from ..audio_utils import to_dtype
+from ..stat_utils import snr_db, mse, rmsd, psnr_db, ber_percent
 from typing import Optional, Dict, Any
 import numpy as np
 import scipy.io.wavfile

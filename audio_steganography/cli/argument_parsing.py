@@ -6,7 +6,7 @@
 """This module contains the parse_args function.
 """
 
-from .methods.method import Method
+from ..methods.method import Method
 from .mode import Mode
 import argparse
 from typing import Tuple, Any
