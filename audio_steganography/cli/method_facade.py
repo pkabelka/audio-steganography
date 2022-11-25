@@ -8,7 +8,7 @@ and decoding of files.
 """
 
 from ..methods.method_base import MethodBase, EncodeDecodeReturn
-from ..methods.method import Method
+from ..methods import Method
 from .mode import Mode
 from ..exceptions import OutputFileExists, WavReadError
 from ..audio_utils import to_dtype

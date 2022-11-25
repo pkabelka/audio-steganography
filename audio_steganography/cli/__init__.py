@@ -8,7 +8,7 @@ MethodsFacade class to run encoding and decoding.
 """
 
 from .argument_parsing import parse_args
-from ..methods.method import Method
+from ..methods import Method
 from .method_facade import MethodFacade
 from .mode import Mode
 from ..exceptions import OutputFileExists, WavReadError, SecretSizeTooLarge
