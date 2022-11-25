@@ -53,6 +53,13 @@ class Echo_single_kernel(MethodBase):
         ) -> EncodeDecodeReturn:
 
         secret_len = self._secret_data.size
+        if secret_len == 0:
+            return self._source_data, {
+                'd0': d0,
+                'd1': d1,
+                'l': secret_len,
+            }
+
         mixer = mixer_sig(self._secret_data, self._source_data.size)
 
         # echo kernel for binary 0
@@ -68,7 +75,8 @@ class Echo_single_kernel(MethodBase):
 
         # center, normalize range and convert to the original dtype
         x = x - np.mean(x)
-        x = x / np.abs(x).max()
+        if np.abs(x).max() != 0:
+            x = x / np.abs(x).max()
         x = to_dtype(x, self._source_data.dtype)
 
         return x, {
