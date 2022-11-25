@@ -1,8 +1,8 @@
 import unittest
 import numpy as np
-from ..test import *
-from .lsb import LSB
-from ..exceptions import SecretSizeTooLarge
+from ...test import *
+from ..lsb import LSB
+from ...exceptions import SecretSizeTooLarge
 
 class TestLSB(unittest.TestCase):
     def setUp(self) -> None:
