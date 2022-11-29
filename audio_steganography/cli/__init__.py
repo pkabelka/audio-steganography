@@ -12,7 +12,7 @@ from ..methods import Method
 from .method_facade import MethodFacade
 from .mode import Mode
 from ..exceptions import OutputFileExists, WavReadError, SecretSizeTooLarge
-from .utils import error_exit, get_attr
+from .cli_utils import error_exit, get_attr
 from .exit_codes import ExitCode
 import sys
 import json
