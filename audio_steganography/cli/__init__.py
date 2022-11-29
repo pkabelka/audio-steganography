@@ -8,7 +8,7 @@ MethodsFacade class to run encoding and decoding.
 """
 
 from .argument_parsing import parse_args
-from ..methods import Method
+from ..methods import MethodEnum
 from .method_facade import MethodFacade
 from .mode import Mode
 from ..exceptions import OutputFileExists, WavReadError, SecretSizeTooLarge
@@ -35,7 +35,7 @@ def main():
 
     # Check if the method is valid
     try:
-        method = Method[args.method]
+        method = MethodEnum[args.method]
     except KeyError:
         error_exit('invalid method specified', ExitCode.InvalidMethod)
 
@@ -55,11 +55,11 @@ def main():
 
     additional_output = {}
     options = {
-        Method.lsb: {
+        MethodEnum.lsb: {
             (a:='depth'): get_attr(args, a),
             'l': get_attr(args, 'len'),
         },
-        Method.echo_single_kernel: {
+        MethodEnum.echo_single_kernel: {
             (a:='d0'): get_attr(args, a),
             (a:='d1'): get_attr(args, a),
             (a:='delay_search'): get_attr(args, a),

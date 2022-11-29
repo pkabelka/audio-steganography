@@ -3,7 +3,7 @@
 # File: __init__.py
 # Author: Petr Kabelka <xkabel09 at stud.fit.vutbr.cz>
 
-"""This module contains the Method enum which maps the individual method
+"""This module contains the MethodEnum class which maps the individual method
 classes to a name in the enum.
 """
 
@@ -11,7 +11,7 @@ from enum import Enum as _Enum
 from .echo_single_kernel import Echo_single_kernel
 from .lsb import LSB
 
-class Method(_Enum):
+class MethodEnum(_Enum):
     """This enum contains implemented steganography methods.
     """
     echo_single_kernel = Echo_single_kernel

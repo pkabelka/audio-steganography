@@ -8,7 +8,7 @@ and decoding of files.
 """
 
 from ..methods.method_base import MethodBase, EncodeDecodeReturn
-from ..methods import Method
+from ..methods import MethodEnum
 from .mode import Mode
 from ..exceptions import OutputFileExists, WavReadError
 from ..audio_utils import to_dtype
@@ -25,7 +25,7 @@ class MethodFacade:
     """
     def __init__(
             self,
-            method: Method,
+            method: MethodEnum,
             mode: Mode,
             source: str,
             output_file: Optional[str] = None,

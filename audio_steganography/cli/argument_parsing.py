@@ -6,7 +6,7 @@
 """This module contains the parse_args function.
 """
 
-from ..methods import Method
+from ..methods import MethodEnum
 from .mode import Mode
 import argparse
 from typing import Tuple, Any
@@ -61,7 +61,7 @@ def parse_args() -> Tuple[Any, argparse.ArgumentParser]:
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(dest='method')
 
-    for m in Method:
+    for m in MethodEnum:
         method_parser = subparsers.add_parser(
             m.name,
             help=f'use {m.name} -h to show help')
