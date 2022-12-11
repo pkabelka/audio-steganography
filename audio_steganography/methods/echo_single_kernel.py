@@ -11,7 +11,6 @@ from ..exceptions import SecretSizeTooLarge
 from ..audio_utils import seg_split, mixer_sig, to_dtype
 from typing import Any, Optional
 import numpy as np
-import scipy.signal
 
 from ..stat_utils import ber_percent
 import scipy.optimize
@@ -62,13 +61,10 @@ class Echo_single_kernel(MethodBase):
 
         mixer = mixer_sig(self._secret_data, self._source_data.size)
 
-        # echo kernel for binary 0
-        k0 = np.append(np.zeros(d0), [1]) * self._alpha
-        # echo kernel for binary 1
-        k1 = np.append(np.zeros(d1), [1]) * self._alpha * self._decay_rate
-
-        h0 = scipy.signal.fftconvolve(k0, self._source_data)
-        h1 = scipy.signal.fftconvolve(k1, self._source_data)
+        # echo of source for binary 0
+        h0 = np.append(np.zeros(d0), self._source_data) * self._alpha
+        # echo of source for binary 1
+        h1 = np.append(np.zeros(d1), self._source_data) * self._alpha * self._decay_rate
 
         sp = np.pad(np.array(self._source_data), (0, len(h1)-self._source_data.size))
         x = sp[:len(mixer)] + h1[:len(mixer)] * mixer + h0[:len(mixer)] * np.abs(1-mixer)
