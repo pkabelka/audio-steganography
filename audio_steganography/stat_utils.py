@@ -7,9 +7,9 @@
 """
 
 import numpy as np
-from typing import List, Any
+from typing import List, Union
 
-def snr_db(x: np.ndarray | List, y: np.ndarray | List) -> float:
+def snr_db(x: Union[np.ndarray, List], y: Union[np.ndarray, List]) -> float:
     """Calculates the decibell signal-to-noise ratio of clean signal and noisy
     signal.
 
@@ -32,7 +32,7 @@ def snr_db(x: np.ndarray | List, y: np.ndarray | List) -> float:
         raise
     return 10 * np.log10((np.sum(x**2)) / (np.sum((x - y)**2)))
 
-def mse(x: np.ndarray | List, y: np.ndarray | List) -> float:
+def mse(x: Union[np.ndarray, List], y: Union[np.ndarray, List]) -> float:
     """Calculates the mean square error of clean signal and noisy signal.
 
     Parameters
@@ -54,7 +54,7 @@ def mse(x: np.ndarray | List, y: np.ndarray | List) -> float:
         raise
     return float(1/n * np.sum((x - y)**2))
 
-def rmsd(x: np.ndarray | List, y: np.ndarray | List) -> float:
+def rmsd(x: Union[np.ndarray, List], y: Union[np.ndarray, List]) -> float:
     """Calculates the root mean square deviation of clean signal and noisy
     signal.
 
@@ -77,7 +77,7 @@ def rmsd(x: np.ndarray | List, y: np.ndarray | List) -> float:
         raise
     return np.sqrt(mse(x, y))
 
-def psnr_db(x: np.ndarray | List, y: np.ndarray | List) -> float:
+def psnr_db(x: Union[np.ndarray, List], y: Union[np.ndarray, List]) -> float:
     """Calculates the peak signal-to-noise ratio of clean signal and noisy
     signal in decibells.
 
@@ -101,8 +101,8 @@ def psnr_db(x: np.ndarray | List, y: np.ndarray | List) -> float:
     return 10 * np.log10(1.0 / mse(x, y))
 
 def ber_percent(
-        x: np.ndarray | List[List],
-        y: np.ndarray | List[List],
+        x: Union[np.ndarray, List],
+        y: Union[np.ndarray, List],
     ) -> float:
     """Calculates the bit error rate of between the two input arrays.
 

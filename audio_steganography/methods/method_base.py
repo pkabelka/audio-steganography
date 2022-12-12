@@ -24,7 +24,7 @@ class MethodBase(abc.ABC):
     def __init__(
             self,
             source_data: np.ndarray,
-            secret_data: np.ndarray[Any, np.dtype[np.uint8]] = np.empty(0, dtype=np.uint8)
+            secret_data = np.empty(0, dtype=np.uint8)
         ):
 
         if secret_data.dtype != np.uint8:

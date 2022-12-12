@@ -9,7 +9,7 @@
 from .method_base import MethodBase, EncodeDecodeReturn, EncodeDecodeArgsReturn
 from ..exceptions import SecretSizeTooLarge
 from ..audio_utils import seg_split, mixer_sig, to_dtype
-from typing import Any, Optional
+from typing import Optional
 import numpy as np
 
 from ..stat_utils import ber_percent
@@ -39,7 +39,7 @@ class Echo_single_kernel(MethodBase):
     def __init__(
             self,
             source_data: np.ndarray,
-            secret_data: np.ndarray[Any, np.dtype[np.uint8]] = np.empty(0, dtype=np.uint8)
+            secret_data = np.empty(0, dtype=np.uint8)
         ):
         super().__init__(source_data, secret_data)
         self._alpha = 0.5

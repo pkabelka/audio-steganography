@@ -8,7 +8,7 @@
 
 import numpy as np
 from numpy.typing import DTypeLike
-from typing import List, Any
+from typing import List
 
 def seg_split(input: np.ndarray, n: int) -> List[np.ndarray]:
     """Splits the input array into N segments
@@ -46,7 +46,7 @@ def seg_split_len_n(input: np.ndarray, n: int) -> List[np.ndarray]:
         return [np.empty(0)]
     return np.array_split(input, np.ceil(len(input) / n))
 
-def mixer_sig(secret_data: np.ndarray[Any, np.dtype[np.uint8]], signal_length: int) -> np.ndarray:
+def mixer_sig(secret_data: np.ndarray, signal_length: int) -> np.ndarray:
     """Creates a mixer signal by spliting the input array into segments of
     secret_data length + 1.
 
