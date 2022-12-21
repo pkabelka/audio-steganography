@@ -232,7 +232,7 @@ class Echo_single_kernel(MethodBase):
         i = 0
         for seg in split:
             cn = np.fft.ifft(np.log(np.abs(np.fft.fft(seg))))
-            if cn[d0+1] > cn[d1+1]:
+            if cn[d0] > cn[d1]:
                 decoded[i] = 0
             else:
                 decoded[i] = 1
