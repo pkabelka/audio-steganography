@@ -11,7 +11,7 @@ from numpy.typing import DTypeLike
 from typing import List
 
 def seg_split(input: np.ndarray, n: int) -> List[np.ndarray]:
-    """Splits the input array into N segments
+    """Splits the input array into N segments of approximately same length.
 
     Parameters
     ----------
@@ -28,7 +28,7 @@ def seg_split(input: np.ndarray, n: int) -> List[np.ndarray]:
     return np.array_split(input, n)[:-1] + [input[-int(round(len(input)/n)):]]
 
 def seg_split_len_n(input: np.ndarray, n: int) -> List[np.ndarray]:
-    """Splits the input array into segments of length N
+    """Splits the input array into segments of approximately length N.
 
     Parameters
     ----------
