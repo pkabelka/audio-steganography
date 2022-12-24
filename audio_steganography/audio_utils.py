@@ -46,6 +46,26 @@ def seg_split_len_n(input: np.ndarray, n: int) -> List[np.ndarray]:
         return [np.empty(0)]
     return np.array_split(input, np.ceil(len(input) / n))
 
+def seg_split_len_n_except_last(input: np.ndarray, n: int) -> List[np.ndarray]:
+    """Splits the input array into segments of length N. Last segment contains
+    the remainder of the input array.
+
+    Parameters
+    ----------
+    input : numpy.ndarray
+        The array to split into N segments.
+    n : int
+        Segment length.
+
+    Returns
+    -------
+    out : List
+        A list containing input split into NumPy arrays of length N.
+    """
+    if len(input) == 0:
+        return [np.empty(0)]
+    return np.split(input, np.arange(n, len(input), n))
+
 def seg_split_same_len_except_last(input: np.ndarray, n: int) -> List[np.ndarray]:
     """Splits the input array into N segments of same length except last
     segment. Last segment contains the remainder of the input array.
