@@ -71,10 +71,10 @@ class TestLSB(unittest.TestCase):
 
     def testEncodeDecode42(self):
         echo = Echo_single_kernel(source_int16_len_131072, secret_uint8_42)
-        output, additional_output = echo.encode(d0=2306, d1=3000)
+        output, additional_output = echo.encode(d0=250, d1=350)
 
         self.assertEqual(additional_output['l'], secret_uint8_42.size)
 
         echo = Echo_single_kernel(output)
         output, additional_output = echo.decode(d0=250, d1=350, l=additional_output['l'])
-        self.assertEqual(ber_percent(secret_uint8_42, output), 31.25)
+        np.testing.assert_equal(secret_uint8_42, output)
