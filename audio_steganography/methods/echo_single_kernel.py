@@ -143,8 +143,12 @@ class Echo_single_kernel(MethodBase):
         ) -> EncodeDecodeReturn:
 
         encoded = np.empty(0)
-        for d0 in range(d0, d0+100):
-            for d1 in range(d0, d0+50):
+        params_hist = {}
+
+        _d0 = d0
+        _d1 = d1
+        for d0 in range(_d0, _d0+10):
+            for d1 in range(_d1, _d1+10):
 
                 encoded, params = self._encode(d0, d1)
 
@@ -153,17 +157,24 @@ class Echo_single_kernel(MethodBase):
 
                 # Decode to verify delay pair
                 test_decoder = Echo_single_kernel(encoded)
-                if np.all(test_decoder.decode(d0, d1, params['l'])[0] == self._secret_data):
+                ber = ber_percent(test_decoder.decode(**params)[0], self._secret_data)
+                if ber == 0.0:
                     return encoded, {
                         'd0': d0,
                         'd1': d1,
                         'l': params['l'],
                     }
+                else:
+                    params_hist[(d0, d1, params['l'])] = ber
+
+        # Encode using best delays found
+        best_params = min(params_hist, key=params_hist.get)
+        encoded, params = self._encode(best_params[0], best_params[1])
 
         return encoded, {
-            'd0': -1,
-            'd1': -1,
-            'l': -1,
+            'd0': params['d0'],
+            'd1': params['d1'],
+            'l': params['l'],
         }
 
     def _optimize_encode(self, x):
