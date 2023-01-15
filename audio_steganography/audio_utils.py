@@ -50,7 +50,7 @@ def seg_split_same_len_except_last(input: np.ndarray, n: int) -> List[np.ndarray
             input[:int(np.floor(len(input)/(n-1))) * (n-1)],
             n-1) + [input[int(np.floor(len(input)/(n-1))) * (n-1):]]
 
-def seg_split_exact_len_trunc(
+def seg_split_exact_len(
         input: np.ndarray, n: int
     ) -> Tuple[np.ndarray, np.ndarray]:
     """Splits the input array into N segments of same length and also returns
