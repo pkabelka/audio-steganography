@@ -115,7 +115,7 @@ def seg_split_len_n_except_last(input: np.ndarray, n: int) -> List[np.ndarray]:
 
 def mixer_sig(secret_data: np.ndarray, signal_length: int) -> np.ndarray:
     """Creates a mixer signal by spliting the input array into segments of
-    secret_data length + 1.
+    secret_data length and multiplying each array with each bit in secret_data.
 
     Parameters
     ----------
@@ -129,13 +129,9 @@ def mixer_sig(secret_data: np.ndarray, signal_length: int) -> np.ndarray:
     out : numpy.ndarray
         Mixer signal of `signal_length` length.
     """
-    secret_len = len(secret_data)
-    mixer = seg_split_same_len_except_last(np.ones(signal_length), secret_len + 1)
-
-    for i in range(len(secret_data)):
-        mixer[i] = mixer[i] * secret_data[i]
-
-    return np.hstack(mixer)
+    mixer, rest = seg_split_exact_len(np.ones(signal_length), len(secret_data))
+    mixer = mixer * secret_data[:, None]
+    return np.append(mixer, rest)
 
 def to_dtype(input: np.ndarray, dtype: DTypeLike) -> np.ndarray:
     """Converts values in input array to specified dtype values.
