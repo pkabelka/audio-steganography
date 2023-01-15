@@ -8,7 +8,7 @@
 
 import numpy as np
 from numpy.typing import DTypeLike
-from typing import List
+from typing import List, Tuple
 
 def seg_split(input: np.ndarray, n: int) -> List[np.ndarray]:
     """Splits the input array into N segments of approximately same length.
@@ -89,7 +89,9 @@ def seg_split_same_len_except_last(input: np.ndarray, n: int) -> List[np.ndarray
             input[:int(np.floor(len(input)/(n-1))) * (n-1)],
             n-1) + [input[int(np.floor(len(input)/(n-1))) * (n-1):]]
 
-def seg_split_exact_len_trunc(input: np.ndarray, n: int):
+def seg_split_exact_len_trunc(
+        input: np.ndarray, n: int
+    ) -> Tuple[np.ndarray, np.ndarray]:
     """Splits the input array into N segments of same length and also returns
     the unused part of array.
 
@@ -107,7 +109,9 @@ def seg_split_exact_len_trunc(input: np.ndarray, n: int):
     rest : NDArray
         Rest of the input which had to be sliced off for alignment.
     """
-    return np.asanyarray(np.array_split(input[:int(np.floor(len(input)/n) * n)], n)), input[int(np.floor(len(input)/n) * n):]
+    return np.asanyarray(
+        np.array_split(input[:int(np.floor(len(input)/n) * n)], n)
+    ), input[int(np.floor(len(input)/n) * n):]
 
 def mixer_sig(secret_data: np.ndarray, signal_length: int) -> np.ndarray:
     """Creates a mixer signal by spliting the input array into segments of
