@@ -89,6 +89,26 @@ def seg_split_same_len_except_last(input: np.ndarray, n: int) -> List[np.ndarray
             input[:int(np.floor(len(input)/(n-1))) * (n-1)],
             n-1) + [input[int(np.floor(len(input)/(n-1))) * (n-1):]]
 
+def seg_split_exact_len_trunc(input: np.ndarray, n: int):
+    """Splits the input array into N segments of same length and also returns
+    the unused part of array.
+
+    Parameters
+    ----------
+    input : numpy.ndarray
+        The array to split into N segments.
+    n : int
+        Number of segments to split input into.
+
+    Returns
+    -------
+    out : NDArray[...]
+        A NumPy array with input split into N NumPy arrays of same length.
+    rest : NDArray
+        Rest of the input which had to be sliced off for alignment.
+    """
+    return np.asanyarray(np.array_split(input[:int(np.floor(len(input)/n) * n)], n)), input[int(np.floor(len(input)/n) * n):]
+
 def mixer_sig(secret_data: np.ndarray, signal_length: int) -> np.ndarray:
     """Creates a mixer signal by spliting the input array into segments of
     secret_data length + 1.
