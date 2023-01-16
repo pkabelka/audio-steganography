@@ -49,28 +49,39 @@ class PhaseCoding(MethodBase):
         secret_len = self._secret_data.size
         if secret_len == 0:
             return self._source_data, {
-                'l': -1,
+                'l': 0,
             }
 
-        seg, rest = seg_split_len_n_exact(self._source_data, secret_len)
-        # l = len(seg[0])
+        # segment_len should be twice as large as secret_len for secret_angles
+        # to blend in
+        segment_len = int(2 * 2**np.ceil(np.log2(2 * secret_len)))
+
+        # check if segments can fit in source
+        if segment_len > self._source_data.size:
+            raise SecretSizeTooLarge('secret data cannot fit in source: '+
+                f'len(secret) = {self._secret_data.size} bits, '+
+                f'capacity(source) = {segment_len//8} bits')
+
+        seg, rest = seg_split_len_n_exact(self._source_data, segment_len)
         fft = np.fft.fft(seg)
         angles = np.angle(fft)
-        diff = np.diff(angles, axis=0)
-        diff = np.concatenate(([np.zeros(secret_len)], diff))
-        # diff = np.concatenate(([np.zeros(l)], diff))
-        # convert secret bits to [-pi/2; pi/2] interval; 0 => pi/2; 1 => -pi/2
-        secret_angles = (self._secret_data * 2 - 1) * -np.pi/2
-        angles[0] = secret_angles
-        # angles[0][int(len(fft[0])/2)-secret_len:int(len(fft[0])/2)] = secret_angles
-        # angles[0][int(len(fft[0])/2):int(len(fft[0])/2)+secret_len] = -np.flip(secret_angles)
-        # new_angles = angles + (np.concatenate((diff[1:], [np.zeros(secret_len)])))
-        # new_angles = np.concatenate(([secret_angles], new_angles[:-1]))
-        new_angles = angles.copy()
-        for i in range(1, len(angles)):
-            new_angles[i] = new_angles[i-1] + diff[i]
 
-        encoded = np.abs(fft) * np.exp(1j * new_angles)
+        # get difference of angles across segments column-wise
+        diff = np.diff(angles, axis=0)
+
+        # convert secret bits to [-pi/2; pi/2] interval; 0 => pi/2; 1 => -pi/2
+        secret_angles = (self._secret_data.astype(np.float64) * 2 - 1) * -np.pi/2
+
+        # insert secret_angles to the middle of the first segment
+        angles[0, segment_len//2 - secret_len : segment_len//2] = secret_angles
+        angles[0, segment_len//2 + 1 : segment_len//2 + 1 + secret_len] = -np.flip(secret_angles)
+
+        # adjust phases of subsequent segments
+        for i in range(1, len(angles)):
+            angles[i] = angles[i-1] + diff[i-1]
+
+        # reconstruct the signal values from new angles
+        encoded = np.abs(fft) * np.exp(1j * angles)
         encoded = np.fft.ifft(encoded).real.flatten()
 
         # center, normalize range and convert to the original dtype
@@ -79,7 +90,7 @@ class PhaseCoding(MethodBase):
             encoded = encoded / np.abs(encoded).max()
         encoded = to_dtype(encoded, self._source_data.dtype)
 
-        return encoded, {
+        return np.append(encoded, rest), {
             'l': secret_len,
         }
 
@@ -89,43 +100,34 @@ class PhaseCoding(MethodBase):
             l: int,
             **kwargs,
         ) -> EncodeDecodeReturn:
-        """Decode using plain least significant bit substitution.
-
-        If `depth` is less than 1 or more than the number of bits the source
-        dtype provides, a `ValueError` exception is raised.
+        """Decode the source data by converting values of angles in the first
+        >0 to 0 and <0 to 1.
 
         Parameters
         ----------
-        depth : int
-            Number of bits encoded in each sample. Default is 1.
-        l : int | None
-            Number of bits encoded in the source. If `l` is set to `None`, then
-            decode will return all least significant bits.
+        l : int
+            Number of bits encoded in the source.
 
         Returns
         -------
         out : method_base.EncodeDecodeReturn
             NumPy array of uint8 zeros and ones representing the bits decoded
-            using least significant bit substitution method.
+            using phase coding method.
         """
 
-        _len = self._source_data.size
-        if l is not None:
-            _len = l
+        if l < 1:
+            return np.zeros(0), {}
 
-        # seg = self._source_data[:int(np.floor(len(self._source_data) / _len))]
-        seg = self._source_data[:_len]
+        # get the first segment
+        segment_len = int(2 * 2**np.ceil(np.log2(2 * l)))
+        seg = self._source_data[:segment_len]
+
+        # get phase values
         fft = np.fft.fft(seg)
         angles = np.angle(fft)
-        decoded = np.array(angles < 0, dtype=np.uint8)
 
-#         decoded = np.zeros(_len, dtype=np.uint8)
-#         for i in range(_len):
-#             if angles[int(l/2) - _len + i] > 0:
-#                 decoded[i] = 0
-#             else:
-#                 decoded[i] = 1
-
+        # convert values >0 to 0 and values <0 to 1
+        decoded = np.array(angles[segment_len//2 - l : segment_len//2] < 0, dtype=np.uint8)
         return decoded, {}
 
 
