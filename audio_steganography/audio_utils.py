@@ -10,7 +10,7 @@ import numpy as np
 from numpy.typing import DTypeLike
 from typing import List, Tuple
 
-def seg_split(input: np.ndarray, n: int) -> List[np.ndarray]:
+def split_to_n_approx_same(input: np.ndarray, n: int) -> List[np.ndarray]:
     """Splits the input array into N segments of approximately same length.
 
     Parameters
@@ -27,7 +27,7 @@ def seg_split(input: np.ndarray, n: int) -> List[np.ndarray]:
     """
     return np.array_split(input, n)[:-1] + [input[-int(round(len(input)/n)):]]
 
-def seg_split_same_len_except_last(input: np.ndarray, n: int) -> List[np.ndarray]:
+def split_to_n_same_except_last(input: np.ndarray, n: int) -> List[np.ndarray]:
     """Splits the input array into N segments of same length except last
     segment. Last segment contains the remainder of the input array.
 
@@ -50,7 +50,7 @@ def seg_split_same_len_except_last(input: np.ndarray, n: int) -> List[np.ndarray
             input[:int(np.floor(len(input)/(n-1))) * (n-1)],
             n-1) + [input[int(np.floor(len(input)/(n-1))) * (n-1):]]
 
-def seg_split_exact_len(
+def split_to_n_segments(
         input: np.ndarray, n: int
     ) -> Tuple[np.ndarray, np.ndarray]:
     """Splits the input array into N segments of same length and also returns
@@ -74,7 +74,7 @@ def seg_split_exact_len(
         np.array_split(input[:int(np.floor(len(input)/n) * n)], n)
     ), input[int(np.floor(len(input)/n) * n):]
 
-def seg_split_len_n(input: np.ndarray, n: int) -> List[np.ndarray]:
+def split_to_segments_of_approx_len_n(input: np.ndarray, n: int) -> List[np.ndarray]:
     """Splits the input array into segments of approximately length N.
 
     Parameters
@@ -93,7 +93,7 @@ def seg_split_len_n(input: np.ndarray, n: int) -> List[np.ndarray]:
         return [np.empty(0)]
     return np.array_split(input, np.ceil(len(input) / n))
 
-def seg_split_len_n_except_last(input: np.ndarray, n: int) -> List[np.ndarray]:
+def split_to_segments_of_len_n_except_last(input: np.ndarray, n: int) -> List[np.ndarray]:
     """Splits the input array into segments of length N. Last segment contains
     the remainder of the input array.
 
@@ -113,7 +113,7 @@ def seg_split_len_n_except_last(input: np.ndarray, n: int) -> List[np.ndarray]:
         return [np.empty(0)]
     return np.split(input, np.arange(n, len(input), n))
 
-def seg_split_len_n_exact(input: np.ndarray, n: int):
+def split_to_segments_of_len_n(input: np.ndarray, n: int):
     """Splits the input array into segments of exactly length N and also
     returns the unused part of array.
 
@@ -153,7 +153,7 @@ def mixer_sig(secret_data: np.ndarray, signal_length: int) -> np.ndarray:
     out : numpy.ndarray
         Mixer signal of `signal_length` length.
     """
-    mixer, rest = seg_split_exact_len(np.ones(signal_length), len(secret_data))
+    mixer, rest = split_to_n_segments(np.ones(signal_length), len(secret_data))
     mixer = mixer * secret_data[:, None]
     return np.append(mixer, rest)
 

@@ -8,7 +8,7 @@
 
 from .method_base import MethodBase, EncodeDecodeReturn, EncodeDecodeArgsReturn
 from ..exceptions import SecretSizeTooLarge
-from ..audio_utils import to_dtype, seg_split_len_n_exact, seg_split_exact_len
+from ..audio_utils import to_dtype, split_to_segments_of_len_n
 from typing import Optional
 import numpy as np
 
@@ -62,7 +62,7 @@ class PhaseCoding(MethodBase):
                 f'len(secret) = {self._secret_data.size} bits, '+
                 f'capacity(source) = {segment_len//8} bits')
 
-        seg, rest = seg_split_len_n_exact(self._source_data, segment_len)
+        seg, rest = split_to_segments_of_len_n(self._source_data, segment_len)
         fft = np.fft.fft(seg)
         angles = np.angle(fft)
 

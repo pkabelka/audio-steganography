@@ -8,7 +8,7 @@
 
 from .method_base import MethodBase, EncodeDecodeReturn, EncodeDecodeArgsReturn
 from ..exceptions import SecretSizeTooLarge
-from ..audio_utils import seg_split_exact_len, mixer_sig, to_dtype
+from ..audio_utils import split_to_n_segments, mixer_sig, to_dtype
 from typing import Optional
 import numpy as np
 
@@ -238,7 +238,7 @@ class Echo_single_kernel(MethodBase):
             using echo single kernel method.
         """
 
-        split, _ = seg_split_exact_len(self._source_data, l)
+        split, _ = split_to_n_segments(self._source_data, l)
         decoded = np.zeros(len(split), dtype=np.uint8)
         i = 0
         for seg in split:

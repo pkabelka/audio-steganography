@@ -8,7 +8,7 @@
 
 from .method_base import MethodBase, EncodeDecodeReturn, EncodeDecodeArgsReturn
 from ..exceptions import SecretSizeTooLarge
-from ..audio_utils import to_dtype, seg_split_len_n
+from ..audio_utils import to_dtype, split_to_segments_of_approx_len_n
 from typing import Optional
 import numpy as np
 
@@ -82,7 +82,7 @@ class LSB(MethodBase):
 
             # split to bit depth long arrays
             secret = np.array(
-                seg_split_len_n(secret_padded_to_bit_depth, depth),
+                split_to_segments_of_approx_len_n(secret_padded_to_bit_depth, depth),
                 dtype=np.uint8)
 
         if secret.size > source.size:
@@ -175,7 +175,7 @@ class LSB(MethodBase):
 
         # split to chunk size arrays and extract up to bit depth in each array
         unpacked_split = np.array(
-            seg_split_len_n(padded, chunk_size))[:, :depth]
+            split_to_segments_of_approx_len_n(padded, chunk_size))[:, :depth]
 
         return unpacked_split.flatten()[:_len], {}
 
