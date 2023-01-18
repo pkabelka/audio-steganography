@@ -3,7 +3,12 @@
 # File: phase_coding.py
 # Author: Petr Kabelka <xkabel09 at stud.fit.vutbr.cz>
 
-"""This module contains the phase coding method implementation
+"""This module contains the phase coding method implementation.
+
+Encode and decode methods are inspired by Dan Oak's answer on StackExchange:
+https://dsp.stackexchange.com/questions/14804/audio-steganography-using-phase-encoding-technique
+and his GitHub repository for phase encoding in Python:
+https://github.com/dan-oak/secret_in_wav
 """
 
 from .method_base import MethodBase, EncodeDecodeReturn, EncodeDecodeArgsReturn
