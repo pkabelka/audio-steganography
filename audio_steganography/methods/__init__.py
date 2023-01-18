@@ -11,6 +11,7 @@ from enum import Enum as _Enum
 from .echo_single_kernel import Echo_single_kernel
 from .lsb import LSB
 from .phase_coding import PhaseCoding
+from .dsss import DSSS
 
 class MethodEnum(_Enum):
     """This enum contains implemented steganography methods.
@@ -18,3 +19,4 @@ class MethodEnum(_Enum):
     echo_single_kernel = Echo_single_kernel
     lsb = LSB
     phase = PhaseCoding
+    dsss = DSSS

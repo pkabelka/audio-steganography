@@ -68,6 +68,10 @@ def main():
         MethodEnum.phase: {
             'l': get_attr(args, 'len'),
         },
+        MethodEnum.dsss: {
+            'l': get_attr(args, 'len'),
+            'password': get_attr(args, 'password'),
+        },
     }
 
     try:
