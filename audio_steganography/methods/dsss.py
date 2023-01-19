@@ -36,15 +36,12 @@ class DSSS(MethodBase):
     >>> DSSS_method.decode()
     """
 
-    def __init__(
+    def encode(
             self,
-            source_data: np.ndarray,
-            secret_data = np.empty(0, dtype=np.uint8)
-        ):
-        super().__init__(source_data, secret_data)
-        self._alpha = 0.005
-
-    def encode(self, password: str = '', **kwargs) -> EncodeDecodeReturn:
+            password: str = '',
+            alpha: float = 0.005,
+            **kwargs
+        ) -> EncodeDecodeReturn:
         """Encodes the secret data into source using direct sequence spread
         spectrum method.
 
@@ -68,6 +65,11 @@ class DSSS(MethodBase):
         mixer = mixer_sig(self._secret_data, self._source_data.size)
         mixer = mixer.astype(np.float64) * 2 - 1
 
+        # center and normalize source to [-1; 1]
+        source = self._source_data - np.mean(self._source_data)
+        if np.abs(source).max() != 0:
+            source = source / np.abs(source).max()
+
         hash = hashlib.sha256()
         hash.update(password.encode('utf-8'))
         # using `random` module because `secrets` module does not allow seeding
@@ -76,7 +78,7 @@ class DSSS(MethodBase):
             [pn_generator.choice([-1, 1]) for _ in range(len(mixer))]
         )
 
-        encoded = self._source_data + mixer * self._alpha * pn_sequence
+        encoded = source + mixer * alpha * pn_sequence
 
         # center, normalize range and convert to the original dtype
         encoded = encoded - np.mean(encoded)
@@ -156,6 +158,14 @@ class DSSS(MethodBase):
                          'required': True,
                          'default': '',
                          'help': 'number of bits to encode in a sample',
+                     }))
+        args.append((['-a', '--alpha'],
+                     {
+                         'action': 'store',
+                         'type': float,
+                         'required': False,
+                         'default': 0.005,
+                         'help': 'encoding sequence amplitude multiplier',
                      }))
         return args
 

@@ -71,6 +71,7 @@ def main():
         MethodEnum.dsss: {
             'l': get_attr(args, 'len'),
             'password': get_attr(args, 'password'),
+            'alpha': get_attr(args, 'alpha'),
         },
     }
 
