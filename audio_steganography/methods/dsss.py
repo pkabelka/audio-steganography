@@ -120,14 +120,19 @@ class DSSS(MethodBase):
         if l < 1:
             return np.zeros(0), {}
 
+        # hash to password for seeding the PRNG
         hash = hashlib.sha256()
         hash.update(password.encode('utf-8'))
+
+        # using `numpy.random` module because `secrets` module does not allow seeding
+        # TODO: allow generating PN-sequence file
         pn_generator = np.random.RandomState(seed=np.frombuffer(hash.digest(), dtype=np.uint32))
         pn_sequence = pn_generator.choice([-1, 1], size=len(self._source_data))
 
         source_segments, _ = split_to_n_segments(self._source_data, l)
         pn_sequence_segments, _ = split_to_n_segments(pn_sequence, l)
 
+        # correlate each segment to decode bits
         decoded = np.zeros(l, dtype=np.uint8)
         for i in range(l):
             correlation = np.sum(source_segments[i] * pn_sequence_segments[i])
