@@ -49,7 +49,7 @@ class DSSS(MethodBase):
         Parameters
         ----------
         password : str
-            Password for seeding the PSRNG to generate the pseudo-random
+            Password for seeding the PRNG to generate the pseudo-random
             sequence from.
 
         Returns
@@ -60,6 +60,7 @@ class DSSS(MethodBase):
             needed for decoding.
         """
 
+        # get the secret data encoded as sequence of [-1; 1]
         mixer = mixer_sig(self._secret_data, self._source_data.size)
         mixer = mixer.astype(np.float64) * 2 - 1
 
@@ -68,6 +69,7 @@ class DSSS(MethodBase):
         if np.abs(source).max() != 0:
             source = source / np.abs(source).max()
 
+        # hash to password for seeding the PRNG
         hash = hashlib.sha256()
         hash.update(password.encode('utf-8'))
 
@@ -76,6 +78,7 @@ class DSSS(MethodBase):
         pn_generator = np.random.RandomState(seed=np.frombuffer(hash.digest(), dtype=np.uint32))
         pn_sequence = pn_generator.choice([-1, 1], size=len(mixer))
 
+        # modulate the secret sequence with the source
         encoded = source + mixer * alpha * pn_sequence
 
         # center, normalize range and convert to the original dtype
@@ -101,7 +104,7 @@ class DSSS(MethodBase):
         Parameters
         ----------
         password : str
-            Password for seeding the PSRNG to generate the pseudo-random
+            Password for seeding the PRNG to generate the pseudo-random
             sequence from.
         l : int | None
             Number of bits encoded in the source. If `l` is set to `None`, then
@@ -127,9 +130,9 @@ class DSSS(MethodBase):
 
         decoded = np.zeros(l, dtype=np.uint8)
         for i in range(l):
-            corr = np.sum(source_segments[i] * pn_sequence_segments[i])
+            correlation = np.sum(source_segments[i] * pn_sequence_segments[i])
 
-            if corr > 0:
+            if correlation > 0:
                 decoded[i] = 1
             else:
                 decoded[i] = 0
@@ -153,7 +156,7 @@ class DSSS(MethodBase):
                          'type': str,
                          'required': True,
                          'default': '',
-                         'help': 'number of bits to encode in a sample',
+                         'help': 'password for seeding the PRNG',
                      }))
         args.append((['-a', '--alpha'],
                      {
@@ -174,7 +177,7 @@ class DSSS(MethodBase):
                          'type': str,
                          'required': True,
                          'default': '',
-                         'help': 'number of bits to encode in a sample',
+                         'help': 'password for seeding the PRNG',
                      }))
         args.append((['-l', '--len'],
                      {
