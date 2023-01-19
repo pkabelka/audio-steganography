@@ -13,8 +13,6 @@ from ..audio_utils import to_dtype, split_to_n_segments, mixer_sig
 from typing import Optional
 import numpy as np
 import hashlib
-import random
-import scipy.signal
 
 class DSSS(MethodBase):
     """This is an implementation of Direct sequence spread spectrum method.
@@ -72,11 +70,11 @@ class DSSS(MethodBase):
 
         hash = hashlib.sha256()
         hash.update(password.encode('utf-8'))
-        # using `random` module because `secrets` module does not allow seeding
-        pn_generator = random.Random(hash.digest())
-        pn_sequence = np.array(
-            [pn_generator.choice([-1, 1]) for _ in range(len(mixer))]
-        )
+
+        # using `numpy.random` module because `secrets` module does not allow seeding
+        # TODO: allow generating PN-sequence file
+        pn_generator = np.random.RandomState(seed=np.frombuffer(hash.digest(), dtype=np.uint32))
+        pn_sequence = pn_generator.choice([-1, 1], size=len(mixer))
 
         encoded = source + mixer * alpha * pn_sequence
 
@@ -121,10 +119,8 @@ class DSSS(MethodBase):
 
         hash = hashlib.sha256()
         hash.update(password.encode('utf-8'))
-        pn_generator = random.Random(hash.digest())
-        pn_sequence = np.array(
-            [pn_generator.choice([-1, 1]) for _ in range(len(self._source_data))]
-        )
+        pn_generator = np.random.RandomState(seed=np.frombuffer(hash.digest(), dtype=np.uint32))
+        pn_sequence = pn_generator.choice([-1, 1], size=len(self._source_data))
 
         source_segments, _ = split_to_n_segments(self._source_data, l)
         pn_sequence_segments, _ = split_to_n_segments(pn_sequence, l)
