@@ -117,7 +117,14 @@ class Echo_single_kernel(EchoBase):
             decoding.
         """
 
-        return super().encode_wrapper(Echo_single_kernel, d0, d1, delay_search, alpha, decay_rate, **kwargs)
+        return super().encode_wrapper(
+            Echo_single_kernel,
+            d0,
+            d1,
+            delay_search,
+            alpha,
+            decay_rate,
+            **kwargs)
 
 
     def decode(self, d0: int, d1: int, l: int, **kwargs) -> EncodeDecodeReturn:
