@@ -75,6 +75,14 @@ def main():
             (a:='delay_search'): get_attr(args, a),
             'l': get_attr(args, 'len'),
         },
+        MethodEnum.echo_bf: {
+            (a:='d0'): get_attr(args, a),
+            (a:='d1'): get_attr(args, a),
+            (a:='alpha'): get_attr(args, a),
+            (a:='decay_rate'): get_attr(args, a),
+            (a:='delay_search'): get_attr(args, a),
+            'l': get_attr(args, 'len'),
+        },
         MethodEnum.phase: {
             'l': get_attr(args, 'len'),
         },
