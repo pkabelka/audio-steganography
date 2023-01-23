@@ -7,14 +7,10 @@
 """
 
 from .echo_base import EchoBase
-from .method_base import EncodeDecodeReturn, EncodeDecodeArgsReturn
-from ..exceptions import SecretSizeTooLarge
+from .method_base import EncodeDecodeReturn
 from ..audio_utils import split_to_n_segments, mixer_sig, to_dtype
 from typing import Optional
 import numpy as np
-
-from ..stat_utils import ber_percent
-import scipy.optimize
 
 class Echo_single_kernel(EchoBase):
     """This is an implementation of echo hiding method using a kernel for each
@@ -60,16 +56,19 @@ class Echo_single_kernel(EchoBase):
         # echo of source for binary 1
         h1 = np.append(np.zeros(d1), self._source_data) * alpha * decay_rate
 
-        sp = np.pad(np.array(self._source_data), (0, len(h1)-self._source_data.size))
-        x = sp[:len(mixer)] + h1[:len(mixer)] * mixer + h0[:len(mixer)] * np.abs(1-mixer)
+        encoded = (
+            self._source_data[:len(mixer)] +
+            h1[:len(mixer)] * mixer +
+            h0[:len(mixer)] * np.abs(1-mixer)
+        )
 
         # center, normalize range and convert to the original dtype
-        x = x - np.mean(x)
-        if np.abs(x).max() != 0:
-            x = x / np.abs(x).max()
-        x = to_dtype(x, self._source_data.dtype)
+        encoded = encoded - np.mean(encoded)
+        if np.abs(encoded).max() != 0:
+            encoded = encoded / np.abs(encoded).max()
+        encoded = to_dtype(encoded, self._source_data.dtype)
 
-        return x, {
+        return encoded, {
             'd0': d0,
             'd1': d1,
             'l': secret_len,
@@ -148,13 +147,12 @@ class Echo_single_kernel(EchoBase):
 
         split, _ = split_to_n_segments(self._source_data, l)
         decoded = np.zeros(len(split), dtype=np.uint8)
-        i = 0
-        for seg in split:
-            cn = np.fft.ifft(np.log(np.abs(np.fft.fft(seg))))
+
+        for i, segment in enumerate(split):
+            cn = np.fft.ifft(np.log(np.abs(np.fft.fft(segment))))
             if cn[d0] > cn[d1]:
                 decoded[i] = 0
             else:
                 decoded[i] = 1
-            i += 1
 
         return decoded, {}
