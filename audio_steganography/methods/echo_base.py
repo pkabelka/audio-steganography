@@ -151,7 +151,7 @@ class EchoBase(MethodBase, abc.ABC):
             decay_rate: float,
         ) -> EncodeDecodeReturn:
 
-        def optimize_encode(self, x):
+        def optimize_encode(x):
             encoded, params = self._encode(int(x[0]), int(x[1]), alpha, decay_rate)
             test_decoder = echo_class(encoded)
             ber = ber_percent(test_decoder.decode(**params)[0], self._secret_data)
@@ -197,6 +197,22 @@ class EchoBase(MethodBase, abc.ABC):
                          'type': int,
                          'default': None,
                          'help': 'offset for binary 1; default 200 samples',
+                     }))
+        args.append((['-a', '--alpha'],
+                     {
+                         'action': 'store',
+                         'type': float,
+                         'required': False,
+                         'default': 0.5,
+                         'help': 'echo amplitude multiplier; default: 0.5',
+                     }))
+        args.append((['-dr', '--decay_rate'],
+                     {
+                         'action': 'store',
+                         'type': float,
+                         'required': False,
+                         'default': 0.85,
+                         'help': 'second echo amplitude multiplier; default: 0.85',
                      }))
         args.append((['--delay_search'],
                      {

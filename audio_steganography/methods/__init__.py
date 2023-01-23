@@ -9,6 +9,7 @@ classes to a name in the enum.
 
 from enum import Enum as _Enum
 from .echo_single_kernel import Echo_single_kernel
+from .echo_bipolar import EchoBipolar
 from .lsb import LSB
 from .phase_coding import PhaseCoding
 from .dsss import DSSS
@@ -17,6 +18,7 @@ class MethodEnum(_Enum):
     """This enum contains implemented steganography methods.
     """
     echo_single_kernel = Echo_single_kernel
+    echo_bipolar = EchoBipolar
     lsb = LSB
     phase = PhaseCoding
     dsss = DSSS
