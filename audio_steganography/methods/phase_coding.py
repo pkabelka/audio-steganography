@@ -14,7 +14,6 @@ https://github.com/dan-oak/secret_in_wav
 from .method_base import MethodBase, EncodeDecodeReturn, EncodeDecodeArgsReturn
 from ..exceptions import SecretSizeTooLarge
 from ..audio_utils import to_dtype, split_to_segments_of_len_n
-from typing import Optional
 import numpy as np
 
 class PhaseCoding(MethodBase):
