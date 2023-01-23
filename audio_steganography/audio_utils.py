@@ -7,8 +7,9 @@
 """
 
 import numpy as np
+import scipy.signal
 from numpy.typing import DTypeLike
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 def split_to_n_approx_same(input: np.ndarray, n: int) -> List[np.ndarray]:
     """Splits the input array into N segments of approximately same length.
@@ -195,3 +196,17 @@ def to_dtype(input: np.ndarray, dtype: DTypeLike) -> np.ndarray:
     out = out * max
     out = out.astype(dtype)
     return out
+
+def autocorr_scipy_correlate(x: Union[List, np.ndarray]):
+    """Computes autocorrelation of signal x.
+
+    This function should be faster than numpy.correlate because it
+    automatically chooses between direct and Fourier method.
+
+    Parameters
+    ----------
+    x : List | ArrayLike
+        A 1-D signal to autocorrelate.
+    """
+    result = scipy.signal.correlate(x, x, mode='full')
+    return result[len(result)//2:]
