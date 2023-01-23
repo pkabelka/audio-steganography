@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-# File: echo_single_kernel.py
+# File: echo_single.py
 # Author: Petr Kabelka <xkabel09 at stud.fit.vutbr.cz>
 
-"""This module contains the Echo_single_kernel class
+"""This module contains the EchoSingle class
 """
 
 from .echo_base import EchoBase
@@ -12,7 +12,7 @@ from ..audio_utils import split_to_n_segments, mixer_sig, to_dtype
 from typing import Optional
 import numpy as np
 
-class Echo_single_kernel(EchoBase):
+class EchoSingle(EchoBase):
     """This is an implementation of echo hiding method using a kernel for each
     of the hidden bits. So two kernels in total for binary 0 and 1.
 
@@ -21,15 +21,15 @@ class Echo_single_kernel(EchoBase):
     Encode "42" to source array.
 
     >>> import numpy as np
-    >>> from audio_steganography.methods import Echo_single_kernel
+    >>> from audio_steganography.methods import EchoSingle
     >>> secret = np.array([0,0,1,1,0,1,0,0,0,0,1,1,0,0,1,0], dtype=np.uint8)
     >>> source = np.random.rand(len(secret) * 8192, 1)
-    >>> echo_method = Echo_single_kernel(source, secret)
+    >>> echo_method = EchoSingle(source, secret)
     >>> encoded = echo_method.encode(250, 350)
 
     Decode
 
-    >>> echo_method = Echo_single_kernel(encoded[0])
+    >>> echo_method = EchoSingle(encoded[0])
     >>> echo_method.decode(250, 350)
     """
 
@@ -117,7 +117,7 @@ class Echo_single_kernel(EchoBase):
         """
 
         return super().encode_wrapper(
-            Echo_single_kernel,
+            EchoSingle,
             d0,
             d1,
             delay_search,

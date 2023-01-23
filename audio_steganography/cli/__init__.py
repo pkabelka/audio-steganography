@@ -59,7 +59,7 @@ def main():
             (a:='depth'): get_attr(args, a),
             'l': get_attr(args, 'len'),
         },
-        MethodEnum.echo_single_kernel: {
+        MethodEnum.echo_single: {
             (a:='d0'): get_attr(args, a),
             (a:='d1'): get_attr(args, a),
             (a:='alpha'): get_attr(args, a),
