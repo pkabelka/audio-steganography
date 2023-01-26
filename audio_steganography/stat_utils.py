@@ -65,6 +65,7 @@ def rmsd(x: Union[np.ndarray, List], y: Union[np.ndarray, List]) -> float:
     n = min(x.size, y.size)
     x = x[:n]
     y = y[:n]
+
     return np.sqrt(mse(x, y))
 
 def snr_db(x: Union[np.ndarray, List], y: Union[np.ndarray, List]) -> float:
@@ -124,6 +125,7 @@ def psnr_db(x: Union[np.ndarray, List], y: Union[np.ndarray, List]) -> float:
     n = min(x.size, y.size)
     x = x[:n]
     y = y[:n]
+
     return 10 * np.log10(1.0 / mse(x, y))
 
 def ber_percent(
@@ -150,4 +152,5 @@ def ber_percent(
     n = min(x.size, y.size)
     x = x[:n]
     y = y[:n]
+
     return float((x != y).sum() / n) * 100
