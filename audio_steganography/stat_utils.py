@@ -64,6 +64,22 @@ def rmsd(x: Union[np.ndarray, List], y: Union[np.ndarray, List]) -> float:
 
     return np.sqrt(mse(x, y))
 
+def rms_db(x: Union[np.ndarray, List]) -> float:
+    """Calculates the decibell root mean square sum of the input signal.
+
+    Parameters
+    ----------
+    x : np.ndarray | List
+        Signal array.
+
+    Returns
+    -------
+    rms_db : float
+        Root mean square sum in decibells.
+    """
+    x = np.asanyarray(x)
+    return 10 * np.log10(mse(x, np.zeros(x.shape)))
+
 def snr_db(x: Union[np.ndarray, List], y: Union[np.ndarray, List]) -> float:
     """Calculates the decibell signal-to-noise ratio of clean signal and noisy
     signal.
