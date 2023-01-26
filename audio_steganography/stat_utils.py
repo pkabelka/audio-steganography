@@ -31,15 +31,11 @@ def mse(x: Union[np.ndarray, List], y: Union[np.ndarray, List]) -> float:
     x = x[:n]
     y = y[:n]
 
-    x = x - np.mean(x)
     if np.abs(x).max() != 0:
         x = x / np.abs(x).max()
-    x = x.astype(np.float64)
 
-    y = y - np.mean(y)
     if np.abs(y).max() != 0:
         y = y / np.abs(y).max()
-    y = y.astype(np.float64)
 
     return float(1/n * np.sum((x - y)**2))
 
@@ -91,15 +87,11 @@ def snr_db(x: Union[np.ndarray, List], y: Union[np.ndarray, List]) -> float:
     x = x[:n]
     y = y[:n]
 
-    x = x - np.mean(x)
     if np.abs(x).max() != 0:
         x = x / np.abs(x).max()
-    x = x.astype(np.float64)
 
-    y = y - np.mean(y)
     if np.abs(y).max() != 0:
         y = y / np.abs(y).max()
-    y = y.astype(np.float64)
 
     return 10 * np.log10((np.sum(x**2)) / (np.sum((x - y)**2)))
 
