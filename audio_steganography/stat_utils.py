@@ -78,7 +78,7 @@ def rms_db(x: Union[np.ndarray, List]) -> float:
         Root mean square sum in decibells.
     """
     x = np.asanyarray(x)
-    return 10 * np.log10(mse(x, np.zeros(x.shape)))
+    return 10 * np.log10(mse(x, np.zeros_like(x)))
 
 def snr_db(x: Union[np.ndarray, List], y: Union[np.ndarray, List]) -> float:
     """Calculates the decibell signal-to-noise ratio of clean signal and noisy
