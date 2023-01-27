@@ -13,6 +13,8 @@ from ..audio_utils import (
     mixer_sig,
     to_dtype,
     autocorr_scipy_correlate,
+    center,
+    normalize,
 )
 from typing import Optional
 import numpy as np
@@ -77,10 +79,8 @@ class EchoBF(EchoBase):
             h02[:len(mixer)] * np.abs(1-mixer)
         )
 
-        # center, normalize range and convert to the original dtype
-        encoded = encoded - np.mean(encoded)
-        if np.abs(encoded).max() != 0:
-            encoded = encoded / np.abs(encoded).max()
+        encoded = center(encoded)
+        encoded = normalize(encoded)
         encoded = to_dtype(encoded, self._source_data.dtype)
 
         return encoded, {

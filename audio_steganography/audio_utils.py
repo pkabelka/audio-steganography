@@ -210,3 +210,35 @@ def autocorr_scipy_correlate(x: Union[List, np.ndarray]):
     """
     result = scipy.signal.correlate(x, x, mode='full')
     return result[len(result)//2:]
+
+def center(input: np.ndarray) -> np.ndarray:
+    """Centers input array i.e. removes the DC component.
+
+    Parameters
+    ----------
+    input : numpy.ndarray
+        Input array to center.
+
+    Returns
+    -------
+    out : numpy.ndarray
+        Centered array.
+    """
+    return input - np.mean(input)
+
+def normalize(input: np.ndarray) -> np.ndarray:
+    """Normalizes input array to [-1; 1] range.
+
+    Parameters
+    ----------
+    input : numpy.ndarray
+        Input array to normalize.
+
+    Returns
+    -------
+    out : numpy.ndarray
+        Normalized array.
+    """
+    if np.abs(input).max() != 0:
+        input = input / np.abs(input).max()
+    return input

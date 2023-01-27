@@ -9,7 +9,13 @@ implementation
 
 from .method_base import MethodBase, EncodeDecodeReturn, EncodeDecodeArgsReturn
 from ..exceptions import SecretSizeTooLarge
-from ..audio_utils import to_dtype, split_to_n_segments, mixer_sig
+from ..audio_utils import (
+    to_dtype,
+    split_to_n_segments,
+    mixer_sig,
+    center,
+    normalize,
+)
 from typing import Optional
 import numpy as np
 import hashlib
@@ -65,9 +71,8 @@ class DSSS(MethodBase):
         mixer = mixer.astype(np.float64) * 2 - 1
 
         # center and normalize source to [-1; 1]
-        source = self._source_data - np.mean(self._source_data)
-        if np.abs(source).max() != 0:
-            source = source / np.abs(source).max()
+        source = center(self._source_data)
+        source = normalize(source)
 
         # hash to password for seeding the PRNG
         hash = hashlib.sha256()
@@ -81,10 +86,8 @@ class DSSS(MethodBase):
         # modulate the secret sequence with the source
         encoded = source + mixer * alpha * pn_sequence
 
-        # center, normalize range and convert to the original dtype
-        encoded = encoded - np.mean(encoded)
-        if np.abs(encoded).max() != 0:
-            encoded = encoded / np.abs(encoded).max()
+        encoded = center(encoded)
+        encoded = normalize(encoded)
         encoded = to_dtype(encoded, self._source_data.dtype)
 
         return encoded, {

@@ -13,7 +13,12 @@ https://github.com/dan-oak/secret_in_wav
 
 from .method_base import MethodBase, EncodeDecodeReturn, EncodeDecodeArgsReturn
 from ..exceptions import SecretSizeTooLarge
-from ..audio_utils import to_dtype, split_to_segments_of_len_n
+from ..audio_utils import (
+    to_dtype,
+    split_to_segments_of_len_n,
+    center,
+    normalize,
+)
 import numpy as np
 
 class PhaseCoding(MethodBase):
@@ -88,10 +93,8 @@ class PhaseCoding(MethodBase):
         encoded = np.abs(fft) * np.exp(1j * angles)
         encoded = np.fft.ifft(encoded).real.flatten()
 
-        # center, normalize range and convert to the original dtype
-        encoded = encoded - np.mean(encoded)
-        if np.abs(encoded).max() != 0:
-            encoded = encoded / np.abs(encoded).max()
+        encoded = center(encoded)
+        encoded = normalize(encoded)
         encoded = to_dtype(encoded, self._source_data.dtype)
 
         return np.append(encoded, rest), {
