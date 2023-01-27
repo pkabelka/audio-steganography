@@ -153,7 +153,7 @@ class EchoSingle(EchoBase):
         decoded = np.zeros(len(split), dtype=np.uint8)
 
         for i, segment in enumerate(split):
-            cn = np.fft.ifft(np.log(np.abs(np.fft.fft(segment))))
+            cn = np.fft.irfft(np.log(np.abs(np.fft.rfft(segment))))
             if cn[d0] > cn[d1]:
                 decoded[i] = 0
             else:

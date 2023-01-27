@@ -170,7 +170,7 @@ class EchoBF(EchoBase):
         for i, segment in enumerate(split):
             cn = autocorr_scipy_correlate(
                 # power cepstrum
-                np.fft.ifft(np.log(np.abs(np.fft.fft(segment)))**2)
+                np.fft.irfft(np.log(np.abs(np.fft.rfft(segment)))**2)
             )
             if cn[d0] > cn[d1]:
                 decoded[i] = 0
