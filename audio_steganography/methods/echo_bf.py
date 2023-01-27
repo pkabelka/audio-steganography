@@ -60,14 +60,14 @@ class EchoBF(EchoBase):
         mixer = mixer_sig(self._secret_data, self._source_data.size)
 
         # forward echo of source for binary 0
-        h01 = np.append(np.zeros(d0), self._source_data) * alpha/2
+        h01 = np.pad(self._source_data, (d0, 0)) * alpha/2
         # backward echo of source for binary 0
-        h02 = np.pad(self._source_data, d0)[d0:] * alpha/2
+        h02 = np.pad(self._source_data, (0, d0)) * alpha/2
 
         # forward echo of source for binary 1
-        h11 = np.append(np.zeros(d1), self._source_data) * alpha/2
+        h11 = np.pad(self._source_data, (d1, 0)) * alpha/2
         # backward echo of source for binary 1
-        h12 = np.pad(self._source_data, d1)[d1:] * alpha/2
+        h12 = np.pad(self._source_data, (0, d1)) * alpha/2
 
         encoded = (
             self._source_data[:len(mixer)] +

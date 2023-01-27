@@ -52,9 +52,9 @@ class EchoSingle(EchoBase):
         mixer = mixer_sig(self._secret_data, self._source_data.size)
 
         # echo of source for binary 0
-        h0 = np.append(np.zeros(d0), self._source_data) * alpha
+        h0 = np.pad(self._source_data, (d0, 0)) * alpha
         # echo of source for binary 1
-        h1 = np.append(np.zeros(d1), self._source_data) * alpha * decay_rate
+        h1 = np.pad(self._source_data, (d1, 0)) * alpha * decay_rate
 
         encoded = (
             self._source_data[:len(mixer)] +

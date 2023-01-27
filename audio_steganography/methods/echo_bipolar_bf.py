@@ -59,22 +59,22 @@ class EchoBipolarBF(EchoBase):
         mixer = mixer_sig(self._secret_data, self._source_data.size)
 
         # forward echo of source for binary 0
-        h01 = np.append(np.zeros(d0), self._source_data) * alpha/4
+        h01 = np.pad(self._source_data, (d0, 0)) * alpha/4
         # backward echo of source for binary 0
-        h02 = np.pad(self._source_data, d0)[d0:] * alpha/4
+        h02 = np.pad(self._source_data, (0, d0)) * alpha/4
         # forward echo of source for binary 0 with negative amplitude
-        h03 = np.append(np.zeros(d0 + 5), self._source_data) * -alpha/4
+        h03 = np.pad(self._source_data, (d0 + 5, 0)) * -alpha/4
         # backward echo of source for binary 0 with positive amplitude
-        h04 = np.pad(self._source_data, d0 + 5)[d0 + 5:] * alpha/4
+        h04 = np.pad(self._source_data, (0, d0 + 5)) * alpha/4
 
         # forward echo of source for binary 1
-        h11 = np.append(np.zeros(d1), self._source_data) * alpha/4
+        h11 = np.pad(self._source_data, (d1, 0)) * alpha/4
         # backward echo of source for binary 1
-        h12 = np.pad(self._source_data, d1)[d1:] * alpha/4
+        h12 = np.pad(self._source_data, (0, d1)) * alpha/4
         # forward echo of source for binary 1 with negative amplitude
-        h13 = np.append(np.zeros(d1 + 5), self._source_data) * -alpha/4
+        h13 = np.pad(self._source_data, (d1 + 5, 0)) * -alpha/4
         # backward echo of source for binary 1 with positive amplitude
-        h14 = np.pad(self._source_data, d1 + 5)[d1 + 5:] * alpha/4
+        h14 = np.pad(self._source_data, (0, d1 + 5)) * alpha/4
 
         encoded = (
             self._source_data[:len(mixer)] +

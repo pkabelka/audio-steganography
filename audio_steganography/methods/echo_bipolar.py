@@ -61,14 +61,14 @@ class EchoBipolar(EchoBase):
         mixer = mixer_sig(self._secret_data, self._source_data.size)
 
         # echo of source for binary 0 with negative amplitude
-        h01 = np.append(np.zeros(d0), self._source_data) * -alpha/2
+        h01 = np.pad(self._source_data, (d0, 0)) * -alpha/2
         # echo of source for binary 0 with positive amplitude
-        h02 = np.append(np.zeros(d0 + 5), self._source_data) * alpha/2 * decay_rate
+        h02 = np.pad(self._source_data, (d0 + 5, 0)) * alpha/2 * decay_rate
 
         # echo of source for binary 1 with negative amplitude
-        h11 = np.append(np.zeros(d1), self._source_data) * -alpha/2
+        h11 = np.pad(self._source_data, (d1, 0)) * -alpha/2
         # echo of source for binary 1 with positive amplitude
-        h12 = np.append(np.zeros(d1 + 5), self._source_data) * alpha/2 * decay_rate
+        h12 = np.pad(self._source_data, (d1 + 5, 0)) * alpha/2 * decay_rate
 
         encoded = (
             self._source_data[:len(mixer)] +
