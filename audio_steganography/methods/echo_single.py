@@ -150,13 +150,7 @@ class EchoSingle(EchoBase):
         """
 
         split, _ = split_to_n_segments(self._source_data, l)
-        decoded = np.zeros(len(split), dtype=np.uint8)
 
-        for i, segment in enumerate(split):
-            cn = np.fft.irfft(np.log(np.abs(np.fft.rfft(segment))))
-            if cn[d0] > cn[d1]:
-                decoded[i] = 0
-            else:
-                decoded[i] = 1
+        cepstrum = np.fft.irfft(np.log(np.abs(np.fft.rfft(split))))
 
-        return decoded, {}
+        return (cepstrum[:, d1] > cepstrum[:, d0]).astype(np.uint8), {}

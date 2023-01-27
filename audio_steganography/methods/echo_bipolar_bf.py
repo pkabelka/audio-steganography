@@ -176,14 +176,10 @@ class EchoBipolarBF(EchoBase):
         """
 
         split, _ = split_to_n_segments(self._source_data, l)
-        decoded = np.zeros(len(split), dtype=np.uint8)
 
-        for i, segment in enumerate(split):
-            cn = np.fft.irfft(np.log(np.abs(np.fft.rfft(segment)))**2)
+        cepstrum = np.fft.irfft(np.log(np.abs(np.fft.rfft(split)))**2)
 
-            if cn[d0] > cn[d1] or cn[d0 + 5] < cn[d1 + 5]:
-                decoded[i] = 0
-            else:
-                decoded[i] = 1
-
-        return decoded, {}
+        return (
+            (cepstrum[:, d1] > cepstrum[:, d0]) |
+            (cepstrum[:, d1+5] < cepstrum[:, d0+5])
+        ).astype(np.uint8), {}
