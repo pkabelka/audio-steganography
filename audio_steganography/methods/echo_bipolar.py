@@ -53,11 +53,11 @@ class EchoBipolar(EchoBase):
         ) -> EncodeDecodeReturn:
 
         secret_len = self._secret_data.size
-        if secret_len == 0:
+        if secret_len == 0 or d0 >= d1:
             return self._source_data, {
-                'd0': d0,
-                'd1': d1,
-                'l': secret_len,
+                'd0': -1,
+                'd1': -1,
+                'l': -1,
             }
 
         mixer = mixer_sig(self._secret_data, self._source_data.size)
