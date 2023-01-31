@@ -51,32 +51,33 @@ class EchoBipolarBF(EchoBase):
         ) -> EncodeDecodeReturn:
 
         secret_len = self._secret_data.size
-        if secret_len == 0:
+        if secret_len == 0 or d0 >= d1:
             return self._source_data, {
-                'd0': d0,
-                'd1': d1,
-                'l': secret_len,
+                'd0': -1,
+                'd1': -1,
+                'l': -1,
             }
 
         mixer = mixer_sig(self._secret_data, self._source_data.size)
 
+        source_pad = np.pad(self._source_data, d1 + 5) * alpha/4
         # forward echo of source for binary 0
-        h01 = np.pad(self._source_data, (d0, 0)) * alpha/4
+        h01 = source_pad[d1+5-d0:]
         # backward echo of source for binary 0
-        h02 = np.pad(self._source_data, (0, d0)) * alpha/4
+        h02 = source_pad[d1+5+d0:]
         # forward echo of source for binary 0 with negative amplitude
-        h03 = np.pad(self._source_data, (d0 + 5, 0)) * -alpha/4
-        # backward echo of source for binary 0 with positive amplitude
-        h04 = np.pad(self._source_data, (0, d0 + 5)) * alpha/4
+        h03 = source_pad[d1-d0:] * -decay_rate
+        # backward echo of source for binary 0 with negative amplitude
+        h04 = source_pad[d1+5+d0+5:] * -decay_rate
 
         # forward echo of source for binary 1
-        h11 = np.pad(self._source_data, (d1, 0)) * alpha/4
+        h11 = source_pad[5:]
         # backward echo of source for binary 1
-        h12 = np.pad(self._source_data, (0, d1)) * alpha/4
+        h12 = source_pad[d1+5+d1:]
         # forward echo of source for binary 1 with negative amplitude
-        h13 = np.pad(self._source_data, (d1 + 5, 0)) * -alpha/4
-        # backward echo of source for binary 1 with positive amplitude
-        h14 = np.pad(self._source_data, (0, d1 + 5)) * alpha/4
+        h13 = source_pad * -decay_rate
+        # backward echo of source for binary 1 with negative amplitude
+        h14 = source_pad[d1+5+d1+5:] * -decay_rate
 
         encoded = (
             self._source_data[:len(mixer)] +
