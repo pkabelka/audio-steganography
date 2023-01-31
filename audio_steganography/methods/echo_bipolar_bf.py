@@ -61,14 +61,22 @@ class EchoBipolarBF(EchoBase):
         mixer = mixer_sig(self._secret_data, self._source_data.size)
         source_pad = np.pad(self._source_data, d1 + 5) * alpha/4
 
+        # left side: d0 zeros
         echo_0_fwd_pos = source_pad[d1+5-d0:]
+        # right side: d0 zeros
         echo_0_bwd_pos = source_pad[d1+5+d0:]
+        # left side: d0 + 5 zeros
         echo_0_fwd_neg = source_pad[d1-d0:] * -decay_rate
+        # right side: d0 + 5 zeros
         echo_0_bwd_neg = source_pad[d1+5+d0+5:] * -decay_rate
 
+        # left side: d1 zeros
         echo_1_fwd_pos = source_pad[5:]
+        # right side: d1 zeros
         echo_1_bwd_pos = source_pad[d1+5+d1:]
+        # left side: d1 + 5 zeros
         echo_1_fwd_neg = source_pad * -decay_rate
+        # right side: d1 + 5 zeros
         echo_1_bwd_neg = source_pad[d1+5+d1+5:] * -decay_rate
 
         encoded = (

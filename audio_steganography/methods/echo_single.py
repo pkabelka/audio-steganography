@@ -58,7 +58,9 @@ class EchoSingle(EchoBase):
         mixer = mixer_sig(self._secret_data, self._source_data.size)
         source_pad = np.pad(self._source_data, (d1, 0)) * alpha
 
+        # left side: d0 zeros
         echo_0 = source_pad[d1-d0:]
+        # left side: d1 zeros
         echo_1 = source_pad * decay_rate
 
         encoded = (
