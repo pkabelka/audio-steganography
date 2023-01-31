@@ -61,23 +61,24 @@ class EchoBipolar(EchoBase):
             }
 
         mixer = mixer_sig(self._secret_data, self._source_data.size)
+        source_pad = np.pad(self._source_data, (d1 + 5, 0)) * alpha/2
 
-        # echo of source for binary 0 with negative amplitude
-        h01 = np.pad(self._source_data, (d0, 0)) * -alpha/2
-        # echo of source for binary 0 with positive amplitude
-        h02 = np.pad(self._source_data, (d0 + 5, 0)) * alpha/2 * decay_rate
+        # left side: d0 zeros
+        echo_0_neg = source_pad[d1+5-d0:] * -1
+        # left side: d0 + 5 zeros
+        echo_0_pos = source_pad[d1-d0:] * decay_rate
 
-        # echo of source for binary 1 with negative amplitude
-        h11 = np.pad(self._source_data, (d1, 0)) * -alpha/2
-        # echo of source for binary 1 with positive amplitude
-        h12 = np.pad(self._source_data, (d1 + 5, 0)) * alpha/2 * decay_rate
+        # left side: d1 zeros
+        echo_1_neg = source_pad[5:] * -1
+        # left side: d1 + 5 zeros
+        echo_1_pos = source_pad * decay_rate
 
         encoded = (
             self._source_data[:len(mixer)] +
-            h11[:len(mixer)] * mixer +
-            h12[:len(mixer)] * mixer +
-            h01[:len(mixer)] * np.abs(1-mixer) +
-            h02[:len(mixer)] * np.abs(1-mixer)
+            echo_1_neg[:len(mixer)] * mixer +
+            echo_1_pos[:len(mixer)] * mixer +
+            echo_0_neg[:len(mixer)] * np.abs(1-mixer) +
+            echo_0_pos[:len(mixer)] * np.abs(1-mixer)
         )
 
         encoded = center(encoded)
