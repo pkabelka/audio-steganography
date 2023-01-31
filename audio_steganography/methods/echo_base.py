@@ -54,9 +54,11 @@ class EchoBase(MethodBase, abc.ABC):
         echo_class : EchoBase
             Concrete echo method class. It must implement the `_encode` method.
         d0 : int | None
-            Echo delay for binary 0. Default value is 150.
+            Echo delay for binary 0. Default value is 150. Must be larger than
+            0 otherwise raises ValueError exception.
         d1 : int | None
-            Echo delay for binary 1. Default value is d0 + 50
+            Echo delay for binary 1. Default value is d0 + 50. Must be larger
+            than 0 and d0 otherwise raises ValueError exception.
         delay_search : str
             Method for searching optimal d0 and d1. Valid options are:
             - '' : do not search, encode with the supplied values
@@ -82,6 +84,11 @@ class EchoBase(MethodBase, abc.ABC):
             d0 = 150
         if d1 is None:
             d1 = d0 + 50
+
+        if d0 >= d1:
+            raise ValueError('d0 must be smaller than d1')
+        if d0 <= 0 or d1 <= 0:
+            raise ValueError('d0 and d1 must be larger than 0')
 
         # require at least 1024 samples per encoded bit
         if self._secret_data.size * 1024 > self._source_data.size:
@@ -158,8 +165,9 @@ class EchoBase(MethodBase, abc.ABC):
             return ber
 
         def take_step(x):
-            x[0] += np.random.randint(-5, 5)
-            x[1] = np.random.randint(x[0]+2, x[0] + 20)
+            x[0] = np.random.randint(max(1, x[0]-5), x[0]+10)
+            x[1] = np.random.randint(max(x[0]+1, x[1]-5), max(x[0]+2, x[1]+10))
+
             return x
 
         res = scipy.optimize.basinhopping(
