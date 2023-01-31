@@ -157,17 +157,16 @@ class EchoBase(MethodBase, abc.ABC):
             ber = ber_percent(test_decoder.decode(**params)[0], self._secret_data)
             return ber
 
-        def bounds(**kwargs):
-            x = kwargs['x_new']
-            return x[0] < x[1]
+        def take_step(x):
+            x[0] += np.random.randint(-5, 5)
+            x[1] = np.random.randint(x[0]+2, x[0] + 20)
+            return x
 
         res = scipy.optimize.basinhopping(
             func=optimize_encode,
             x0=[d0, d1],
             niter=100,
-            T=3.0,
-            stepsize=8.0,
-            accept_test=bounds,
+            take_step=take_step,
             callback=lambda x, f, accept: True if f == 0.0 else None,
         )
 
