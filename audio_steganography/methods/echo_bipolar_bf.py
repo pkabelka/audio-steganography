@@ -59,36 +59,28 @@ class EchoBipolarBF(EchoBase):
             }
 
         mixer = mixer_sig(self._secret_data, self._source_data.size)
-
         source_pad = np.pad(self._source_data, d1 + 5) * alpha/4
-        # forward echo of source for binary 0
-        h01 = source_pad[d1+5-d0:]
-        # backward echo of source for binary 0
-        h02 = source_pad[d1+5+d0:]
-        # forward echo of source for binary 0 with negative amplitude
-        h03 = source_pad[d1-d0:] * -decay_rate
-        # backward echo of source for binary 0 with negative amplitude
-        h04 = source_pad[d1+5+d0+5:] * -decay_rate
 
-        # forward echo of source for binary 1
-        h11 = source_pad[5:]
-        # backward echo of source for binary 1
-        h12 = source_pad[d1+5+d1:]
-        # forward echo of source for binary 1 with negative amplitude
-        h13 = source_pad * -decay_rate
-        # backward echo of source for binary 1 with negative amplitude
-        h14 = source_pad[d1+5+d1+5:] * -decay_rate
+        echo_0_fwd_pos = source_pad[d1+5-d0:]
+        echo_0_bwd_pos = source_pad[d1+5+d0:]
+        echo_0_fwd_neg = source_pad[d1-d0:] * -decay_rate
+        echo_0_bwd_neg = source_pad[d1+5+d0+5:] * -decay_rate
+
+        echo_1_fwd_pos = source_pad[5:]
+        echo_1_bwd_pos = source_pad[d1+5+d1:]
+        echo_1_fwd_neg = source_pad * -decay_rate
+        echo_1_bwd_neg = source_pad[d1+5+d1+5:] * -decay_rate
 
         encoded = (
             self._source_data[:len(mixer)] +
-            h11[:len(mixer)] * mixer +
-            h12[:len(mixer)] * mixer +
-            h13[:len(mixer)] * mixer +
-            h14[:len(mixer)] * mixer +
-            h01[:len(mixer)] * np.abs(1-mixer) +
-            h02[:len(mixer)] * np.abs(1-mixer) +
-            h03[:len(mixer)] * np.abs(1-mixer) +
-            h04[:len(mixer)] * np.abs(1-mixer)
+            echo_1_fwd_pos[:len(mixer)] * mixer +
+            echo_1_bwd_pos[:len(mixer)] * mixer +
+            echo_1_fwd_neg[:len(mixer)] * mixer +
+            echo_1_bwd_neg[:len(mixer)] * mixer +
+            echo_0_fwd_pos[:len(mixer)] * np.abs(1-mixer) +
+            echo_0_bwd_pos[:len(mixer)] * np.abs(1-mixer) +
+            echo_0_fwd_neg[:len(mixer)] * np.abs(1-mixer) +
+            echo_0_bwd_neg[:len(mixer)] * np.abs(1-mixer)
         )
 
         encoded = center(encoded)
