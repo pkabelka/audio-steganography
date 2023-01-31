@@ -56,16 +56,15 @@ class EchoSingle(EchoBase):
             }
 
         mixer = mixer_sig(self._secret_data, self._source_data.size)
+        source_pad = np.pad(self._source_data, (d1, 0)) * alpha
 
-        # echo of source for binary 0
-        h0 = np.pad(self._source_data, (d0, 0)) * alpha
-        # echo of source for binary 1
-        h1 = np.pad(self._source_data, (d1, 0)) * alpha * decay_rate
+        echo_0 = source_pad[d1-d0:]
+        echo_1 = source_pad * decay_rate
 
         encoded = (
             self._source_data[:len(mixer)] +
-            h1[:len(mixer)] * mixer +
-            h0[:len(mixer)] * np.abs(1-mixer)
+            echo_1[:len(mixer)] * mixer +
+            echo_0[:len(mixer)] * np.abs(1-mixer)
         )
 
         encoded = center(encoded)
