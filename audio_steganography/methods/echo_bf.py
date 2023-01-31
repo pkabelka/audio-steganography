@@ -52,31 +52,28 @@ class EchoBF(EchoBase):
         ) -> EncodeDecodeReturn:
 
         secret_len = self._secret_data.size
-        if secret_len == 0:
+        if secret_len == 0 or d0 >= d1:
             return self._source_data, {
-                'd0': d0,
-                'd1': d1,
-                'l': secret_len,
+                'd0': -1,
+                'd1': -1,
+                'l': -1,
             }
 
         mixer = mixer_sig(self._secret_data, self._source_data.size)
+        source_pad = np.pad(self._source_data, d1) * alpha/2
 
-        # forward echo of source for binary 0
-        h01 = np.pad(self._source_data, (d0, 0)) * alpha/2
-        # backward echo of source for binary 0
-        h02 = np.pad(self._source_data, (0, d0)) * alpha/2
+        echo_0_fwd = source_pad[d1-d0:]
+        echo_0_bwd = source_pad[d1+d0:]
 
-        # forward echo of source for binary 1
-        h11 = np.pad(self._source_data, (d1, 0)) * alpha/2
-        # backward echo of source for binary 1
-        h12 = np.pad(self._source_data, (0, d1)) * alpha/2
+        echo_1_fwd = source_pad
+        echo_1_bwd = source_pad[d1+d1:]
 
         encoded = (
             self._source_data[:len(mixer)] +
-            h11[:len(mixer)] * mixer +
-            h12[:len(mixer)] * mixer +
-            h01[:len(mixer)] * np.abs(1-mixer) +
-            h02[:len(mixer)] * np.abs(1-mixer)
+            echo_1_fwd[:len(mixer)] * mixer +
+            echo_1_bwd[:len(mixer)] * mixer +
+            echo_0_fwd[:len(mixer)] * np.abs(1-mixer) +
+            echo_0_bwd[:len(mixer)] * np.abs(1-mixer)
         )
 
         encoded = center(encoded)
