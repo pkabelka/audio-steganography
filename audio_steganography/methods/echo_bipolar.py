@@ -21,11 +21,19 @@ import numpy as np
 
 class EchoBipolar(EchoBase):
     """This is an implementation of echo hiding method using a kernel with two
-    echos for each of the hidden bits. So 4 echos in total for binary 0 and 1.
-    The first echo has negative amplitude and the second has positive
-    amplitude.
+    echos for each of the hidden bits. The first echo of the two has negative
+    amplitude and the second has positive amplitude which is scaled down by decay rate parameter.
 
-    The delay for the second echo in each kernel is just d{0,1} + 5.
+    The delay for the second echo in each kernel is d{0,1} + 5.
+
+    Kernel visualization; left represents original sample.
+
+    |
+    |
+    |       |
+    .........
+         |
+         |
 
     Examples
     --------
@@ -163,7 +171,7 @@ class EchoBipolar(EchoBase):
         -------
         out : MethodBase.EncodeDecodeReturn
             NumPy array of uint8 zeros and ones representing the bits decoded
-            using echo single kernel method.
+            using echo bipolar kernel method.
         """
 
         split, _ = split_to_n_segments(self._source_data, l)

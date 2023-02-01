@@ -22,6 +22,13 @@ class EchoSingle(EchoBase):
     """This is an implementation of echo hiding method using a kernel for each
     of the hidden bits. So two kernels in total for binary 0 and 1.
 
+    Kernel visualization; left represents original sample.
+
+    |
+    |    |
+    |    |
+    .........
+
     Examples
     --------
     Encode "42" to source array.

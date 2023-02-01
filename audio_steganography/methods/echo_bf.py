@@ -21,10 +21,14 @@ import numpy as np
 
 class EchoBF(EchoBase):
     """This is an implementation of backward forward echo hiding method using a
-    kernel with two echos for each of the hidden bits. So 4 echos in total for
-    binary 0 and 1. One echo is moved back and second one is moved forward.
+    kernel with two echos for each of the hidden bits. One echo is moved back
+    and second one is moved forward.
 
-    The delay for the second echo in each kernel is just d{0,1} + 5.
+    Kernel visualization; middle represents original sample.
+
+         |
+    |    |    |
+    ...........
 
     Examples
     --------
@@ -162,7 +166,7 @@ class EchoBF(EchoBase):
         -------
         out : MethodBase.EncodeDecodeReturn
             NumPy array of uint8 zeros and ones representing the bits decoded
-            using echo single kernel method.
+            using echo backward-forward kernel method.
         """
 
         split, _ = split_to_n_segments(self._source_data, l)

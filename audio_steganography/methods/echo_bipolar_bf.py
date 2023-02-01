@@ -20,10 +20,19 @@ import numpy as np
 
 class EchoBipolarBF(EchoBase):
     """This is an implementation of backward forward echo hiding method using a
-    kernel with two echos for each of the hidden bits. So 4 echos in total for
-    binary 0 and 1. One echo is moved back and second one is moved forward.
+    kernel with four echos for each of the hidden bits. Two echos are moved
+    back and two are moved forward and the further echos have negative
+    amplitude which is scaled down by decay rate parameter.
 
-    The delay for the second echo in each kernel is just d{0,1} + 5.
+    The delay for the second echo in each kernel is d{0,1} + 5.
+
+    Kernel visualization; middle represents original sample.
+
+            |
+       |    |    |
+       |    |    |
+    .................
+    |               |
 
     Examples
     --------
@@ -157,8 +166,7 @@ class EchoBipolarBF(EchoBase):
         """Decode with the supplied d0, d1 and l values.
 
         Decoding of this method involves checking the height of the peaks in
-        autoceptrum of the segement. The autocepstrum is just an autorrelated
-        power cepstrum.
+        ceptrum of the segement.
 
         Parameters
         ----------
@@ -173,7 +181,7 @@ class EchoBipolarBF(EchoBase):
         -------
         out : MethodBase.EncodeDecodeReturn
             NumPy array of uint8 zeros and ones representing the bits decoded
-            using echo single kernel method.
+            using echo bipolar backward-forward kernel method.
         """
 
         split, _ = split_to_n_segments(self._source_data, l)
