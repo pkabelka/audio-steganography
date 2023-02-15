@@ -28,6 +28,9 @@ def mse(x: Union[np.ndarray, List], y: Union[np.ndarray, List]) -> float:
     y = np.asanyarray(y)
 
     n = min(x.size, y.size)
+    if n == 0:
+        return 0.0
+
     x = x[:n]
     y = y[:n]
 
@@ -82,7 +85,7 @@ def rms_db(x: Union[np.ndarray, List]) -> float:
     if np.abs(x).max() != 0:
         x = x / np.abs(x).max()
 
-    return 10 * np.log10(np.sum(x**2) / x.size)
+    return 10 * np.log10(np.divide(np.sum(x**2), x.size))
 
 def snr_db(x: Union[np.ndarray, List], y: Union[np.ndarray, List]) -> float:
     """Calculates the decibell signal-to-noise ratio of clean signal and noisy
@@ -113,7 +116,7 @@ def snr_db(x: Union[np.ndarray, List], y: Union[np.ndarray, List]) -> float:
     if np.abs(y).max() != 0:
         y = y / np.abs(y).max()
 
-    return 10 * np.log10((np.sum(x**2)) / (np.sum((x - y)**2)))
+    return 10 * np.log10(np.divide(np.sum(x**2), np.sum((x - y)**2)))
 
 def psnr_db(x: Union[np.ndarray, List], y: Union[np.ndarray, List]) -> float:
     """Calculates the peak signal-to-noise ratio of clean signal and noisy
@@ -138,7 +141,7 @@ def psnr_db(x: Union[np.ndarray, List], y: Union[np.ndarray, List]) -> float:
     x = x[:n]
     y = y[:n]
 
-    return 10 * np.log10(1.0 / mse(x, y))
+    return 10 * np.log10(np.divide(1.0, mse(x, y)))
 
 def ber_percent(
         x: Union[np.ndarray, List],
@@ -162,6 +165,9 @@ def ber_percent(
     y = np.asanyarray(y)
 
     n = min(x.size, y.size)
+    if n == 0:
+        return 0.0
+
     x = x[:n]
     y = y[:n]
 
