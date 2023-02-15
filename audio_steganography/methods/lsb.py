@@ -42,6 +42,9 @@ class LSB(MethodBase):
         """Encodes the secret data into source using least significant bit
         substitution.
 
+        If the source dtype is a float type, then the output will be converted
+        to an integer type.
+
         If `depth` is less than 1 or more than the number of bits the source
         dtype provides, a `ValueError` exception is raised.
 
@@ -63,7 +66,6 @@ class LSB(MethodBase):
 
         # convert float dtypes to int dtypes
         source = self._source_data
-        source_dtype = source.dtype
         if source.dtype in dtype_conv:
             source = to_dtype(source, dtype_conv[source.dtype])
 
@@ -109,9 +111,6 @@ class LSB(MethodBase):
             )
         )
 
-        if source_dtype in dtype_conv:
-            encoded = to_dtype(encoded, source_dtype)
-
         return encoded, {
             'l': len(self._secret_data),
             'depth': depth,
@@ -125,6 +124,9 @@ class LSB(MethodBase):
             **kwargs,
         ) -> EncodeDecodeReturn:
         """Decode using plain least significant bit substitution.
+
+        This method accepts source with an integer dtype only, otherwise
+        it will raise a ValueError exception.
 
         If `depth` is less than 1 or more than the number of bits the source
         dtype provides, a `ValueError` exception is raised.
@@ -145,21 +147,19 @@ class LSB(MethodBase):
         """
 
         depth = int(depth)
-        if depth < 1 or depth > np.iinfo(self._source_data.dtype).bits:
-            raise ValueError(f'bit depth must be between 1 and '+
-                             f'{np.iinfo(self._source_data.dtype).bits}')
+        try:
+            if depth < 1 or depth > np.iinfo(self._source_data.dtype).bits:
+                raise ValueError(f'bit depth must be between 1 and '+
+                                 f'{np.iinfo(self._source_data.dtype).bits}')
+        except ValueError:
+            raise ValueError('source must be of an integer dtype')
 
         _len = self._source_data.size
         if l is not None:
             _len = l
 
-        # convert float dtypes to int64
-        source = self._source_data
-        if source.dtype in [np.float16, np.float32, np.float64]:
-            source = to_dtype(source, np.int32)
-
         # get least significant bits up to bit depth
-        lsb = np.bitwise_and(source[:_len], 2**depth - 1).astype(np.uint8)
+        lsb = np.bitwise_and(self._source_data[:_len], 2**depth - 1).astype(np.uint8)
 
         # unpack bytes to bits
         unpacked = np.unpackbits(lsb, bitorder='little')
