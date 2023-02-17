@@ -109,6 +109,7 @@ class LSB(MethodBase):
             )
         )
 
+        # convert dtype back to float if originaly float
         if self._source_data.dtype in dtype_conv:
             encoded = np.frombuffer(
                 encoded,
