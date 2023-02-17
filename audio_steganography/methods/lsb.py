@@ -64,10 +64,11 @@ class LSB(MethodBase):
             needed for decoding.
         """
 
-        # convert float dtypes to int dtypes
+        # convert float dtypes to int dtypes through raw bytes
         source = self._source_data
         if source.dtype in dtype_conv:
-            source = to_dtype(source, dtype_conv[source.dtype])
+            source = source.astype(source.dtype.newbyteorder('<')).tobytes()
+            source = np.frombuffer(source, dtype=dtype_conv[self._source_data.dtype])
 
         depth = int(depth)
         if depth < 1 or depth > np.iinfo(source.dtype).bits:
@@ -111,6 +112,11 @@ class LSB(MethodBase):
             )
         )
 
+        if self._source_data.dtype in dtype_conv:
+            encoded = np.frombuffer(
+                encoded,
+                dtype=np.dtype(self._source_data.dtype).newbyteorder('<'))
+
         return encoded, {
             'l': len(self._secret_data),
             'depth': depth,
@@ -146,20 +152,23 @@ class LSB(MethodBase):
             using least significant bit substitution method.
         """
 
-        depth = int(depth)
-        try:
-            if depth < 1 or depth > np.iinfo(self._source_data.dtype).bits:
-                raise ValueError(f'bit depth must be between 1 and '+
-                                 f'{np.iinfo(self._source_data.dtype).bits}')
-        except ValueError:
-            raise ValueError('source must be of an integer dtype')
+        # convert float dtypes to int dtypes through raw bytes
+        source = self._source_data
+        if source.dtype in dtype_conv:
+            source = source.astype(source.dtype.newbyteorder('<')).tobytes()
+            source = np.frombuffer(source, dtype=dtype_conv[self._source_data.dtype])
 
-        _len = self._source_data.size
+        depth = int(depth)
+        if depth < 1 or depth > np.iinfo(source.dtype).bits:
+            raise ValueError(f'bit depth must be between 1 and '+
+                             f'{np.iinfo(source.dtype).bits}')
+
+        _len = source.size
         if l is not None:
             _len = l
 
         # get least significant bits up to bit depth
-        lsb = np.bitwise_and(self._source_data[:_len], 2**depth - 1).astype(np.uint8)
+        lsb = np.bitwise_and(source[:_len], 2**depth - 1).astype(np.uint8)
 
         # unpack bytes to bits
         unpacked = np.unpackbits(lsb, bitorder='little')
