@@ -66,6 +66,17 @@ class DSSS(MethodBase):
             needed for decoding.
         """
 
+        if len(self._secret_data) == 0:
+            return self._source_data, {
+                'l': 0,
+                'password': '',
+            }
+
+        if len(self._source_data) < len(self._secret_data):
+            raise SecretSizeTooLarge('secret data cannot fit in source: '+
+                f'secret.size = {self._secret_data.size}, '+
+                f'capacity(source) = {self._source_data.size}')
+
         # get the secret data encoded as sequence of [-1; 1]
         mixer = mixer_sig(self._secret_data, self._source_data.size)
         mixer = mixer.astype(np.float64) * 2 - 1
