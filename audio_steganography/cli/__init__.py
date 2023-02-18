@@ -57,6 +57,7 @@ def main():
     options = {
         MethodEnum.lsb: {
             (a:='depth'): get_attr(args, a),
+            (a:='only_needed'): get_attr(args, a),
             'l': get_attr(args, 'len'),
         },
         **dict.fromkeys(

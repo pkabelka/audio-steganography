@@ -38,7 +38,7 @@ class LSB(MethodBase):
     >>> LSB_method.decode()
     """
 
-    def encode(self, depth: int = 1, **kwargs) -> EncodeDecodeReturn:
+    def encode(self, depth: int = 1, only_needed=False, **kwargs) -> EncodeDecodeReturn:
         """Encodes the secret data into source using least significant bit
         substitution.
 
@@ -106,12 +106,16 @@ class LSB(MethodBase):
             size=source.size - secret.size)
 
         # zero out LSB
-        encoded = np.bitwise_and(source, np.bitwise_not(2**depth - 1))
+        encoded = np.bitwise_and(
+            source[:len(secret) if only_needed else len(secret_padded_to_source)],
+            np.bitwise_not(2**depth - 1)
+        )
 
         # encode secret data to LSB
         encoded = np.bitwise_or(
             encoded,
-            secret_padded_to_source,
+            secret_padded_to_source[
+                :len(secret) if only_needed else len(secret_padded_to_source)],
         )
 
         # convert dtype back to float if originaly float
@@ -119,6 +123,9 @@ class LSB(MethodBase):
             encoded = np.frombuffer(
                 encoded,
                 dtype=np.dtype(self._source_data.dtype).newbyteorder('<'))
+
+        if only_needed:
+            encoded = np.append(encoded, self._source_data[len(secret):])
 
         return encoded, {
             'l': len(self._secret_data),
@@ -198,6 +205,12 @@ class LSB(MethodBase):
                          'type': int,
                          'default': 1,
                          'help': 'number of bits to encode in a sample',
+                     }))
+        args.append((['--only_needed'],
+                     {
+                         'action': 'store_true',
+                         'default': False,
+                         'help': 'encode only LSBs that are needed',
                      }))
         return args
 
