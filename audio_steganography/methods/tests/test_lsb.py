@@ -40,11 +40,10 @@ class TestLSB(unittest.TestCase):
         output, additional_output = lsb.encode()
 
         self.assertEqual(output.size, source_uint8_len_32.size)
-        np.testing.assert_equal(output, zeroed_lsb_reference)
         self.assertEqual(additional_output['l'], secret_uint8_empty.size)
 
     def testWrongTypeSource(self):
-        lsb = LSB(source_object_empty, secret_uint8_empty)
+        lsb = LSB(source_object_empty, secret_uint8_42)
         self.assertRaisesRegex(
             ValueError,
             "Invalid integer data type 'O'.",

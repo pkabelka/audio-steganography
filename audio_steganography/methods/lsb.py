@@ -61,6 +61,12 @@ class LSB(MethodBase):
             needed for decoding.
         """
 
+        if len(self._secret_data) == 0:
+            return self._source_data, {
+                'l': 0,
+                'depth': depth,
+            }
+
         # convert float dtypes to int dtypes through raw bytes
         source = self._source_data
         if source.dtype in dtype_conv:
