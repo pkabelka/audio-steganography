@@ -5,7 +5,7 @@ from ..echo_single import EchoSingle
 from ...exceptions import SecretSizeTooLarge
 from ...stat_utils import ber_percent
 
-class TestLSB(unittest.TestCase):
+class TestEchoSingle(unittest.TestCase):
     def setUp(self) -> None:
         return super().setUp()
 
@@ -40,7 +40,7 @@ class TestLSB(unittest.TestCase):
 
         self.assertEqual(output.size, source_uint8_len_32.size)
         np.testing.assert_equal(output, source_uint8_len_32)
-        self.assertEqual(additional_output['l'], secret_uint8_empty.size)
+        self.assertEqual(additional_output['l'], -1)
 
     def testEmptyEncode(self):
         echo = EchoSingle(source_int16_empty, secret_uint8_empty)
@@ -48,7 +48,7 @@ class TestLSB(unittest.TestCase):
 
         self.assertEqual(output.size, source_int16_empty.size)
         np.testing.assert_equal(output, source_int16_empty)
-        self.assertEqual(additional_output['l'], secret_uint8_empty.size)
+        self.assertEqual(additional_output['l'], -1)
 
     def testEmptySourceEncode(self):
         echo = EchoSingle(source_uint8_empty, secret_uint8_42)

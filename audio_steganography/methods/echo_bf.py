@@ -60,7 +60,7 @@ class EchoBF(EchoBase):
             return self._source_data, {
                 'd0': -1,
                 'd1': -1,
-                'l': -1,
+                'l': 0,
             }
 
         mixer = mixer_sig(self._secret_data, self._source_data.size)
@@ -168,6 +168,9 @@ class EchoBF(EchoBase):
             NumPy array of uint8 zeros and ones representing the bits decoded
             using echo backward-forward kernel method.
         """
+
+        if l < 1:
+            return np.empty(0, dtype=np.uint8), {}
 
         split, _ = split_to_n_segments(self._source_data, l)
         decoded = np.zeros(len(split), dtype=np.uint8)
