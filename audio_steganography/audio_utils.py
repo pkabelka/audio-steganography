@@ -239,6 +239,6 @@ def normalize(input: np.ndarray) -> np.ndarray:
     out : numpy.ndarray
         Normalized array.
     """
-    if np.abs(input).max() != 0:
+    if len(input) > 0 and np.abs(input).max() != 0:
         input = input / np.abs(input).max()
     return input
