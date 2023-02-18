@@ -97,16 +97,21 @@ class LSB(MethodBase):
                 axis=-1,
                 bitorder='little').flatten()
 
+
+        # fill rest of secret with random noise
+        secret_padded_to_source = np.pad(secret, (0, source.size - secret.size))
+        secret_padded_to_source[len(secret):] = np.random.randint(
+            0,
+            2**depth,
+            size=source.size - secret.size)
+
         # zero out LSB
         encoded = np.bitwise_and(source, np.bitwise_not(2**depth - 1))
 
         # encode secret data to LSB
         encoded = np.bitwise_or(
             encoded,
-            np.pad(
-                secret,
-                (0, source.size - secret.size)
-            )
+            secret_padded_to_source,
         )
 
         # convert dtype back to float if originaly float
