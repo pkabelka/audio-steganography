@@ -1,4 +1,10 @@
 import numpy as np
+import unittest
+import abc
+from typing import Type
+from .methods.method_base import MethodBase
+from .exceptions import SecretSizeTooLarge
+
 
 # secret
 secret_empty = np.array([])
@@ -76,3 +82,71 @@ source_float64_len_131072 = np.array(rs.rand(size) * 2 - 1).astype(np.float64)
 # source_float16_len_524288 = np.array(rs.rand(size) * 2 - 1).astype(np.float16)
 # source_float32_len_524288 = np.array(rs.rand(size) * 2 - 1).astype(np.float32)
 # source_float64_len_524288 = np.array(rs.rand(size) * 2 - 1).astype(np.float64)
+
+
+
+class TestCommon(abc.ABC):
+    @abc.abstractmethod
+    def setUp(self, method: Type[MethodBase]) -> None:
+        self._method = method
+        return super().setUp()
+
+    def tearDown(self) -> None:
+        return super().tearDown()
+
+    def testWrongTypeSecret(self):
+        self.assertRaisesRegex(
+            TypeError,
+            'secret_data must be of type numpy.uint8',
+            self._method,
+            source_empty,
+            secret_empty)
+
+        self.assertRaisesRegex(
+            TypeError,
+            'secret_data must be of type numpy.uint8',
+            self._method,
+            source_empty,
+            secret_int16_empty)
+
+        self.assertRaisesRegex(
+            TypeError,
+            'secret_data must be of type numpy.uint8',
+            self._method,
+            source_empty,
+            secret_uint16_42)
+
+    def testEmptySecretEncode(self):
+        method = self._method(source_uint8_len_32, secret_uint8_empty)
+        output, additional_output = method.encode()
+
+        self.assertEqual(output.size, source_uint8_len_32.size)
+        np.testing.assert_equal(output, source_uint8_len_32)
+        self.assertEqual(additional_output['l'], 0)
+
+    def testEmptyEncode(self):
+        method = self._method(source_int16_empty, secret_uint8_empty)
+        output, additional_output = method.encode()
+
+        self.assertEqual(output.size, source_int16_empty.size)
+        np.testing.assert_equal(output, source_int16_empty)
+        self.assertEqual(additional_output['l'], 0)
+
+    def testEmptySourceEncode(self):
+        method = self._method(source_uint8_empty, secret_uint8_42)
+        self.assertRaises(SecretSizeTooLarge, method.encode)
+
+        method = self._method(source_int16_empty, secret_uint8_42)
+        self.assertRaises(SecretSizeTooLarge, method.encode)
+
+        method = self._method(source_int32_empty, secret_uint8_42)
+        self.assertRaises(SecretSizeTooLarge, method.encode)
+
+        method = self._method(source_float16_empty, secret_uint8_42)
+        self.assertRaises(SecretSizeTooLarge, method.encode)
+
+        method = self._method(source_float32_empty, secret_uint8_42)
+        self.assertRaises(SecretSizeTooLarge, method.encode)
+
+        method = self._method(source_float64_empty, secret_uint8_42)
+        self.assertRaises(SecretSizeTooLarge, method.encode)
