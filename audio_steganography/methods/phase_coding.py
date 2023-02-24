@@ -31,14 +31,14 @@ class PhaseCoding(MethodBase):
     >>> import numpy as np
     >>> from audio_steganography.methods import PhaseCoding
     >>> secret = np.array([0,0,1,1,0,1,0,0,0,0,1,1,0,0,1,0], dtype=np.uint8)
-    >>> source = np.random.rand(secret.size * 2)
+    >>> source = np.random.rand(secret.size * 4)
     >>> PhaseCoding_method = PhaseCoding(source, secret)
     >>> encoded = PhaseCoding_method.encode()
 
     Decode
 
     >>> PhaseCoding_method = PhaseCoding(encoded[0])
-    >>> PhaseCoding_method.decode()
+    >>> PhaseCoding_method.decode(encoded[1]['l'])
     """
 
     def encode(self, **kwargs) -> EncodeDecodeReturn:
