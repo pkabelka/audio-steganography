@@ -242,3 +242,57 @@ def normalize(input: np.ndarray) -> np.ndarray:
     if len(input) > 0 and np.abs(input).max() != 0:
         input = input / np.abs(input).max()
     return input
+
+def consecutive_values(input: Union[List, np.ndarray]):
+    """Returns starting indices and lengths of consecutive values.
+
+    Parameters
+    ----------
+    x : NDArray
+        1D array of values.
+
+    Returns
+    -------
+    indices : NDArray
+        NumPy array of indices where consecutive values start
+    lengths : NDArray
+        NumPy array of lengths of consecutive values
+
+    ---
+    This function is a modified version from a StackOverflow answer:
+    https://stackoverflow.com/a/4652265
+    by Paul (https://stackoverflow.com/users/31676/paul)
+    edited by Peter Mortensen (https://stackoverflow.com/users/63550/peter-mortensen)
+
+    This function is under CC BY-SA 3.0 License:
+    https://creativecommons.org/licenses/by-sa/3.0
+
+    THE WORK (AS DEFINED BELOW) IS PROVIDED UNDER THE TERMS OF THIS CREATIVE
+    COMMONS PUBLIC LICENSE ("CCPL" OR "LICENSE"). THE WORK IS PROTECTED BY
+    COPYRIGHT AND/OR OTHER APPLICABLE LAW. ANY USE OF THE WORK OTHER THAN AS
+    AUTHORIZED UNDER THIS LICENSE OR COPYRIGHT LAW IS PROHIBITED.
+
+    BY EXERCISING ANY RIGHTS TO THE WORK PROVIDED HERE, YOU ACCEPT AND AGREE TO
+    BE BOUND BY THE TERMS OF THIS LICENSE. TO THE EXTENT THIS LICENSE MAY BE
+    CONSIDERED TO BE A CONTRACT, THE LICENSOR GRANTS YOU THE RIGHTS CONTAINED
+    HERE IN CONSIDERATION OF YOUR ACCEPTANCE OF SUCH TERMS AND CONDITIONS.
+
+    UNLESS OTHERWISE MUTUALLY AGREED TO BY THE PARTIES IN WRITING, LICENSOR
+    OFFERS THE WORK AS-IS AND MAKES NO REPRESENTATIONS OR WARRANTIES OF ANY
+    KIND CONCERNING THE WORK, EXPRESS, IMPLIED, STATUTORY OR OTHERWISE,
+    INCLUDING, WITHOUT LIMITATION, WARRANTIES OF TITLE, MERCHANTIBILITY,
+    FITNESS FOR A PARTICULAR PURPOSE, NONINFRINGEMENT, OR THE ABSENCE OF LATENT
+    OR OTHER DEFECTS, ACCURACY, OR THE PRESENCE OF ABSENCE OF ERRORS, WHETHER
+    OR NOT DISCOVERABLE. SOME JURISDICTIONS DO NOT ALLOW THE EXCLUSION OF
+    IMPLIED WARRANTIES, SO SUCH EXCLUSION MAY NOT APPLY TO YOU.
+
+    Citation date: 2023-02-23
+    """
+    input = np.asanyarray(input)
+
+    if input.size == 0:
+        return np.array([]), np.array([])
+
+    diff = np.ones(input.shape, dtype=bool)
+    diff[1:] = np.diff(input)
+    return np.nonzero(diff)[0], np.diff(np.append(np.nonzero(diff)[0], input.size))
