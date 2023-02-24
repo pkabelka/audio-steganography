@@ -37,7 +37,7 @@ class DSSS(MethodBase):
     Decode
 
     >>> DSSS_method = DSSS(encoded[0])
-    >>> DSSS_method.decode()
+    >>> DSSS_method.decode(encoded[1]['l'])
     """
 
     def encode(
