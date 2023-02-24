@@ -57,15 +57,43 @@ class ToneInsertion(MethodBase):
 
         segment_len = 705
         segments, rest = split_to_segments_of_len_n(self._source_data, segment_len)
-        segment_powers = np.sum(np.abs(segments)**2, axis=1) / segment_len
 
+        # check if segments can fit in source
+        if len(self._secret_data) > len(segments):
+            raise SecretSizeTooLarge('secret data cannot fit in source: '+
+                f'len(secret) = {self._secret_data.size} bits, '+
+                f'capacity(source) = {len(segments)} bits')
+
+        # calculate power of segments
+        segment_powers = np.sum(np.abs(segments.astype(np.float64))**2, axis=1) / segment_len
+
+        # generate tones with frequencies f0 and f1
         tone_f0 = np.sin(2. * np.pi * f0 * np.linspace(0, 0.016, 705))
         tone_f1 = np.sin(2. * np.pi * f1 * np.linspace(0, 0.016, 705))
 
+        # calculate powers of the tones
         tone_f0_power = np.sum(np.abs(tone_f0)**2) / len(tone_f0)
         tone_f1_power = np.sum(np.abs(tone_f1)**2) / len(tone_f1)
 
-        return np.concatenate(segments), {
+        # calculate amplitudes for the tones for each of the segments
+        # the row index is the wanted bit value
+        f0_amplitudes = np.empty((2, len(segments)))
+        f0_amplitudes[0] = np.sqrt(0.0025 * segment_powers / tone_f0_power)
+        f0_amplitudes[1] = np.sqrt(0.000025 * segment_powers / tone_f0_power)
+
+        f1_amplitudes = np.empty((2, len(segments)))
+        f1_amplitudes[0] = np.sqrt(0.000025 * segment_powers / tone_f1_power)
+        f1_amplitudes[1] = np.sqrt(0.0025 * segment_powers / tone_f1_power)
+
+        # encode by adding the tones with their correct amplitudes
+        for i, bit in enumerate(self._secret_data):
+            segments[i] += (tone_f0.astype(self._source_data.dtype) *
+                            f0_amplitudes[bit][i].astype(self._source_data.dtype))
+
+            segments[i] += (tone_f1.astype(self._source_data.dtype) *
+                            f1_amplitudes[bit][i].astype(self._source_data.dtype))
+
+        return np.append(np.concatenate(segments), rest), {
             'l': len(self._secret_data),
         }
 
