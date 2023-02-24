@@ -15,6 +15,7 @@ from .echo_bipolar_bf import EchoBipolarBF
 from .lsb import LSB
 from .phase_coding import PhaseCoding
 from .dsss import DSSS
+from .silence_interval import SilenceInterval
 
 class MethodEnum(_Enum):
     """This enum contains implemented steganography methods.
@@ -26,3 +27,4 @@ class MethodEnum(_Enum):
     lsb = LSB
     phase = PhaseCoding
     dsss = DSSS
+    silence_interval = SilenceInterval

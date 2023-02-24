@@ -84,6 +84,9 @@ def main():
             'password': get_attr(args, 'password'),
             'alpha': get_attr(args, 'alpha'),
         },
+        MethodEnum.silence_interval: {
+            'l': get_attr(args, 'len'),
+        },
     }
 
     try:
