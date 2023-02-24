@@ -21,14 +21,14 @@ class SilenceInterval(MethodBase):
     >>> import numpy as np
     >>> from audio_steganography.methods import SilenceInterval
     >>> secret = np.array([0,0,1,1,0,1,0,0,0,0,1,1,0,0,1,0], dtype=np.uint8)
-    >>> source = np.random.rand(secret.size * 2)
+    >>> source = np.cumsum(np.random.rand(secret.size * 10000))
     >>> SilenceInterval_method = SilenceInterval(source, secret)
     >>> encoded = SilenceInterval_method.encode()
 
     Decode
 
     >>> SilenceInterval_method = SilenceInterval(encoded[0])
-    >>> SilenceInterval_method.decode()
+    >>> SilenceInterval_method.decode(encoded[1]['l'])
     """
 
     min_silence_len = 600
@@ -100,13 +100,13 @@ class SilenceInterval(MethodBase):
             l: int,
             **kwargs,
         ) -> EncodeDecodeReturn:
-        """Decode the source data by converting values of angles in the first
-        >0 to 0 and <0 to 1.
+        """Decode the source data by finding lengths of silence intervals and
+        calculating the byte value with modulo operator.
 
         Parameters
         ----------
         l : int
-            Number of bits encoded in the source.
+            Number of bytes encoded in the source.
 
         Returns
         -------
