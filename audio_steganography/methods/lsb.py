@@ -35,7 +35,7 @@ class LSB(MethodBase):
     Decode
 
     >>> LSB_method = LSB(encoded[0])
-    >>> LSB_method.decode()
+    >>> LSB_method.decode(encoded[1]['l'])
     """
 
     def encode(self, depth: int = 1, only_needed=False, **kwargs) -> EncodeDecodeReturn:
