@@ -95,6 +95,8 @@ class ToneInsertion(MethodBase):
 
         return np.append(np.concatenate(segments), rest), {
             'l': len(self._secret_data),
+            'f0': f0,
+            'f1': f1,
         }
 
 
