@@ -31,7 +31,7 @@ class SilenceInterval(MethodBase):
     >>> SilenceInterval_method.decode(encoded[1]['l'])
     """
 
-    min_silence_len = 600
+    min_silence_len = 856
 
     def encode(self, **kwargs) -> EncodeDecodeReturn:
         """Encodes the secret data into source using silence interval coding.
@@ -65,7 +65,7 @@ class SilenceInterval(MethodBase):
             raise SecretSizeTooLarge('secret data cannot fit in source: '+
                 f'len(secret) = {secret.size} bytes, '+
                 f'very inaccurate approx capacity(source) = '+
-                f'{silence_lens[silence_lens > self.min_silence_len + 256].size} bytes')
+                f'{silence_lens[silence_lens > self.min_silence_len].size} bytes')
 
         segments = np.split(self._source_data, silence_starts[1:])
 
@@ -75,7 +75,7 @@ class SilenceInterval(MethodBase):
                 break
 
             new_len = len(segment) - ((len(segment) - secret[secret_idx]) % 256)
-            if len(segment) < self.min_silence_len + 256 or new_len < self.min_silence_len + 256:
+            if len(segment) < self.min_silence_len or new_len < self.min_silence_len:
                 continue
 
             # shorten the segment
@@ -88,7 +88,7 @@ class SilenceInterval(MethodBase):
             raise SecretSizeTooLarge('secret data cannot fit in source: '+
                 f'len(secret) = {secret.size} bytes, '+
                 f'very inaccurate approx capacity(source) = '+
-                f'{silence_lens[silence_lens > self.min_silence_len + 256].size} bytes')
+                f'{silence_lens[silence_lens > self.min_silence_len].size} bytes')
 
         return np.concatenate(segments), {
             'l': len(secret),
@@ -122,7 +122,7 @@ class SilenceInterval(MethodBase):
             np.abs(self._source_data) <= 0.15 * np.abs(self._source_data).max())
 
         decoded = np.array(
-            silence_lens[silence_lens >= self.min_silence_len + 256][:l] % 256,
+            silence_lens[silence_lens >= self.min_silence_len][:l] % 256,
             dtype=np.uint8)
 
         decoded = np.unpackbits(decoded, axis=-1, bitorder='big')
