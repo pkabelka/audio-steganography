@@ -123,7 +123,18 @@ class ToneInsertion(MethodBase):
         if l < 1:
             return np.empty(0, dtype=np.uint8), {}
 
-        decoded = np.empty(0)
+        segment_len = 705
+        segments, rest = split_to_segments_of_len_n(self._source_data, segment_len)
+
+        # generate tones with frequencies f0 and f1
+        tone_f0 = np.sin(2. * np.pi * f0 * np.linspace(0, 0.016, 705))
+        tone_f1 = np.sin(2. * np.pi * f1 * np.linspace(0, 0.016, 705))
+
+        decoded = np.zeros(l, dtype=np.uint8)
+        for i in range(min(l, len(segments))):
+            decoded[i] = (np.sum(segments[i] * tone_f1) / segment_len >
+                np.sum(segments[i] * tone_f0) / segment_len)
+
         return decoded, {}
 
 
