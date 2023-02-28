@@ -87,6 +87,11 @@ def main():
         MethodEnum.silence_interval: {
             'l': get_attr(args, 'len'),
         },
+        MethodEnum.dsss_dft: {
+            'l': get_attr(args, 'len'),
+            'password': get_attr(args, 'password'),
+            'alpha': get_attr(args, 'alpha'),
+        },
         # MethodEnum.tone_insertion: {
         #     'l': get_attr(args, 'len'),
         #     (a:='f0'): get_attr(args, a),
