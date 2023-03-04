@@ -18,6 +18,11 @@ class MethodBase(abc.ABC):
     decode method. For correct function in CLI mode, the method needs to be
     added in the `Method` enum.
 
+    The dictionary output of `encode` method should contain the parameters
+    needed for the `decode` method with the EXACT same name as in the specific
+    `decode` signature. This allows the output of `encode` to be expanded with
+    the `**` operator into the `decode` method.
+
     Custom arguments for encoding and decoding can be specified by overriding
     `get_encode_args` and `get_decode_args` methods.
     """
