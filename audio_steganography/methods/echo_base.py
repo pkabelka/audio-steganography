@@ -203,7 +203,7 @@ class EchoBase(MethodBase, abc.ABC):
                          'action': 'store',
                          'type': int,
                          'default': None,
-                         'help': 'offset for binary 1; default 200 samples',
+                         'help': 'offset for binary 1; default d0 + 50 samples',
                      }))
         args.append((['-a', '--alpha'],
                      {
