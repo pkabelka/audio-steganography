@@ -119,7 +119,9 @@ class EchoBase(MethodBase, abc.ABC):
         _d0 = d0
         _d1 = d1
         for d0 in range(_d0, _d0+10):
-            for d1 in range(_d1, _d1+10):
+            for d1 in range(_d1, _d1+30):
+                if d0 >= d1:
+                    continue
 
                 encoded, params = self._encode(d0, d1, alpha, decay_rate)
 
