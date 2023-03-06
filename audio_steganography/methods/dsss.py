@@ -12,7 +12,7 @@ from ..exceptions import SecretSizeTooLarge
 from ..audio_utils import (
     to_dtype,
     split_to_n_segments,
-    mixer_sig,
+    spread_bits,
     center,
     normalize,
 )
@@ -78,7 +78,7 @@ class DSSS(MethodBase):
                 f'capacity(source) = {self._source_data.size}')
 
         # get the secret data encoded as sequence of [-1; 1]
-        mixer = mixer_sig(self._secret_data, self._source_data.size)
+        mixer = spread_bits(self._secret_data, self._source_data.size)
         mixer = mixer.astype(np.float64) * 2 - 1
 
         # center and normalize source to [-1; 1]

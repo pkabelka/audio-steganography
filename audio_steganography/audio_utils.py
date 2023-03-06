@@ -138,9 +138,8 @@ def split_to_segments_of_len_n(input: np.ndarray, n: int):
         np.array_split(input[:int(np.floor(len(input)/n) * n)], int(len(input)/n))
     ), input[int(np.floor(len(input)/n) * n):]
 
-def mixer_sig(secret_data: np.ndarray, signal_length: int) -> np.ndarray:
-    """Creates a mixer signal by spliting the input array into segments of
-    secret_data length and multiplying each array with each bit in secret_data.
+def spread_bits(secret_data: np.ndarray, signal_length: int) -> np.ndarray:
+    """Spreads the `secret_data` over the size of `signal_length`.
 
     Parameters
     ----------

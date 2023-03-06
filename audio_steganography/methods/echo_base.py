@@ -8,7 +8,7 @@
 
 from .method_base import MethodBase, EncodeDecodeReturn, EncodeDecodeArgsReturn
 from ..exceptions import SecretSizeTooLarge
-from ..audio_utils import split_to_n_segments, mixer_sig, to_dtype
+from ..audio_utils import split_to_n_segments, spread_bits, to_dtype
 from typing import Optional
 import numpy as np
 import abc

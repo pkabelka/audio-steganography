@@ -10,7 +10,7 @@ from .echo_base import EchoBase
 from .method_base import EncodeDecodeReturn
 from ..audio_utils import (
     split_to_n_segments,
-    mixer_sig,
+    spread_bits,
     to_dtype,
     autocorr_scipy_correlate,
     center,
@@ -68,7 +68,7 @@ class EchoBipolar(EchoBase):
                 'l': 0,
             }
 
-        mixer = mixer_sig(self._secret_data, self._source_data.size)
+        mixer = spread_bits(self._secret_data, self._source_data.size)
         source_pad = np.pad(self._source_data, (d1 + 5, 0)) * alpha/2
 
         # left side: d0 zeros
