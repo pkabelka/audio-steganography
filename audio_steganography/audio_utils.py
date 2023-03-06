@@ -151,7 +151,7 @@ def spread_bits(secret_data: np.ndarray, signal_length: int) -> np.ndarray:
     Returns
     -------
     out : numpy.ndarray
-        Mixer signal of `signal_length` length.
+        Array `secret_data` spread to `signal_length` size.
     """
     mixer, rest = split_to_n_segments(np.ones(signal_length), len(secret_data))
     mixer = mixer * secret_data[:, None]
