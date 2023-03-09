@@ -53,7 +53,13 @@ class SilenceInterval(MethodBase):
         silence_starts, silence_lens = consecutive_values(
             np.abs(self._source_data) <= 0.15 * np.abs(self._source_data).max())
 
-        secret, _ = split_to_segments_of_len_n(self._secret_data, 4)
+        # padding in case secret is not multiple of 4
+        secret_padded_to_multiple4 = np.pad(
+            self._secret_data,
+            (0, np.ceil(len(self._secret_data) / 4).
+                 astype(np.uint32) * 4 - len(self._secret_data)))
+
+        secret, _ = split_to_segments_of_len_n(secret_padded_to_multiple4, 4)
         secret = np.packbits(
             secret.astype(np.uint8),
             axis=-1,
@@ -90,7 +96,7 @@ class SilenceInterval(MethodBase):
                 f'{silence_lens[silence_lens > min_silence_len].size} bytes')
 
         return np.concatenate(segments), {
-            'l': len(secret),
+            'l': len(self._secret_data),
         }
 
 
@@ -122,13 +128,14 @@ class SilenceInterval(MethodBase):
             np.abs(self._source_data) <= 0.15 * np.abs(self._source_data).max())
 
         decoded = np.array(
-            silence_lens[silence_lens >= min_silence_len][:l] % 16,
+            silence_lens[silence_lens >= min_silence_len][
+                :int(np.ceil(len(self._source_data) / 4))] % 16,
             dtype=np.uint8)
 
         # take every other 4 bits
         decoded = np.unpackbits(
             decoded, axis=-1,
-            bitorder='little').reshape(-1, 4)[::2, :].reshape(-1)
+            bitorder='little').reshape(-1, 4)[::2, :].reshape(-1)[:l]
         return decoded, {}
 
 
