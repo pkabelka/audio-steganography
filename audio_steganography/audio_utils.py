@@ -133,7 +133,7 @@ def split_to_segments_of_len_n(input: np.ndarray, n: int):
         Rest of the input which had to be sliced off for alignment.
     """
     if len(input) == 0:
-        return [np.empty(0)]
+        return np.empty(0), np.empty(0)
     return np.asanyarray(
         np.array_split(input[:int(np.floor(len(input)/n) * n)], int(len(input)/n))
     ), input[int(np.floor(len(input)/n) * n):]
