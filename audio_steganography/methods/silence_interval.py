@@ -8,7 +8,7 @@
 
 from .method_base import MethodBase, EncodeDecodeReturn, EncodeDecodeArgsReturn
 from ..exceptions import SecretSizeTooLarge
-from ..audio_utils import consecutive_values
+from ..audio_utils import consecutive_values, split_to_segments_of_len_n
 import numpy as np
 
 class SilenceInterval(MethodBase):
@@ -31,9 +31,7 @@ class SilenceInterval(MethodBase):
     >>> SilenceInterval_method.decode(encoded[1]['l'])
     """
 
-    min_silence_len = 856
-
-    def encode(self, **kwargs) -> EncodeDecodeReturn:
+    def encode(self, min_silence_len=400, **kwargs) -> EncodeDecodeReturn:
         """Encodes the secret data into source using silence interval coding.
 
         If the secret data is bigger than source capacity, a
@@ -55,17 +53,18 @@ class SilenceInterval(MethodBase):
         silence_starts, silence_lens = consecutive_values(
             np.abs(self._source_data) <= 0.15 * np.abs(self._source_data).max())
 
+        secret, _ = split_to_segments_of_len_n(self._secret_data, 4)
         secret = np.packbits(
-            self._secret_data,
+            secret.astype(np.uint8),
             axis=-1,
-            bitorder='big')
+            bitorder='little').ravel()
 
         # trivial check if segments can fit in source
-        if silence_lens[silence_lens > self.min_silence_len].size < len(secret):
+        if silence_lens[silence_lens > min_silence_len].size < len(secret):
             raise SecretSizeTooLarge('secret data cannot fit in source: '+
                 f'len(secret) = {secret.size} bytes, '+
                 f'very inaccurate approx capacity(source) = '+
-                f'{silence_lens[silence_lens > self.min_silence_len].size} bytes')
+                f'{silence_lens[silence_lens > min_silence_len].size} bytes')
 
         segments = np.split(self._source_data, silence_starts[1:])
 
@@ -74,8 +73,8 @@ class SilenceInterval(MethodBase):
             if secret_idx == len(secret):
                 break
 
-            new_len = len(segment) - ((len(segment) - secret[secret_idx]) % 256)
-            if len(segment) < self.min_silence_len or new_len < self.min_silence_len:
+            new_len = len(segment) - ((len(segment) - secret[secret_idx]) % 16)
+            if len(segment) < min_silence_len or new_len < min_silence_len:
                 continue
 
             # shorten the segment
@@ -88,7 +87,7 @@ class SilenceInterval(MethodBase):
             raise SecretSizeTooLarge('secret data cannot fit in source: '+
                 f'len(secret) = {secret.size} bytes, '+
                 f'very inaccurate approx capacity(source) = '+
-                f'{silence_lens[silence_lens > self.min_silence_len].size} bytes')
+                f'{silence_lens[silence_lens > min_silence_len].size} bytes')
 
         return np.concatenate(segments), {
             'l': len(secret),
@@ -98,6 +97,7 @@ class SilenceInterval(MethodBase):
     def decode(
             self,
             l: int,
+            min_silence_len=400,
             **kwargs,
         ) -> EncodeDecodeReturn:
         """Decode the source data by finding lengths of silence intervals and
@@ -122,12 +122,29 @@ class SilenceInterval(MethodBase):
             np.abs(self._source_data) <= 0.15 * np.abs(self._source_data).max())
 
         decoded = np.array(
-            silence_lens[silence_lens >= self.min_silence_len][:l] % 256,
+            silence_lens[silence_lens >= min_silence_len][:l] % 16,
             dtype=np.uint8)
 
-        decoded = np.unpackbits(decoded, axis=-1, bitorder='big')
+        # take every other 4 bits
+        decoded = np.unpackbits(
+            decoded, axis=-1,
+            bitorder='little').reshape(-1, 4)[::2, :].reshape(-1)
         return decoded, {}
 
+
+    @staticmethod
+    def get_encode_args() -> EncodeDecodeArgsReturn:
+        args = []
+        args.append((['-m', '--min_silence_len'],
+                     {
+                         'action': 'store',
+                         'type': int,
+                         'required': False,
+                         'help': 'minimum length of a silence interval; '+
+                             'default: 400',
+                         'default': 400,
+                     }))
+        return args
 
     @staticmethod
     def get_decode_args() -> EncodeDecodeArgsReturn:
@@ -140,5 +157,14 @@ class SilenceInterval(MethodBase):
                          'help': 'encoded data length; decode only this many '+
                              'bits',
                          'default': None,
+                     }))
+        args.append((['-m', '--min_silence_len'],
+                     {
+                         'action': 'store',
+                         'type': int,
+                         'required': False,
+                         'help': 'minimum length of a silence interval; '+
+                             'default: 400',
+                         'default': 400,
                      }))
         return args

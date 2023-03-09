@@ -86,6 +86,7 @@ def main():
         },
         MethodEnum.silence_interval: {
             'l': get_attr(args, 'len'),
+            (a:='min_silence_len'): get_attr(args, a),
         },
         MethodEnum.dsss_dft: {
             'l': get_attr(args, 'len'),
