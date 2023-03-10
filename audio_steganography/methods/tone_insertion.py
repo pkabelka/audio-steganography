@@ -75,7 +75,8 @@ class ToneInsertion(MethodBase):
                 f'capacity(source) = {len(segments)} bits')
 
         # calculate power of segments
-        segment_powers = np.sum(np.abs(segments.astype(np.float64))**2, axis=1) / segment_len
+        segment_powers = np.sum(np.abs(segments.astype(np.float64))**2,
+                                axis=1) / segment_len
 
         # generate tones with frequencies f0 and f1
         tone_f0 = np.sin(2. * np.pi * f0 * np.linspace(0, 0.016, 705))
