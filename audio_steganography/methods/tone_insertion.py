@@ -149,8 +149,7 @@ class ToneInsertion(MethodBase):
         for i in range(min(l, len(segments))):
             decoded[i] = (
                 np.sum(segments[i] * tone_f1) / segment_len >
-                np.sum(segments[i] * tone_f0) / segment_len
-            )
+                np.sum(segments[i] * tone_f0) / segment_len)
 
         return decoded, {}
 
