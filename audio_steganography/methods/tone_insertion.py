@@ -42,7 +42,9 @@ class ToneInsertion(MethodBase):
             f1: float = 8575.0,
             **kwargs,
         ) -> EncodeDecodeReturn:
-        """Encodes the secret data into source using tone insertion.
+        """Encodes the secret data into source using tone insertion method.
+
+        The source signal will be centered and normalized for encoding.
 
         If the secret data is bigger than source capacity, a
         `SecretSizeTooLarge` exception is raised.
