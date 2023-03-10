@@ -100,8 +100,8 @@ class ToneInsertion(MethodBase):
 
         # encode by adding the tones with their correct amplitudes
         for i, bit in enumerate(self._secret_data):
-            segments[i] += (tone_f0 * f0_amplitudes[bit][i])
-            segments[i] += (tone_f1 * f1_amplitudes[bit][i])
+            segments[i] += (tone_f0 * f0_amplitudes[bit][i] +
+                            tone_f1 * f1_amplitudes[bit][i])
 
         encoded = np.append(np.concatenate(segments), rest)
         encoded = to_dtype(encoded, self._source_data.dtype)
