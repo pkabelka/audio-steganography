@@ -17,7 +17,7 @@ from .phase_coding import PhaseCoding
 from .dsss import DSSS
 from .silence_interval import SilenceInterval
 from .dsss_dft import DSSSDFT
-# from .tone_insertion import ToneInsertion
+from .tone_insertion import ToneInsertion
 
 class MethodEnum(_Enum):
     """This enum contains implemented steganography methods.
@@ -31,4 +31,4 @@ class MethodEnum(_Enum):
     dsss = DSSS
     silence_interval = SilenceInterval
     dsss_dft = DSSSDFT
-    # tone_insertion = ToneInsertion
+    tone_insertion = ToneInsertion

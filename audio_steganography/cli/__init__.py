@@ -93,11 +93,11 @@ def main():
             'password': get_attr(args, 'password'),
             'alpha': get_attr(args, 'alpha'),
         },
-        # MethodEnum.tone_insertion: {
-        #     'l': get_attr(args, 'len'),
-        #     (a:='f0'): get_attr(args, a),
-        #     (a:='f1'): get_attr(args, a),
-        # },
+        MethodEnum.tone_insertion: {
+            'l': get_attr(args, 'len'),
+            (a:='f0'): get_attr(args, a),
+            (a:='f1'): get_attr(args, a),
+        },
     }
 
     try:

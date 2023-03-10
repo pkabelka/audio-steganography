@@ -8,7 +8,12 @@
 
 from .method_base import MethodBase, EncodeDecodeReturn, EncodeDecodeArgsReturn
 from ..exceptions import SecretSizeTooLarge
-from ..audio_utils import split_to_segments_of_len_n
+from ..audio_utils import (
+    split_to_segments_of_len_n,
+    center,
+    normalize,
+    to_dtype,
+)
 import numpy as np
 
 class ToneInsertion(MethodBase):
@@ -33,8 +38,8 @@ class ToneInsertion(MethodBase):
 
     def encode(
             self,
-            f0: int = 250,
-            f1: int = 350,
+            f0: float = 1250.0,
+            f1: float = 8575.0,
             **kwargs,
         ) -> EncodeDecodeReturn:
         """Encodes the secret data into source using tone insertion.
@@ -56,7 +61,12 @@ class ToneInsertion(MethodBase):
             }
 
         segment_len = 705
-        segments, rest = split_to_segments_of_len_n(self._source_data, segment_len)
+
+        # center and normalize source to [-1; 1]
+        source = center(self._source_data)
+        source = normalize(source)
+
+        segments, rest = split_to_segments_of_len_n(source, segment_len)
 
         # check if segments can fit in source
         if len(self._secret_data) > len(segments):
@@ -87,13 +97,10 @@ class ToneInsertion(MethodBase):
 
         # encode by adding the tones with their correct amplitudes
         for i, bit in enumerate(self._secret_data):
-            segments[i] += (tone_f0.astype(self._source_data.dtype) *
-                            f0_amplitudes[bit][i].astype(self._source_data.dtype))
+            segments[i] += (tone_f0 * f0_amplitudes[bit][i])
+            segments[i] += (tone_f1 * f1_amplitudes[bit][i])
 
-            segments[i] += (tone_f1.astype(self._source_data.dtype) *
-                            f1_amplitudes[bit][i].astype(self._source_data.dtype))
-
-        return np.append(np.concatenate(segments), rest), {
+        return to_dtype(np.append(np.concatenate(segments), rest), self._source_data.dtype), {
             'l': len(self._secret_data),
             'f0': f0,
             'f1': f1,
@@ -103,8 +110,8 @@ class ToneInsertion(MethodBase):
     def decode(
             self,
             l: int,
-            f0: int = 250,
-            f1: int = 350,
+            f0: float = 1250.0,
+            f1: float = 8575.0,
             **kwargs,
         ) -> EncodeDecodeReturn:
         """Decode the source data by comparing ratios of values of tones at
@@ -126,7 +133,7 @@ class ToneInsertion(MethodBase):
             return np.empty(0, dtype=np.uint8), {}
 
         segment_len = 705
-        segments, rest = split_to_segments_of_len_n(self._source_data, segment_len)
+        segments, _ = split_to_segments_of_len_n(self._source_data, segment_len)
 
         # generate tones with frequencies f0 and f1
         tone_f0 = np.sin(2. * np.pi * f0 * np.linspace(0, 0.016, 705))
@@ -146,15 +153,15 @@ class ToneInsertion(MethodBase):
         args.append((['-f0'],
                      {
                          'action': 'store',
-                         'type': int,
-                         'default': 250,
+                         'type': float,
+                         'default': 1250.0,
                          'help': 'first frequency for encoding',
                      }))
         args.append((['-f1'],
                      {
                          'action': 'store',
-                         'type': int,
-                         'default': 350,
+                         'type': float,
+                         'default': 8575.0,
                          'help': 'second frequence for encoding',
                      }))
         return args
@@ -165,15 +172,15 @@ class ToneInsertion(MethodBase):
         args.append((['-f0'],
                      {
                          'action': 'store',
-                         'type': int,
-                         'default': 250,
+                         'type': float,
+                         'default': 1250.0,
                          'help': 'first frequency for decoding',
                      }))
         args.append((['-f1'],
                      {
                          'action': 'store',
-                         'type': int,
-                         'default': 350,
+                         'type': float,
+                         'default': 8575.0,
                          'help': 'second frequence for decoding',
                      }))
         args.append((['-l', '--len'],
