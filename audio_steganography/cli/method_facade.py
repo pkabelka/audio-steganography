@@ -30,9 +30,6 @@ class MethodFacade:
         self.mode = mode
         self.source_data = source
 
-        self.text_to_encode = None
-        self.file_to_encode = None
-
         self.data_to_encode = np.empty(0, dtype=np.uint8)
 
     def encode(self, *args, **kwargs) -> EncodeDecodeReturn:
@@ -40,7 +37,6 @@ class MethodFacade:
         specified Method.
         """
         self.prepare_source_data()
-        self.prepare_secret_data()
 
         method: MethodBase = self.method.value(self.source_data, self.data_to_encode)
         output, additional_output = method.encode(*args, **kwargs)
@@ -76,15 +72,6 @@ class MethodFacade:
         #     Any,
         #     np.dtype[np.float64]] = (self.source_data /
         #         np.abs(self.source_data).max()).astype(np.float64)
-
-    def prepare_secret_data(self):
-        if self.text_to_encode is not None:
-            self.data_to_encode = np.unpackbits(
-                np.frombuffer(self.text_to_encode.encode('utf8'), np.uint8))
-
-        elif self.file_to_encode is not None:
-            self.data_to_encode = np.unpackbits(
-                np.fromfile(self.file_to_encode, np.uint8))
         
     def get_stats(
             self,

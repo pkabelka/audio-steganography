@@ -11,7 +11,7 @@ from .argument_parsing import parse_args
 from ..methods import MethodEnum
 from .method_facade import MethodFacade
 from .mode import Mode
-from ..exceptions import OutputFileExists, WavReadError, SecretSizeTooLarge
+from ..exceptions import SecretSizeTooLarge
 from .cli_utils import error_exit, get_attr
 from .exit_codes import ExitCode
 import sys
@@ -49,6 +49,19 @@ def check_filename(source_name, output_file, method) -> str:
 
     return fname
 
+def prepare_secret_data(text_to_encode: str, file_to_encode: str) -> np.ndarray:
+    """Converts the input text or file to uint8 bit array.
+
+    Returns
+    -------
+    out : NDArray[UINT8]
+        New file name.
+    """
+    if text_to_encode is not None:
+        return np.unpackbits(np.frombuffer(text_to_encode.encode('utf8'), np.uint8))
+
+    elif file_to_encode is not None:
+        return np.unpackbits(np.fromfile(file_to_encode, np.uint8))
 
 def main():
     """The main function of the program.
@@ -148,8 +161,7 @@ def main():
     # Run encode/decode
     try:
         if mode == Mode.encode:
-            steganography.text_to_encode = args.text
-            steganography.file_to_encode = args.file
+            steganography.data_to_encode = prepare_secret_data(args.text, args.file)
             output, additional_output = steganography.encode(**options.get(method, {}))
 
             stats = {}
