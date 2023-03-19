@@ -66,6 +66,7 @@ def main():
     args, _ = parse_args()
     print(args, file=sys.stderr)
 
+    # get the requested methods from args
     methods = [method.value for method in MethodEnum]
     if isinstance(args.methods, list) and 'ALL' not in args.methods:
         methods = []
