@@ -166,12 +166,12 @@ def main():
     if mode == Mode.encode:
         scipy.io.wavfile.write(output_file, source_sr, output)
     else:
-        bytes = np.packbits(output).tobytes()
+        bytes_ = np.packbits(output).tobytes()
         # -o - works only in decode mode
         if output_file == '-':
-            print(bytes)
+            print(bytes_)
         else:
             with open(output_file, 'wb') as f:
-                f.write(bytes)
+                f.write(bytes_)
 
     print(json.dumps(additional_output))
