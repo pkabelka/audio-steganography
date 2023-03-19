@@ -16,6 +16,39 @@ from .cli_utils import error_exit, get_attr
 from .exit_codes import ExitCode
 import sys
 import json
+import scipy.io.wavfile
+import os.path
+import numpy as np
+
+def check_filename(source_name, output_file, method) -> str:
+    """Creates the output file name according to the used method or uses
+    the user specified file name and checks if the file already exists.
+
+    If the file already exists and `self.overwrite` is not used, raises
+    `OutputFileExists` exception.
+
+    Returns
+    -------
+    fname : str
+        New file name.
+    """
+    if output_file == '-':
+        return output_file
+
+    name, ext = os.path.splitext(source_name)
+    # Filename when decoding
+    fname = f'{name}_{method.name}.out'
+
+    # Filename when encoding
+    if mode == Mode.encode:
+        fname = f'{name}_{method.name}{ext}'
+
+    # Override filename with the user specified one
+    if output_file is not None:
+        fname = output_file
+
+    return fname
+
 
 def main():
     """The main function of the program.
@@ -45,12 +78,24 @@ def main():
     except KeyError:
         error_exit('invalid mode specified', ExitCode.InvalidMode)
 
+    # Read source WAV data
+    try:
+        source_sr, source_data = scipy.io.wavfile.read(args.source)
+    except FileNotFoundError:
+        error_exit('source file not found', ExitCode.FileNotFound)
+    except ValueError as e:
+        error_exit(str(e), ExitCode.WavReadError)
+
+    # Check if the output exists
+    output_file = check_filename(args.source, args.output, method)
+    if os.path.exists(output_file) and not args.overwrite:
+        error_exit('output file already exists', ExitCode.OutputFileExists)
+
+    # Create facade for encoding/decoding
     steganography = MethodFacade(
         method,
         mode,
-        args.source,
-        args.output,
-        args.overwrite,
+        source_data,
     )
 
     additional_output = {}
@@ -100,10 +145,11 @@ def main():
         },
     }
 
+    # Run encode/decode
     try:
         if mode == Mode.encode:
-            steganography.set_text_to_encode(args.text)
-            steganography.set_file_to_encode(args.file)
+            steganography.text_to_encode = args.text
+            steganography.file_to_encode = args.file
             output, additional_output = steganography.encode(**options.get(method, {}))
 
             stats = {}
@@ -113,15 +159,19 @@ def main():
         else:
             output, additional_output = steganography.decode(**options.get(method, {}))
 
-    except OutputFileExists as e:
-        error_exit(str(e), ExitCode.OutputFileExists)
-    except FileNotFoundError as e:
-        error_exit(str(e), ExitCode.FileNotFound)
-    except WavReadError as e:
-        error_exit(str(e), ExitCode.WavReadError)
     except SecretSizeTooLarge as e:
         error_exit(str(e), ExitCode.SecretSizeTooLarge)
 
-    steganography.write_output(output)
+    # Write output
+    if mode == Mode.encode:
+        scipy.io.wavfile.write(output_file, source_sr, output)
+    else:
+        bytes = np.packbits(output).tobytes()
+        # -o - works only in decode mode
+        if output_file == '-':
+            print(bytes)
+        else:
+            with open(output_file, 'wb') as f:
+                f.write(bytes)
 
     print(json.dumps(additional_output))
