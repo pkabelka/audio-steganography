@@ -202,7 +202,7 @@ def main():
     ]
     stats = pd.DataFrame( columns=columns)
 
-    # evaluate all files with chosen methods
+    # evaluate chosen methods on dataset files
     for dataset in datasets:
         logging.debug(dataset.name)
         categories = [x for x in dataset.iterdir() if x.is_dir()]
