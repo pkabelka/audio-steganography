@@ -19,6 +19,7 @@ import json
 import scipy.io.wavfile
 import os.path
 import numpy as np
+from typing import Optional
 
 def check_filename(source_name, output_file, method) -> str:
     """Creates the output file name according to the used method or uses
@@ -49,7 +50,10 @@ def check_filename(source_name, output_file, method) -> str:
 
     return fname
 
-def prepare_secret_data(text_to_encode: str, file_to_encode: str) -> np.ndarray:
+def prepare_secret_data(
+        text_to_encode: Optional[str], 
+        file_to_encode: Optional[str],
+    ) -> np.ndarray:
     """Converts the input text or file to uint8 bit array.
 
     Returns
@@ -59,9 +63,10 @@ def prepare_secret_data(text_to_encode: str, file_to_encode: str) -> np.ndarray:
     """
     if text_to_encode is not None:
         return np.unpackbits(np.frombuffer(text_to_encode.encode('utf8'), np.uint8))
-
     elif file_to_encode is not None:
         return np.unpackbits(np.fromfile(file_to_encode, np.uint8))
+    else:
+        return np.empty(0, np.uint8)
 
 def main():
     """The main function of the program.
