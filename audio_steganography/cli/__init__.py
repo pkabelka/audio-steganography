@@ -23,10 +23,7 @@ from typing import Optional
 
 def check_filename(source_name, output_file, method) -> str:
     """Creates the output file name according to the used method or uses
-    the user specified file name and checks if the file already exists.
-
-    If the file already exists and `self.overwrite` is not used, raises
-    `OutputFileExists` exception.
+    the user specified file name.
 
     Returns
     -------
