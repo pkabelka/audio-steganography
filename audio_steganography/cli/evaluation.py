@@ -68,7 +68,7 @@ def parse_args() -> Tuple[Any, argparse.ArgumentParser]:
     args = parser.parse_args()
     return args, parser
 
-def evaluate(
+def evaluate_method(
         method: MethodEnum, 
         source_data: np.ndarray, 
         columns,
@@ -222,7 +222,7 @@ def main():
                         error_exit(str(e), ExitCode.WavReadError)
 
                     logging.info(file)
-                    method_res = evaluate(method, source_data, columns)
+                    method_res = evaluate_method(method, source_data, columns)
                     method_res['dataset'] = dataset.name
                     method_res['category'] = category.name
                     method_res['file'] = file.name
