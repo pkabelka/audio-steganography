@@ -100,11 +100,10 @@ def evaluate_method(
 
     for secret_data in [
         'Bike',
-        'Boundary',
         'Hyperventilation',
-        'Lorem ipsum dolor sit amet velit',
-        'In rhoncus, ligula id dictum sagittis, leo metus lobortis currus',
-    ]:
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer',
+    ] + (['Boundary', 'In rhoncus, ligula id dictum sit'] if extended else []):
+
         logging.info(secret_data)
         facade.data_to_encode = prepare_secret_data(secret_data, None)
 
