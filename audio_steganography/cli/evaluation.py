@@ -136,6 +136,7 @@ def evaluate_method(
         except SecretSizeTooLarge:
             continue
 
+        logging.info(f'encoding took: {time_to_encode}')
         stats = facade.get_stats(output, additional_output)
         stats_df = pd.DataFrame(
             [[
