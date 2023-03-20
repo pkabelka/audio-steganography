@@ -18,6 +18,7 @@ from pathlib import Path
 import scipy.io.wavfile
 import logging
 import pandas as pd
+import time
 
 def main():
     """The main function of the evaluation program.
@@ -71,6 +72,8 @@ def main():
         x for x in dataset_root.iterdir()
         if x.is_dir() and not x.name.startswith('.')
     ]
+
+    start_time = time.perf_counter()
     for dataset in datasets:
         logging.debug(dataset.name)
         categories = [
@@ -103,6 +106,8 @@ def main():
                     method_res['category'] = category.name
                     method_res['file'] = file.name
                     stats = pd.concat([stats, method_res], ignore_index=True)
+
+    logging.info(f'evaluation took: {time.perf_counter() - start_time}')
 
     stats = stats.sort_values(
         [
