@@ -15,12 +15,13 @@ from ...decorators import perf
 import numpy as np
 import pandas as pd
 import logging
+from typing import List
 
 def evaluate_method(
         method: MethodEnum, 
         source_data: np.ndarray, 
-        columns,
-        extended,
+        columns: List[str],
+        extended=False,
     ) -> pd.DataFrame:
 
     facade = MethodFacade(
