@@ -141,6 +141,22 @@ def evaluate_method(
             # encode
             (output, additional_output), time_to_encode = perf(facade.encode)(**opt)
         except SecretSizeTooLarge:
+            stats_df = pd.DataFrame(
+                [[
+                    '', 
+                    '', 
+                    '', 
+                    method.name, 
+                    opt,
+                    np.nan,
+                    np.nan,
+                    np.nan,
+                    np.nan,
+                    np.nan,
+                    np.Inf,
+                    np.Inf,
+                ]], columns=columns)
+            all_stats_df = pd.concat([all_stats_df, stats_df], ignore_index=True)
             continue
 
         logging.info(f'encoding took: {time_to_encode}')
@@ -167,6 +183,7 @@ def evaluate_method(
                 stats['mse'],
                 stats['rmsd'],
                 time_to_encode,
+                time_to_decode,
             ]], columns=columns)
         all_stats_df = pd.concat([all_stats_df, stats_df], ignore_index=True)
 
@@ -215,6 +232,7 @@ def main():
         'mse',
         'rmsd',
         'time_to_encode',
+        'time_to_decode',
     ]
     stats = pd.DataFrame( columns=columns)
 
