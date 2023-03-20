@@ -48,7 +48,7 @@ def check_filename(source_name, output_file, method) -> str:
     return fname
 
 def prepare_secret_data(
-        text_to_encode: Optional[str], 
+        text_to_encode: Optional[str],
         file_to_encode: Optional[str],
     ) -> np.ndarray:
     """Converts the input text or file to uint8 bit array.

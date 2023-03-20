@@ -29,7 +29,7 @@ def main():
     args, _ = parse_args()
     logging.basicConfig(level=logging.INFO)
     if not args.log:
-        logging.disable(logging.INFO) 
+        logging.disable(logging.INFO)
 
     # check the output file
     output_file = Path(args.output)
@@ -49,11 +49,11 @@ def main():
                 error_exit('invalid method specified', ExitCode.InvalidMethod)
 
     columns = [
-        'dataset', 
-        'category', 
-        'file', 
-        'method', 
-        'params', 
+        'dataset',
+        'category',
+        'file',
+        'method',
+        'params',
         'secret_bits',
         'ber_percent',
         'snr_db',
@@ -97,9 +97,9 @@ def main():
 
                     logging.info(file)
                     method_res = evaluate_method(
-                        method, 
-                        source_data, 
-                        columns, 
+                        method,
+                        source_data,
+                        columns,
                         args.extended,
                     )
                     method_res['dataset'] = dataset.name
@@ -111,11 +111,11 @@ def main():
 
     stats = stats.sort_values(
         [
-            'method', 
-            'dataset', 
-            'category', 
-            'file', 
-            'ber_percent', 
+            'method',
+            'dataset',
+            'category',
+            'file',
+            'ber_percent',
             'snr_db'
         ],
     )
