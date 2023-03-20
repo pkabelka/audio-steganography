@@ -15,13 +15,13 @@ from ..exceptions import SecretSizeTooLarge
 from .cli_utils import error_exit
 from .exit_codes import ExitCode
 from . import prepare_secret_data
+from ..decorators import perf
 import argparse
 from typing import Tuple, List, Any
 from pathlib import Path
 import scipy.io.wavfile
 import numpy as np
 import pandas as pd
-import time
 import logging
 
 def parse_args() -> Tuple[Any, argparse.ArgumentParser]:
@@ -138,15 +138,22 @@ def evaluate_method(
         logging.info(method.name)
         logging.info(opt)
         try:
-            start_time = time.perf_counter()
-            output, additional_output = facade.encode(**opt)
-            end_time = time.perf_counter()
-            time_to_encode = end_time - start_time
+            # encode
+            (output, additional_output), time_to_encode = perf(facade.encode)(**opt)
         except SecretSizeTooLarge:
             continue
 
         logging.info(f'encoding took: {time_to_encode}')
-        stats = facade.get_stats(output, additional_output)
+
+        # decode
+        (decoded_secret, _), time_to_decode = perf(method.value(output).decode)(**additional_output)
+        logging.info(f'decoding took: {time_to_decode}')
+
+        # calculate statistical functions
+        stats, time_to_get_stats = perf(facade.get_stats)(output, decoded_secret)
+        logging.info(f'get_stats took: {time_to_get_stats}')
+
+        # append stats to the DataFrame
         stats_df = pd.DataFrame(
             [[
                 '', 
