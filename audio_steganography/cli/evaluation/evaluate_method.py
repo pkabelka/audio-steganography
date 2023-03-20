@@ -12,10 +12,23 @@ from ..mode import Mode
 from ...exceptions import SecretSizeTooLarge
 from .. import prepare_secret_data
 from ...decorators import perf
+from ...audio_utils import resample
 import numpy as np
 import pandas as pd
 import logging
 from typing import List
+
+def half_sampling(input: np.ndarray):
+    x = resample(input, 2, 'nearest')
+    x = resample(x, 0.5, 'nearest')
+
+    if input.dtype in [
+        np.dtype(np.int64),
+        np.dtype(np.int32),
+        np.dtype(np.int16),
+    ]:
+        x = x.astype(input.dtype)
+    return x
 
 def evaluate_method(
         method: MethodEnum,
@@ -116,7 +129,7 @@ def evaluate_method(
             logging.info(opt)
             try:
                 # encode
-                (output, additional_output), time_to_encode = perf(facade.encode)(**opt)
+                (stego, additional_output), time_to_encode = perf(facade.encode)(**opt)
             except SecretSizeTooLarge:
                 stats_df = pd.DataFrame(
                     [[
@@ -126,6 +139,7 @@ def evaluate_method(
                         method.name,
                         opt,
                         len(secret_data) * 8,
+                        '',
                         np.nan,
                         np.nan,
                         np.nan,
@@ -139,31 +153,43 @@ def evaluate_method(
 
             logging.info(f'encoding took: {time_to_encode}')
 
-            # decode
-            (decoded_secret, _), time_to_decode = perf(method.value(output).decode)(**additional_output)
-            logging.info(f'decoding took: {time_to_decode}')
+            # modifications
+            for modification_name, modification_func in {
+                '': lambda x: x,
+                'half sampling': half_sampling,
+            }.items():
+                logging.info(f'modification name: {modification_name}')
+                # modify stego signal
+                stego = modification_func(stego)
 
-            # calculate statistical functions
-            stats, time_to_get_stats = perf(facade.get_stats)(output, decoded_secret)
-            logging.info(f'get_stats took: {time_to_get_stats}')
+                # decode
+                (decoded_secret, _), time_to_decode = (
+                    perf(method.value(stego).decode)(**additional_output)
+                )
+                logging.info(f'decoding took: {time_to_decode}')
 
-            # append stats to the DataFrame
-            stats_df = pd.DataFrame(
-                [[
-                    '',
-                    '',
-                    '',
-                    method.name,
-                    opt,
-                    len(secret_data) * 8,
-                    stats['ber_percent_secret_encoded'],
-                    stats['snr_db'],
-                    stats['psnr_db'],
-                    stats['mse'],
-                    stats['rmsd'],
-                    time_to_encode,
-                    time_to_decode,
-                ]], columns=columns)
-            all_stats_df = pd.concat([all_stats_df, stats_df], ignore_index=True)
+                # calculate statistical functions
+                stats, time_to_get_stats = perf(facade.get_stats)(stego, decoded_secret)
+                logging.info(f'get_stats took: {time_to_get_stats}')
+
+                # append stats to the DataFrame
+                stats_df = pd.DataFrame(
+                    [[
+                        '',
+                        '',
+                        '',
+                        method.name,
+                        opt,
+                        len(secret_data) * 8,
+                        modification_name,
+                        stats['ber_percent_secret_encoded'],
+                        stats['snr_db'],
+                        stats['psnr_db'],
+                        stats['mse'],
+                        stats['rmsd'],
+                        time_to_encode,
+                        time_to_decode,
+                    ]], columns=columns)
+                all_stats_df = pd.concat([all_stats_df, stats_df], ignore_index=True)
 
     return all_stats_df

@@ -55,6 +55,7 @@ def main():
         'method',
         'params',
         'secret_bits',
+        'modification',
         'ber_percent',
         'snr_db',
         'psnr_db',
