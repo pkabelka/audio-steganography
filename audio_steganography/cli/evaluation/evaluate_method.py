@@ -23,6 +23,30 @@ def evaluate_method(
         columns: List[str],
         extended=False,
     ) -> pd.DataFrame:
+    """Evaluates the quality of the given method by encoding data of varying
+    length. The stego signal is then filtered, resampled, requantized and
+    converted to MP3 and back. The modified signals are used to calculate
+    bit error rate to see how robust is the method.
+
+    Parameters
+    ----------
+    method : MethodEnum
+        Chosen steganography method from MethodEnum.
+    source_data : NDArray
+        Source signal array.
+    columns : MethodEnum
+        Columns of the statistical DataFrame defined in __main__.
+    extended : bool
+        Enables extended testing. This includes basinhopping and bruteforce in
+        echo methods.
+
+    Returns
+    -------
+    out : method_base.EncodeDecodeReturn
+        Tuple containing NumPy array of samples with secret data encoded
+        using direct sequance spread spectrum method and additional output
+        needed for decoding.
+    """
 
     facade = MethodFacade(
         method,
