@@ -53,6 +53,7 @@ def main():
         'file', 
         'method', 
         'params', 
+        'secret_bits',
         'ber_percent',
         'snr_db',
         'psnr_db',

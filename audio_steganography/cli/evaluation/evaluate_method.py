@@ -98,59 +98,69 @@ def evaluate_method(
     # DataFrame for stats of all runs of the method
     all_stats_df = pd.DataFrame(columns=columns)
 
-    facade.data_to_encode = prepare_secret_data('Lorem ipsum', None)
+    for secret_data in [
+        'Bike',
+        'Boundary',
+        'Hyperventilation',
+        'Lorem ipsum dolor sit amet velit',
+        'In rhoncus, ligula id dictum sagittis, leo metus lobortis currus',
+    ]:
+        logging.info(secret_data)
+        facade.data_to_encode = prepare_secret_data(secret_data, None)
 
-    for opt in options.get(method, []):
-        logging.info(method.name)
-        logging.info(opt)
-        try:
-            # encode
-            (output, additional_output), time_to_encode = perf(facade.encode)(**opt)
-        except SecretSizeTooLarge:
+        for opt in options.get(method, []):
+            logging.info(method.name)
+            logging.info(opt)
+            try:
+                # encode
+                (output, additional_output), time_to_encode = perf(facade.encode)(**opt)
+            except SecretSizeTooLarge:
+                stats_df = pd.DataFrame(
+                    [[
+                        '', 
+                        '', 
+                        '', 
+                        method.name, 
+                        opt,
+                        np.nan,
+                        np.nan,
+                        np.nan,
+                        np.nan,
+                        np.nan,
+                        np.nan,
+                        np.Inf,
+                        np.Inf,
+                    ]], columns=columns)
+                all_stats_df = pd.concat([all_stats_df, stats_df], ignore_index=True)
+                continue
+
+            logging.info(f'encoding took: {time_to_encode}')
+
+            # decode
+            (decoded_secret, _), time_to_decode = perf(method.value(output).decode)(**additional_output)
+            logging.info(f'decoding took: {time_to_decode}')
+
+            # calculate statistical functions
+            stats, time_to_get_stats = perf(facade.get_stats)(output, decoded_secret)
+            logging.info(f'get_stats took: {time_to_get_stats}')
+
+            # append stats to the DataFrame
             stats_df = pd.DataFrame(
                 [[
                     '', 
                     '', 
                     '', 
                     method.name, 
-                    opt,
-                    np.nan,
-                    np.nan,
-                    np.nan,
-                    np.nan,
-                    np.nan,
-                    np.Inf,
-                    np.Inf,
+                    opt, 
+                    len(secret_data) * 8,
+                    stats['ber_percent_secret_encoded'],
+                    stats['snr_db'],
+                    stats['psnr_db'],
+                    stats['mse'],
+                    stats['rmsd'],
+                    time_to_encode,
+                    time_to_decode,
                 ]], columns=columns)
             all_stats_df = pd.concat([all_stats_df, stats_df], ignore_index=True)
-            continue
-
-        logging.info(f'encoding took: {time_to_encode}')
-
-        # decode
-        (decoded_secret, _), time_to_decode = perf(method.value(output).decode)(**additional_output)
-        logging.info(f'decoding took: {time_to_decode}')
-
-        # calculate statistical functions
-        stats, time_to_get_stats = perf(facade.get_stats)(output, decoded_secret)
-        logging.info(f'get_stats took: {time_to_get_stats}')
-
-        # append stats to the DataFrame
-        stats_df = pd.DataFrame(
-            [[
-                '', 
-                '', 
-                '', 
-                method.name, 
-                opt, 
-                stats['ber_percent_secret_encoded'],
-                stats['snr_db'],
-                stats['psnr_db'],
-                stats['mse'],
-                stats['rmsd'],
-                time_to_encode,
-                time_to_decode,
-            ]], columns=columns)
-        all_stats_df = pd.concat([all_stats_df, stats_df], ignore_index=True)
 
     return all_stats_df
