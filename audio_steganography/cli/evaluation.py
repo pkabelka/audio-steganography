@@ -57,6 +57,13 @@ def parse_args() -> Tuple[Any, argparse.ArgumentParser]:
         default=False)
 
     parser.add_argument(
+        '-e',
+        '--extended',
+        action='store_true',
+        help='enables extended testing',
+        default=False)
+
+    parser.add_argument(
         'methods',
         action='store',
         choices=['ALL'] + [method.name for method in MethodEnum],
@@ -72,6 +79,7 @@ def evaluate_method(
         method: MethodEnum, 
         source_data: np.ndarray, 
         columns,
+        extended,
     ) -> pd.DataFrame:
 
     facade = MethodFacade(
@@ -104,7 +112,7 @@ def evaluate_method(
                 for d0 in [50, 100, 150, 200]
                 for alpha in [0.5, 0.25, 0.1, 0.05]
                 for decay_rate in [0.85, 0.5]
-                for delay_search in ['', 'basinhopping', 'bruteforce']
+                for delay_search in [''] + (['basinhopping', 'bruteforce'] if extended else [])
             ]
         ),
         MethodEnum.phase: [{}],
@@ -223,7 +231,12 @@ def main():
                         error_exit(str(e), ExitCode.WavReadError)
 
                     logging.info(file)
-                    method_res = evaluate_method(method, source_data, columns)
+                    method_res = evaluate_method(
+                        method, 
+                        source_data, 
+                        columns, 
+                        args.extended,
+                    )
                     method_res['dataset'] = dataset.name
                     method_res['category'] = category.name
                     method_res['file'] = file.name
