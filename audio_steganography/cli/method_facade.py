@@ -72,7 +72,7 @@ class MethodFacade:
         #     Any,
         #     np.dtype[np.float64]] = (self.source_data /
         #         np.abs(self.source_data).max()).astype(np.float64)
-        
+
     def get_stats(
             self,
             output: np.ndarray,
