@@ -3,7 +3,7 @@
 # File: evaluate_method.py
 # Author: Petr Kabelka <xkabel09 at stud.fit.vutbr.cz>
 
-"""This file contains function for evaluating a steganograpghy method.
+"""This file contains the function for evaluating a steganograpghy method.
 """
 
 from ...methods import MethodEnum
