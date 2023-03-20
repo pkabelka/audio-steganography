@@ -84,7 +84,7 @@ def evaluate_method(
         MethodEnum.phase: [{}],
         MethodEnum.dsss: [{'alpha': alpha} for alpha in [0.05, 0.005, 0.0025]],
         MethodEnum.silence_interval: [
-            {'min_silence_len': l} for l in [400, 600, 800]
+            {'min_silence_len': l} for l in [400, 600] + ([800] if extended else [])
         ],
         MethodEnum.dsss_dft:[{'alpha': alpha} for alpha in [0.05, 0.005, 0.0025]], 
         MethodEnum.tone_insertion: [
