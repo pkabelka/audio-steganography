@@ -18,8 +18,8 @@ import logging
 from typing import List
 
 def evaluate_method(
-        method: MethodEnum, 
-        source_data: np.ndarray, 
+        method: MethodEnum,
+        source_data: np.ndarray,
         columns: List[str],
         extended=False,
     ) -> pd.DataFrame:
@@ -56,10 +56,8 @@ def evaluate_method(
 
     options = {
         MethodEnum.lsb: [
-            {
-                'depth': i,
-                'only_needed': needed,
-            } for i in [1, 2, 4, 8] for needed in [True, False]
+            {'depth': i, 'only_needed': needed}
+            for i in [1, 2, 4, 8] for needed in [True, False]
         ],
         **dict.fromkeys(
             [
@@ -78,20 +76,26 @@ def evaluate_method(
                 for d0 in [50, 100, 150, 200]
                 for alpha in [0.5, 0.25, 0.1, 0.05]
                 for decay_rate in [0.85, 0.5]
-                for delay_search in [''] + (['basinhopping', 'bruteforce'] if extended else [])
+                for delay_search in [''] +
+                    (['basinhopping', 'bruteforce'] if extended else [])
             ]
         ),
         MethodEnum.phase: [{}],
-        MethodEnum.dsss: [{'alpha': alpha} for alpha in [0.05, 0.005, 0.0025]],
-        MethodEnum.silence_interval: [
-            {'min_silence_len': l} for l in [400, 600] + ([800] if extended else [])
+        MethodEnum.dsss: [
+            {'alpha': alpha}
+            for alpha in [0.05, 0.005, 0.0025]
         ],
-        MethodEnum.dsss_dft:[{'alpha': alpha} for alpha in [0.05, 0.005, 0.0025]], 
+        MethodEnum.silence_interval: [
+            {'min_silence_len': l}
+            for l in [400, 600] + ([800] if extended else [])
+        ],
+        MethodEnum.dsss_dft:[
+            {'alpha': alpha}
+            for alpha in [0.05, 0.005, 0.0025]
+        ],
         MethodEnum.tone_insertion: [
-            {
-                'f0': f0,
-                'f1': f1,
-            } for f0, f1 in zip([3685, 5215, 13277, 18757], [4629, 6331, 15755, 21703]) 
+            {'f0': f0, 'f1': f1}
+            for f0, f1 in zip([3685, 5215, 13277, 18757], [4629, 6331, 15755, 21703])
         ],
     }
 
@@ -116,10 +120,10 @@ def evaluate_method(
             except SecretSizeTooLarge:
                 stats_df = pd.DataFrame(
                     [[
-                        '', 
-                        '', 
-                        '', 
-                        method.name, 
+                        '',
+                        '',
+                        '',
+                        method.name,
                         opt,
                         len(secret_data) * 8,
                         np.nan,
@@ -146,11 +150,11 @@ def evaluate_method(
             # append stats to the DataFrame
             stats_df = pd.DataFrame(
                 [[
-                    '', 
-                    '', 
-                    '', 
-                    method.name, 
-                    opt, 
+                    '',
+                    '',
+                    '',
+                    method.name,
+                    opt,
                     len(secret_data) * 8,
                     stats['ber_percent_secret_encoded'],
                     stats['snr_db'],
