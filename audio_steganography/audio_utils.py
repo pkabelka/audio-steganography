@@ -8,6 +8,7 @@
 
 import numpy as np
 import scipy.signal
+import scipy.interpolate
 from numpy.typing import DTypeLike
 from typing import List, Tuple, Union
 
@@ -295,3 +296,72 @@ def consecutive_values(input: Union[List, np.ndarray]):
     diff = np.ones(input.shape, dtype=bool)
     diff[1:] = np.diff(input)
     return np.nonzero(diff)[0], np.diff(np.append(np.nonzero(diff)[0], input.size))
+
+def resample(
+        input: Union[List, np.ndarray],
+        factor: float,
+        kind='linear',
+    ) -> np.ndarray:
+    """Resamples the input array with the given factor.
+
+    Parameters
+    ----------
+    input : List | NDArray
+        1D array of values.
+    factor : List | NDArray
+        Resampling factor.
+    kind : List | NDArray
+        Interpolation kind.
+
+    Returns
+    -------
+    out : NDArray
+        NumPy array with the input resampled with the given factor.
+
+    ---
+    This function is a modified version from a StackOverflow answer:
+    https://stackoverflow.com/a/55747293
+    by fabda01 (https://stackoverflow.com/users/6327658/fabda01)
+    edited 2019-04-19 13:08
+
+    This function is under CC BY-SA 4.0 License:
+    https://creativecommons.org/licenses/by-sa/4.0
+
+    By exercising the Licensed Rights (defined below), You accept and agree to
+    be bound by the terms and conditions of this Creative Commons
+    Attribution-ShareAlike 4.0 International Public License ("Public License").
+    To the extent this Public License may be interpreted as a contract, You are
+    granted the Licensed Rights in consideration of Your acceptance of these
+    terms and conditions, and the Licensor grants You such rights in
+    consideration of benefits the Licensor receives from making the Licensed
+    Material available under these terms and conditions.
+
+    Unless otherwise separately undertaken by the Licensor, to the extent
+    possible, the Licensor offers the Licensed Material as-is and as-available,
+    and makes no representations or warranties of any kind concerning the
+    Licensed Material, whether express, implied, statutory, or other. This
+    includes, without limitation, warranties of title, merchantability, fitness
+    for a particular purpose, non-infringement, absence of latent or other
+    defects, accuracy, or the presence or absence of errors, whether or not
+    known or discoverable. Where disclaimers of warranties are not allowed in
+    full or in part, this disclaimer may not apply to You.
+
+    To the extent possible, in no event will the Licensor be liable to You on
+    any legal theory (including, without limitation, negligence) or otherwise
+    for any direct, special, indirect, incidental, consequential, punitive,
+    exemplary, or other losses, costs, expenses, or damages arising out of this
+    Public License or use of the Licensed Material, even if the Licensor has
+    been advised of the possibility of such losses, costs, expenses, or
+    damages. Where a limitation of liability is not allowed in full or in part,
+    this limitation may not apply to You.
+
+    Citation date: 2023-03-20
+    """
+    input = np.asanyarray(input)
+
+    if input.size == 0:
+        return np.empty(0)
+
+    n = int(np.ceil(input.size / factor))
+    f = scipy.interpolate.interp1d(np.linspace(0, 1, input.size), input, kind)
+    return f(np.linspace(0, 1, n))
