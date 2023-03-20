@@ -121,7 +121,7 @@ def evaluate_method(
                         '', 
                         method.name, 
                         opt,
-                        np.nan,
+                        len(secret_data) * 8,
                         np.nan,
                         np.nan,
                         np.nan,
