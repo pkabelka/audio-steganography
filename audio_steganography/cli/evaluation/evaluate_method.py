@@ -59,7 +59,7 @@ def evaluate_method(
             {
                 'depth': i,
                 'only_needed': needed,
-            } for i in range(1, 9) for needed in [True, False]
+            } for i in [1, 2, 4, 8] for needed in [True, False]
         ],
         **dict.fromkeys(
             [
