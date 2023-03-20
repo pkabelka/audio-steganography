@@ -228,6 +228,7 @@ def main():
                     method_res['file'] = file.name
                     stats = pd.concat([stats, method_res], ignore_index=True)
 
+    stats = stats.sort_values('method')
     # output stats to STDOUT or CSV file
     if args.output == '-':
         print(stats)
