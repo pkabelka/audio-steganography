@@ -76,7 +76,7 @@ class MethodFacade:
     def get_stats(
             self,
             output: np.ndarray,
-            additional_output: Dict[str, Any]
+            decoded_secret,
         ) -> Dict:
         """Compute and return statistical tests on source and `encode` method
         output and also `source`, `secret` and `output` lengths.
@@ -99,9 +99,6 @@ class MethodFacade:
         #     np.array(bytearray(output.tobytes()), dtype=np.uint8),
         #     bitorder='little')
 
-        method: MethodBase = self.method.value(output)
-        encoded_secret, _ = method.decode(**additional_output)
-
         stats = {
             'snr_db': snr_db(self.source_data, output),
             'mse': mse(self.source_data, output),
@@ -109,7 +106,7 @@ class MethodFacade:
             'psnr_db': psnr_db(self.source_data, output),
             # 'ber_percent_source_output': ber_percent(source_bits, output_bits),
             'ber_percent_secret_encoded': ber_percent(self.data_to_encode,
-                                                      encoded_secret),
+                                                      decoded_secret),
             'source_sample_len': len(self.source_data),
             'secret_bit_len': len(self.data_to_encode),
             'output_sample_len': len(output),
