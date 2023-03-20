@@ -129,6 +129,7 @@ def evaluate_method(
         ],
     }
 
+    # DataFrame for stats of all runs of the method
     all_stats_df = pd.DataFrame(columns=columns)
 
     facade.data_to_encode = prepare_secret_data('Lorem ipsum dolor sit amet consectetur', None)
@@ -161,7 +162,6 @@ def evaluate_method(
                 time_to_encode,
             ]], columns=columns)
         all_stats_df = pd.concat([all_stats_df, stats_df], ignore_index=True)
-        # additional_output = {**additional_output, **stats}
 
     return all_stats_df
 
