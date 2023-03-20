@@ -94,7 +94,7 @@ class EchoBase(MethodBase, abc.ABC):
         if self._secret_data.size * 1024 > self._source_data.size:
             raise SecretSizeTooLarge('secret data cannot fit in source: '+
                 f'len(secret) = {self._secret_data.size}, capacity(source) = '+
-                f'{self._source_data.size}')
+                f'{self._source_data.size//1024}')
 
         if delay_search == 'bruteforce':
             return self._encode_bruteforce(echo_class, d0, d1, alpha, decay_rate)
