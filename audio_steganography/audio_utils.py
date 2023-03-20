@@ -247,7 +247,7 @@ def consecutive_values(input: Union[List, np.ndarray]):
 
     Parameters
     ----------
-    x : NDArray
+    input : List | NDArray
         1D array of values.
 
     Returns
