@@ -217,9 +217,6 @@ def main():
             except KeyError:
                 error_exit('invalid method specified', ExitCode.InvalidMethod)
 
-    dataset_root = Path(args.workdir)
-    datasets = [x for x in dataset_root.iterdir() if x.is_dir()]
-
     columns = [
         'dataset', 
         'category', 
@@ -237,9 +234,18 @@ def main():
     stats = pd.DataFrame( columns=columns)
 
     # evaluate chosen methods on dataset files
+    dataset_root = Path(args.workdir)
+    # ignore datasets starting with "."
+    datasets = [
+        x for x in dataset_root.iterdir()
+        if x.is_dir() and not x.name.startswith('.')
+    ]
     for dataset in datasets:
         logging.debug(dataset.name)
-        categories = [x for x in dataset.iterdir() if x.is_dir()]
+        categories = [
+            x for x in dataset.iterdir()
+            if x.is_dir() and not x.name.startswith('.')
+        ]
         logging.debug(categories)
         for category in categories:
             files = [x for x in category.iterdir() if
