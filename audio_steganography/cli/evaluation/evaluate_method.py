@@ -129,6 +129,7 @@ def evaluate_method(
     # DataFrame for stats of all runs of the method
     all_stats_df = pd.DataFrame(columns=columns)
 
+    # encode messages of various lengths
     for secret_data in [
         'Bike',
         'Hyperventilation',
@@ -138,6 +139,7 @@ def evaluate_method(
         logging.info(secret_data)
         facade.data_to_encode = prepare_secret_data(secret_data, None)
 
+        # use various method options for encoding
         for opt in options.get(method, []):
             logging.info(method.name)
             logging.info(opt)
@@ -167,7 +169,7 @@ def evaluate_method(
 
             logging.info(f'encoding took: {time_to_encode}')
 
-            # modifications
+            # modify the stego signal to test robustness
             modifications = {
                 '': lambda x: x,
                 'half sampling': half_sampling,
