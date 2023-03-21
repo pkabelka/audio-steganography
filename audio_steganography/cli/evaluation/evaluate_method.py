@@ -100,7 +100,7 @@ def evaluate_method(
                 'delay_search': delay_search,
             }
                 for d0 in [50, 100, 150, 200]
-                for alpha in [0.5, 0.25, 0.1, 0.05]
+                for alpha in [0.5, 0.25, 0.05] + ([0.1] if extended else [])
                 for decay_rate in [0.85, 0.5]
                 for delay_search in [''] +
                     (['basinhopping', 'bruteforce'] if extended else [])
@@ -121,7 +121,8 @@ def evaluate_method(
         ],
         MethodEnum.tone_insertion: [
             {'f0': f0, 'f1': f1}
-            for f0, f1 in zip([3685, 5215, 13277, 18757], [4629, 6331, 15755, 21703])
+            for f0, f1 in list(zip([433, 10685, 18757], [511, 13277, 21703])) +
+                ([(5215, 13629), (6331, 15755)] if extended else [])
         ],
     }
 
