@@ -12,7 +12,7 @@ from ..mode import Mode
 from ...exceptions import SecretSizeTooLarge
 from .. import prepare_secret_data
 from ...decorators import perf
-from ...audio_utils import resample, to_dtype
+from ...audio_utils import resample, to_dtype, add_normalized_noise
 import numpy as np
 import pandas as pd
 import logging
@@ -168,11 +168,19 @@ def evaluate_method(
             logging.info(f'encoding took: {time_to_encode}')
 
             # modifications
-            for modification_name, modification_func in {
+            modifications = {
                 '': lambda x: x,
                 'half sampling': half_sampling,
                 'half quantization': half_quantization,
-            }.items():
+                'noise: 20 dB SNR': lambda x: to_dtype(add_normalized_noise(x, 20), x.dtype),
+                'noise: 10 dB SNR': lambda x: to_dtype(add_normalized_noise(x, 10), x.dtype),
+            }
+            modifications.update(
+                {
+                    'noise: 15 dB SNR': lambda x: to_dtype(add_normalized_noise(x, 15), x.dtype),
+                } if extended else {})
+
+            for modification_name, modification_func in modifications.items():
                 logging.info(f'modification name: {modification_name}')
                 # modify stego signal
                 stego = modification_func(stego)

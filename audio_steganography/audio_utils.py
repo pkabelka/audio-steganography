@@ -365,3 +365,25 @@ def resample(
     n = int(np.ceil(input.size / factor))
     f = scipy.interpolate.interp1d(np.linspace(0, 1, input.size), input, kind)
     return f(np.linspace(0, 1, n))
+
+def add_normalized_noise(input: np.ndarray, wanted_snr_db: float):
+    """Adds noise with requested dB and normalizes the signal to [-1; 1] range.
+
+    Parameters
+    ----------
+    input : numpy.ndarray
+        Input array to add noise to.
+    wanted_snr_db : float
+        Signal to noise ratio of the noise to add in decibells.
+
+    Returns
+    -------
+    out : numpy.ndarray
+        Input array with added noise.
+    """
+    signal = center(input)
+    signal = normalize(signal)
+    avg_db = 10 * np.log10(np.mean(signal**2))
+    noise_power = 10 ** ((avg_db - wanted_snr_db) / 10)
+    noise = np.random.normal(0, np.sqrt(noise_power), len(signal))
+    return signal + noise
