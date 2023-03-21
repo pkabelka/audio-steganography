@@ -16,6 +16,7 @@ from ...audio_utils import resample
 import numpy as np
 import pandas as pd
 import logging
+import json
 from typing import List
 
 def half_sampling(input: np.ndarray):
@@ -137,7 +138,7 @@ def evaluate_method(
                         '',
                         '',
                         method.name,
-                        opt,
+                        json.dumps(opt),
                         len(secret_data) * 8,
                         '',
                         np.nan,
@@ -179,7 +180,7 @@ def evaluate_method(
                         '',
                         '',
                         method.name,
-                        opt,
+                        json.dumps(opt),
                         len(secret_data) * 8,
                         modification_name,
                         stats['ber_percent_secret_encoded'],
