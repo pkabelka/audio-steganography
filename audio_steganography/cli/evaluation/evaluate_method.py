@@ -12,7 +12,7 @@ from ..mode import Mode
 from ...exceptions import SecretSizeTooLarge
 from .. import prepare_secret_data
 from ...decorators import perf
-from ...audio_utils import resample
+from ...audio_utils import resample, to_dtype
 import numpy as np
 import pandas as pd
 import logging
@@ -30,6 +30,18 @@ def half_sampling(input: np.ndarray):
     ]:
         x = x.astype(input.dtype)
     return x
+
+def half_quantization(input: np.ndarray):
+    dtype_conv = {
+        np.dtype(np.int64): np.int32,
+        np.dtype(np.int32): np.int16,
+        np.dtype(np.int16): np.int8,
+        np.dtype(np.float64): np.float32,
+        np.dtype(np.float32): np.float16,
+    }
+
+    x = to_dtype(input, dtype_conv.get(input.dtype, np.float64))
+    return to_dtype(x, input.dtype)
 
 def evaluate_method(
         method: MethodEnum,
@@ -158,6 +170,7 @@ def evaluate_method(
             for modification_name, modification_func in {
                 '': lambda x: x,
                 'half sampling': half_sampling,
+                'half quantization': half_quantization,
             }.items():
                 logging.info(f'modification name: {modification_name}')
                 # modify stego signal
