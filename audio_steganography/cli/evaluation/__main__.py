@@ -117,7 +117,7 @@ def main():
             'category',
             'file',
             'ber_percent',
-            'snr_db'
+            'snr_db',
         ],
     )
     # output stats to STDOUT or CSV file
