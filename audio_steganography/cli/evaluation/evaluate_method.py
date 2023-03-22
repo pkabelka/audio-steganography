@@ -97,12 +97,11 @@ def evaluate_method(
                 'd0': d0,
                 'd1': d0 + 50,
                 'alpha': alpha,
-                'decay_rate': decay_rate,
+                'decay_rate': 0.85,
                 'delay_search': delay_search,
             }
                 for d0 in [50, 100, 150, 200]
                 for alpha in [0.5, 0.25, 0.05] + ([0.1] if extended else [])
-                for decay_rate in [0.85, 0.5]
                 for delay_search in [''] +
                     (['basinhopping', 'bruteforce'] if extended else [])
             ]
