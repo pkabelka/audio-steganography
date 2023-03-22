@@ -131,12 +131,14 @@ def evaluate_method(
         needed for decoding.
     """
 
+    # facade for encoding
     facade = MethodFacade(
         method,
         Mode.encode,
         source_data,
     )
 
+    # method options to evaluate
     options = {
         MethodEnum.lsb: [
             {'depth': i, 'only_needed': needed}
@@ -226,14 +228,17 @@ def evaluate_method(
 
             logging.info(f'encoding took: {time_to_encode}')
 
-            # modify the stego signal to test robustness
+            # modify the stego signal to evaluate robustness
             modifications = {
                 '': lambda x: x,
                 'half sampling': half_sampling,
                 'half quantization': half_quantization,
-                'noise: SNR 20 dB': lambda x: to_dtype(add_normalized_noise(x, 20), x.dtype),
-                'noise: SNR 10 dB': lambda x: to_dtype(add_normalized_noise(x, 10), x.dtype),
-                'mp3 transcoding: 96k': lambda x: mp3_transcoding(x, 96),
+                'noise: SNR 20 dB':
+                    lambda x: to_dtype(add_normalized_noise(x, 20), x.dtype),
+                'noise: SNR 10 dB':
+                    lambda x: to_dtype(add_normalized_noise(x, 10), x.dtype),
+                'mp3 transcoding: 96k':
+                    lambda x: mp3_transcoding(x, 96),
                 'low-pass half max frequency':
                     lambda x: to_dtype(
                         butterworth_filter(x, sample_rate//4, 'lowpass', sample_rate),
@@ -245,16 +250,20 @@ def evaluate_method(
             }
             modifications.update(
                 {
-                    'noise: SNR 15 dB': lambda x: to_dtype(add_normalized_noise(x, 15), x.dtype),
-                    'mp3 transcoding: 128k': lambda x: mp3_transcoding(x, 128),
+                    'noise: SNR 15 dB':
+                        lambda x: to_dtype(add_normalized_noise(x, 15), x.dtype),
+                    'mp3 transcoding: 128k':
+                        lambda x: mp3_transcoding(x, 128),
                 } if extended else {})
 
             for modification_name, modification_func in modifications.items():
                 logging.info(f'modification name: {modification_name}')
-                # modify stego signal
+
+                # run the modification of stego signal
                 try:
                     stego, time_to_modify = perf(modification_func)(stego)
                 except FileNotFoundError as e:
+                    # FFMpeg executable not found
                     logging.warn(e)
                     stats_df = pd.DataFrame(
                         [[
@@ -275,6 +284,7 @@ def evaluate_method(
                         ]], columns=columns)
                     all_stats_df = pd.concat([all_stats_df, stats_df], ignore_index=True)
                     continue
+
                 logging.info(f'modification took: {time_to_modify}')
 
                 # decode
