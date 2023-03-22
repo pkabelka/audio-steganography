@@ -15,6 +15,7 @@ from ...decorators import perf
 from ...audio_utils import resample, to_dtype, add_normalized_noise
 import numpy as np
 import pandas as pd
+import scipy.signal
 import logging
 import json
 import subprocess
@@ -83,9 +84,25 @@ def mp3_transcoding(input: np.ndarray, bitrate: float):
     transcoded_wav = proc_to_wav.communicate(input=input_bytes)[0]
     return np.frombuffer(transcoded_wav, dtype=input.dtype, offset=6*8*44)
 
+def butterworth_filter(
+        input,
+        cutoff_frequency,
+        btype='lowpass',
+        samplerate=None,
+    ):
+    num, denom = scipy.signal.butter(
+        2,
+        cutoff_frequency,
+        btype=btype,
+        output='ba',
+        fs=samplerate,
+    )
+    return scipy.signal.filtfilt(num, denom, input)
+
 def evaluate_method(
         method: MethodEnum,
         source_data: np.ndarray,
+        sample_rate: float,
         columns: List[str],
         extended=False,
     ) -> pd.DataFrame:
@@ -217,6 +234,14 @@ def evaluate_method(
                 'noise: SNR 20 dB': lambda x: to_dtype(add_normalized_noise(x, 20), x.dtype),
                 'noise: SNR 10 dB': lambda x: to_dtype(add_normalized_noise(x, 10), x.dtype),
                 'mp3 transcoding: 96k': lambda x: mp3_transcoding(x, 96),
+                'low-pass half max frequency':
+                    lambda x: to_dtype(
+                        butterworth_filter(x, sample_rate//4, 'lowpass', sample_rate),
+                        x.dtype),
+                'high-pass half max frequency':
+                    lambda x: to_dtype(
+                        butterworth_filter(x, sample_rate//4, 'highpass', sample_rate),
+                        x.dtype),
             }
             modifications.update(
                 {

@@ -100,6 +100,7 @@ def main():
                     method_res = evaluate_method(
                         method,
                         source_data,
+                        source_sr,
                         columns,
                         args.extended,
                     )
