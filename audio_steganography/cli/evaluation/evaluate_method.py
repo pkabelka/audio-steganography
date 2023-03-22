@@ -17,6 +17,7 @@ import numpy as np
 import pandas as pd
 import logging
 import json
+import subprocess
 from typing import List
 
 def half_sampling(input: np.ndarray):
@@ -42,6 +43,45 @@ def half_quantization(input: np.ndarray):
 
     x = to_dtype(input, dtype_conv.get(input.dtype, np.float64))
     return to_dtype(x, input.dtype)
+
+def mp3_transcoding(input: np.ndarray, bitrate: float):
+    ffmpeg_base = [
+        'ffmpeg',
+        '-hide_banner',
+    ]
+
+    proc_to_mp3 = subprocess.Popen(
+        ffmpeg_base + [
+            '-f', 's16le',
+            '-i', 'data/speech_signed_16_pcm.wav',
+            '-c:a', 'libmp3lame',
+            '-b:a', f'{bitrate}k',
+            '-f', 'matroska',
+            'pipe:',
+        ],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+        bufsize=10**8,
+    )
+    proc_to_wav = subprocess.Popen(
+        ffmpeg_base + [
+            '-f', 'matroska',
+            '-i', 'pipe:',
+            '-c:a', 'pcm_s16le',
+            '-f', 's16le',
+            'pipe:',
+        ],
+        stdin=proc_to_mp3.stdout,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+        bufsize=10**8,
+    )
+
+    proc_to_mp3.stdout.close()
+
+    input_bytes = input.astype(input.dtype.newbyteorder('<')).tobytes()
+    transcoded_wav = proc_to_wav.communicate(input=input_bytes)[0]
+    return np.frombuffer(transcoded_wav, dtype=input.dtype, offset=6*8*44)
 
 def evaluate_method(
         method: MethodEnum,
@@ -176,16 +216,41 @@ def evaluate_method(
                 'half quantization': half_quantization,
                 'noise: SNR 20 dB': lambda x: to_dtype(add_normalized_noise(x, 20), x.dtype),
                 'noise: SNR 10 dB': lambda x: to_dtype(add_normalized_noise(x, 10), x.dtype),
+                'mp3 transcoding: 96k': lambda x: mp3_transcoding(x, 96),
             }
             modifications.update(
                 {
                     'noise: SNR 15 dB': lambda x: to_dtype(add_normalized_noise(x, 15), x.dtype),
+                    'mp3 transcoding: 128k': lambda x: mp3_transcoding(x, 128),
                 } if extended else {})
 
             for modification_name, modification_func in modifications.items():
                 logging.info(f'modification name: {modification_name}')
                 # modify stego signal
-                stego = modification_func(stego)
+                try:
+                    stego, time_to_modify = perf(modification_func)(stego)
+                except FileNotFoundError as e:
+                    logging.warn(e)
+                    stats_df = pd.DataFrame(
+                        [[
+                            '',
+                            '',
+                            '',
+                            method.name,
+                            json.dumps(opt),
+                            len(secret_data) * 8,
+                            modification_name,
+                            np.nan,
+                            np.nan,
+                            np.nan,
+                            np.nan,
+                            np.nan,
+                            np.Inf,
+                            np.Inf,
+                        ]], columns=columns)
+                    all_stats_df = pd.concat([all_stats_df, stats_df], ignore_index=True)
+                    continue
+                logging.info(f'modification took: {time_to_modify}')
 
                 # decode
                 (decoded_secret, _), time_to_decode = (
