@@ -174,12 +174,12 @@ def evaluate_method(
                 '': lambda x: x,
                 'half sampling': half_sampling,
                 'half quantization': half_quantization,
-                'noise: 20 dB SNR': lambda x: to_dtype(add_normalized_noise(x, 20), x.dtype),
-                'noise: 10 dB SNR': lambda x: to_dtype(add_normalized_noise(x, 10), x.dtype),
+                'noise: SNR 20 dB': lambda x: to_dtype(add_normalized_noise(x, 20), x.dtype),
+                'noise: SNR 10 dB': lambda x: to_dtype(add_normalized_noise(x, 10), x.dtype),
             }
             modifications.update(
                 {
-                    'noise: 15 dB SNR': lambda x: to_dtype(add_normalized_noise(x, 15), x.dtype),
+                    'noise: SNR 15 dB': lambda x: to_dtype(add_normalized_noise(x, 15), x.dtype),
                 } if extended else {})
 
             for modification_name, modification_func in modifications.items():
