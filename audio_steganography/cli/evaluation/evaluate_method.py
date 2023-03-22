@@ -54,12 +54,13 @@ def mp3_transcoding(input: np.ndarray, bitrate: float):
     proc_to_mp3 = subprocess.Popen(
         ffmpeg_base + [
             '-f', 's16le',
-            '-i', 'data/speech_signed_16_pcm.wav',
+            '-i', 'pipe:',
             '-c:a', 'libmp3lame',
             '-b:a', f'{bitrate}k',
             '-f', 'matroska',
             'pipe:',
         ],
+        stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         stderr=subprocess.DEVNULL,
         bufsize=10**8,
@@ -81,7 +82,8 @@ def mp3_transcoding(input: np.ndarray, bitrate: float):
     proc_to_mp3.stdout.close()
 
     input_bytes = input.astype(input.dtype.newbyteorder('<')).tobytes()
-    transcoded_wav = proc_to_wav.communicate(input=input_bytes)[0]
+    proc_to_mp3.communicate(input=input_bytes)
+    transcoded_wav = proc_to_wav.communicate()[0]
     return np.frombuffer(transcoded_wav, dtype=input.dtype, offset=6*8*44)
 
 def butterworth_filter(
