@@ -87,6 +87,7 @@ def main():
                 x.is_file() and x.suffix.lower() == '.wav']
             logging.debug(files)
             for file in files:
+                logging.info(f'file: {file}')
                 for method in methods:
                     # Read source WAV data
                     try:
@@ -96,7 +97,6 @@ def main():
                     except ValueError as e:
                         error_exit(str(e), ExitCode.WavReadError)
 
-                    logging.info(file)
                     method_res = evaluate_method(
                         method,
                         source_data,
