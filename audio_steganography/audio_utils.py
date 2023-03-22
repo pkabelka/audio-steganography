@@ -380,6 +380,45 @@ def add_normalized_noise(input: np.ndarray, wanted_snr_db: float):
     -------
     out : numpy.ndarray
         Input array with added noise.
+
+    ---
+    This function is a modified version from a StackOverflow answer:
+    https://stackoverflow.com/a/53688043
+    by tmcdevitt (https://stackoverflow.com/users/6321443/tmcdevitt)
+    edited 2019-09-24 15:14
+
+    This function is under CC BY-SA 4.0 License:
+    https://creativecommons.org/licenses/by-sa/4.0
+
+    By exercising the Licensed Rights (defined below), You accept and agree to
+    be bound by the terms and conditions of this Creative Commons
+    Attribution-ShareAlike 4.0 International Public License ("Public License").
+    To the extent this Public License may be interpreted as a contract, You are
+    granted the Licensed Rights in consideration of Your acceptance of these
+    terms and conditions, and the Licensor grants You such rights in
+    consideration of benefits the Licensor receives from making the Licensed
+    Material available under these terms and conditions.
+
+    Unless otherwise separately undertaken by the Licensor, to the extent
+    possible, the Licensor offers the Licensed Material as-is and as-available,
+    and makes no representations or warranties of any kind concerning the
+    Licensed Material, whether express, implied, statutory, or other. This
+    includes, without limitation, warranties of title, merchantability, fitness
+    for a particular purpose, non-infringement, absence of latent or other
+    defects, accuracy, or the presence or absence of errors, whether or not
+    known or discoverable. Where disclaimers of warranties are not allowed in
+    full or in part, this disclaimer may not apply to You.
+
+    To the extent possible, in no event will the Licensor be liable to You on
+    any legal theory (including, without limitation, negligence) or otherwise
+    for any direct, special, indirect, incidental, consequential, punitive,
+    exemplary, or other losses, costs, expenses, or damages arising out of this
+    Public License or use of the Licensed Material, even if the Licensor has
+    been advised of the possibility of such losses, costs, expenses, or
+    damages. Where a limitation of liability is not allowed in full or in part,
+    this limitation may not apply to You.
+
+    Citation date: 2023-03-21
     """
     signal = center(input)
     signal = normalize(signal)
