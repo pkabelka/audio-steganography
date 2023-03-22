@@ -264,8 +264,8 @@ def evaluate_method(
                 # run the modification of stego signal
                 try:
                     stego, time_to_modify = perf(modification_func)(stego)
-                except FileNotFoundError as e:
-                    # FFMpeg executable not found
+                except Exception as e:
+                    # Catch all exceptions and continue
                     logging.warn(e)
                     stats_df = pd.DataFrame(
                         [[
