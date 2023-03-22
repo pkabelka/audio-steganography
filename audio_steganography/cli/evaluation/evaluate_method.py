@@ -141,8 +141,8 @@ def evaluate_method(
 
         # use various method options for encoding
         for opt in options.get(method, []):
-            logging.info(method.name)
-            logging.info(opt)
+            logging.info(f'method name: {method.name}')
+            logging.info(f'parameters: {opt}')
             try:
                 # encode
                 (stego, additional_output), time_to_encode = perf(facade.encode)(**opt)
