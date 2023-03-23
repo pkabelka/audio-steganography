@@ -15,26 +15,21 @@ def parse_args() -> Tuple[Any, argparse.ArgumentParser]:
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
-        '-w',
-        '--workdir', metavar='PATH',
+        '-d',
+        '--datasets', metavar='PATH',
         action='store',
-        help='path to a directory containing datasets',
+        help='path to a directory containing datasets; expected structure '+
+            'is: <dataset root>/<datasets>/<categories>/<files>; directories '+
+            'starting with "." will be ignored',
         required=True)
 
     parser.add_argument(
         '-o',
         '--output',
-        metavar='OUTPUT_FILE',
+        metavar='OUTPUT_DIR',
         action='store',
-        help='path to an output file; - outputs to STDOUT',
+        help='path to an output directory; EXISTING FILES WILL BE OVERWRITTEN',
         default=None)
-
-    parser.add_argument(
-        '-y',
-        '--overwrite',
-        action='store_true',
-        help='overwrite existing OUTPUT_FILE',
-        default=False)
 
     parser.add_argument(
         '-l',

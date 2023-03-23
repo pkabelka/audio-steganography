@@ -107,7 +107,7 @@ def main():
     ]
 
     # evaluate chosen methods on dataset files
-    dataset_root = Path(args.workdir)
+    dataset_root = Path(args.datasets)
     # ignore datasets starting with "."
     datasets = [
         x for x in dataset_root.iterdir()
