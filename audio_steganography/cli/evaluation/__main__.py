@@ -16,6 +16,7 @@ from .evaluate_method import evaluate_method
 from typing import List
 from pathlib import Path
 import scipy.io.wavfile
+import pandas as pd
 import logging
 import time
 import multiprocessing as mp
@@ -30,6 +31,10 @@ def evaluation_process(
         output_dir,
     ):
     logging.info(f'file: {file}')
+
+    # DataFrame for stats of all runs of the method
+    all_stats_df = pd.DataFrame(columns=columns)
+
     for method in methods:
         # Read source WAV data
         try:
@@ -50,13 +55,15 @@ def evaluation_process(
         method_res['category'] = category.name
         method_res['file'] = file.name
 
-        output_path = output_dir / f'{dataset.name}' / f'{category.name}'
-        output_path.mkdir(parents=True, exist_ok=True)
+        all_stats_df = pd.concat([all_stats_df, method_res], ignore_index=True)
 
-        method_res.to_csv(
-            output_path / f'{file.name}.csv',
-            sep=';',
-        )
+    output_path = output_dir / f'{dataset.name}' / f'{category.name}'
+    output_path.mkdir(parents=True, exist_ok=True)
+
+    all_stats_df.to_csv(
+        output_path / f'{file.name}.csv',
+        sep=';',
+    )
 
 def main():
     """The main function of the evaluation program.
