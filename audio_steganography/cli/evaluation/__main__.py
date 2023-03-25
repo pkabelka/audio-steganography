@@ -115,7 +115,7 @@ def main():
     ]
 
     # multiprocess pool
-    pool = mp.Pool(mp.cpu_count())
+    pool = mp.Pool(min(args.processes, mp.cpu_count()))
 
     start_time = time.perf_counter()
     for dataset in datasets:

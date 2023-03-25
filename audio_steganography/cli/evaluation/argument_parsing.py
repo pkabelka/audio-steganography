@@ -9,6 +9,7 @@ program.
 
 from ...methods import MethodEnum
 import argparse
+import multiprocessing
 from typing import Tuple, Any
 
 def parse_args() -> Tuple[Any, argparse.ArgumentParser]:
@@ -44,6 +45,16 @@ def parse_args() -> Tuple[Any, argparse.ArgumentParser]:
         action='store_true',
         help='enables extended testing',
         default=False)
+
+    parser.add_argument(
+        '-p',
+        '--processes',
+        metavar='N',
+        action='store',
+        type=int,
+        required=False,
+        help='number of concurrent processes to use',
+        default=multiprocessing.cpu_count())
 
     parser.add_argument(
         'methods',
