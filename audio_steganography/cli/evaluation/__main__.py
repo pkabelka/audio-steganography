@@ -29,6 +29,7 @@ def evaluation_process(
         columns,
         extended,
         output_dir,
+        no_mp3,
     ):
     logging.info(f'file: {file}')
 
@@ -50,6 +51,7 @@ def evaluation_process(
             source_sr,
             columns,
             extended,
+            no_mp3,
         )
         method_res['dataset'] = dataset.name
         method_res['category'] = category.name
@@ -141,6 +143,7 @@ def main():
                         columns,
                         args.extended,
                         output_dir,
+                        args.no_mp3,
                     ),
                 )
 

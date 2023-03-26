@@ -57,6 +57,12 @@ def parse_args() -> Tuple[Any, argparse.ArgumentParser]:
         default=multiprocessing.cpu_count())
 
     parser.add_argument(
+        '--no-mp3',
+        action='store_true',
+        help='disables transcoding to MP3 format',
+        default=False)
+
+    parser.add_argument(
         'methods',
         action='store',
         choices=['ALL'] + [method.name for method in MethodEnum],

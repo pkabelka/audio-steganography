@@ -107,6 +107,7 @@ def evaluate_method(
         sample_rate: float,
         columns: List[str],
         extended=False,
+        no_mp3=False,
     ) -> pd.DataFrame:
     """Evaluates the quality of the given method by encoding data of varying
     length. The stego signal is then filtered, resampled, requantized and
@@ -239,8 +240,6 @@ def evaluate_method(
                     lambda x: to_dtype(add_normalized_noise(x, 20), x.dtype),
                 'noise: SNR 10 dB':
                     lambda x: to_dtype(add_normalized_noise(x, 10), x.dtype),
-                'mp3 transcoding: 96k':
-                    lambda x: mp3_transcoding(x, 96),
                 'low-pass half max frequency':
                     lambda x: to_dtype(
                         butterworth_filter(x, sample_rate//4, 'lowpass', sample_rate),
@@ -250,13 +249,26 @@ def evaluate_method(
                         butterworth_filter(x, sample_rate//4, 'highpass', sample_rate),
                         x.dtype),
             }
+            # add mp3 transcoding
+            modifications.update(
+                {
+                    'mp3 transcoding: 96k':
+                        lambda x: mp3_transcoding(x, 96),
+                } if not no_mp3 else {})
+
+            # add extended modifications
             modifications.update(
                 {
                     'noise: SNR 15 dB':
                         lambda x: to_dtype(add_normalized_noise(x, 15), x.dtype),
+                } if extended else {})
+
+            # add extended mp3 transcoding
+            modifications.update(
+                {
                     'mp3 transcoding: 128k':
                         lambda x: mp3_transcoding(x, 128),
-                } if extended else {})
+                } if extended and not no_mp3 else {})
 
             for modification_name, modification_func in modifications.items():
                 logging.info(f'modification name: {modification_name}')
