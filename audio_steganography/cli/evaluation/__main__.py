@@ -111,8 +111,11 @@ def main():
         ]
         logging.debug(categories)
         for category in categories:
-            files = [x for x in category.iterdir() if
-                x.is_file() and x.suffix.lower() == '.wav']
+            files = [
+                x for x in category.iterdir() if
+                x.is_file() and not x.name.startswith('.')
+                            and x.suffix.lower() == '.wav'
+            ]
             logging.debug(files)
             for file in files:
                 # add files to pool
