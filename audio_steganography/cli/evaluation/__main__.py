@@ -65,6 +65,7 @@ def evaluation_process(
     all_stats_df.to_csv(
         output_path / f'{file.name}.csv',
         sep=';',
+        index=False,
     )
 
 def main():
