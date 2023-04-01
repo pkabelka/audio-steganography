@@ -62,7 +62,13 @@ def main():
                             and x.suffix.lower() == '.csv'
             ]
             for file in files:
-                file_dfs.append(pd.read_csv(file, sep=';'))
+                file_dfs.append(
+                    pd.read_csv(
+                        file,
+                        sep=';',
+                        converters={'modification': str},
+                    )
+                )
 
     df_all = pd.concat(file_dfs, ignore_index=True)
 
