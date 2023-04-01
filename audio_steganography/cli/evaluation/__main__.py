@@ -13,6 +13,7 @@ from ..exit_codes import ExitCode
 from .argument_parsing import parse_args
 from ...methods import MethodEnum
 from .evaluate_method import evaluate_method
+from . import stat_df_columns
 from typing import List
 from pathlib import Path
 import scipy.io.wavfile
@@ -26,7 +27,6 @@ def evaluation_process(
         category,
         file,
         methods,
-        columns,
         extended,
         output_dir,
         no_mp3,
@@ -34,7 +34,7 @@ def evaluation_process(
     logging.info(f'file: {file}')
 
     # DataFrame for stats of all runs of the method
-    all_stats_df = pd.DataFrame(columns=columns)
+    all_stats_df = pd.DataFrame(columns=stat_df_columns)
 
     for method in methods:
         # Read source WAV data
@@ -49,7 +49,6 @@ def evaluation_process(
             method,
             source_data,
             source_sr,
-            columns,
             extended,
             no_mp3,
         )
@@ -92,23 +91,6 @@ def main():
             except KeyError:
                 error_exit('invalid method specified', ExitCode.InvalidMethod)
 
-    columns = [
-        'dataset',
-        'category',
-        'file',
-        'method',
-        'params',
-        'secret_bits',
-        'modification',
-        'ber_percent',
-        'snr_db',
-        'psnr_db',
-        'mse',
-        'rmsd',
-        'time_to_encode',
-        'time_to_decode',
-    ]
-
     # evaluate chosen methods on dataset files
     dataset_root = Path(args.datasets)
     # ignore datasets starting with "."
@@ -141,7 +123,6 @@ def main():
                         category,
                         file,
                         methods,
-                        columns,
                         args.extended,
                         output_dir,
                         args.no_mp3,

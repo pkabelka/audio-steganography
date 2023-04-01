@@ -13,6 +13,7 @@ from ...exceptions import SecretSizeTooLarge
 from .. import prepare_secret_data
 from ...decorators import perf
 from ...audio_utils import resample, to_dtype, add_normalized_noise
+from . import stat_df_columns
 import numpy as np
 import pandas as pd
 import scipy.signal
@@ -105,7 +106,6 @@ def evaluate_method(
         method: MethodEnum,
         source_data: np.ndarray,
         sample_rate: float,
-        columns: List[str],
         extended=False,
         no_mp3=False,
     ) -> pd.DataFrame:
@@ -120,8 +120,6 @@ def evaluate_method(
         Chosen steganography method from MethodEnum.
     source_data : NDArray
         Source signal array.
-    columns : MethodEnum
-        Columns of the statistical DataFrame defined in __main__.
     extended : bool
         Enables extended testing. This includes basinhopping and bruteforce in
         echo methods.
@@ -189,7 +187,7 @@ def evaluate_method(
     }
 
     # DataFrame for stats of all runs of the method
-    all_stats_df = pd.DataFrame(columns=columns)
+    all_stats_df = pd.DataFrame(columns=stat_df_columns)
 
     # encode messages of various lengths
     for secret_data in [
@@ -225,7 +223,7 @@ def evaluate_method(
                         np.nan,
                         np.Inf,
                         np.Inf,
-                    ]], columns=columns)
+                    ]], columns=stat_df_columns)
                 all_stats_df = pd.concat([all_stats_df, stats_df], ignore_index=True)
                 continue
 
@@ -295,7 +293,7 @@ def evaluate_method(
                             np.nan,
                             np.Inf,
                             np.Inf,
-                        ]], columns=columns)
+                        ]], columns=stat_df_columns)
                     all_stats_df = pd.concat([all_stats_df, stats_df], ignore_index=True)
                     continue
 
@@ -328,7 +326,7 @@ def evaluate_method(
                         stats['rmsd'],
                         time_to_encode,
                         time_to_decode,
-                    ]], columns=columns)
+                    ]], columns=stat_df_columns)
                 all_stats_df = pd.concat([all_stats_df, stats_df], ignore_index=True)
 
     return all_stats_df
