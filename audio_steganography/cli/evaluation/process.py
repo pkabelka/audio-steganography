@@ -79,7 +79,6 @@ def main():
                     pd.read_csv(
                         file,
                         sep=';',
-                        converters={'modification': str},
                     )
                 )
 
