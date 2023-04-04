@@ -8,8 +8,10 @@
 steganography methods evaluation results.
 """
 
+from ..cli_utils import get_attr
 import argparse
-from typing import Tuple, Any
+import uuid
+from typing import Tuple, Any, List
 from pathlib import Path
 import pandas as pd
 
@@ -47,8 +49,9 @@ def set_dtypes(df: pd.DataFrame) -> pd.DataFrame:
     df['modification'] = df['modification'].astype('category')
     return df
 
-def process_data(df: pd.DataFrame):
-    pass
+def process_data(df: pd.DataFrame) -> List[pd.DataFrame]:
+    dfs = []
+    return dfs
 
 def main():
     """The main function of the evaluation data processing program.
@@ -84,7 +87,18 @@ def main():
 
     df_all = pd.concat(file_dfs, ignore_index=True)
     df_all = set_dtypes(df_all)
-    process_data(df_all)
+
+    dataframes = process_data(df_all)
+
+    # write all DataFrames to CSVs
+    for df in dataframes:
+        df_name = get_attr(df, 'name')
+        df_name = df_name if df_name is not None else str(uuid.uuid4())
+        df.to_csv(
+            output_dir / f'{df_name}.csv',
+            sep=';',
+            index=False,
+        )
 
 if __name__ == '__main__':
     main()
