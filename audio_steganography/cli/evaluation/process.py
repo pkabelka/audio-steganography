@@ -77,6 +77,38 @@ def process_data(df: pd.DataFrame) -> List[pd.DataFrame]:
     dfs.append(df_no_mod_all_param_group_max)
     dfs.append(df_no_mod_all_param_group_mean)
 
+    # Method modifications on clean methods with best BER
+    df_clean_best_ber = df_useful_cols[df_useful_cols['ber_percent'] == 0.0]
+
+    df_mod = df_useful_cols[~df_useful_cols['modification'].isna()]
+
+    df_mod_of_best_ber = pd.merge(
+        df_mod,
+        df_clean_best_ber,
+        how='inner',
+        on=[
+            'dataset',
+            'category',
+            'file',
+            'method',
+            'params',
+            'secret_bits',
+        ],
+        suffixes=('_mod', '_clean'),
+    ).drop(['ber_percent_clean', 'snr_db_clean', 'psnr_db_clean'], axis=1)
+
+    df_mod_of_best_ber_group = df_mod_of_best_ber.groupby(['method', 'modification_mod'])
+    df_mod_of_best_ber_group_mean = df_mod_of_best_ber_group.mean(numeric_only=True).reset_index()
+
+    methods = df_mod_of_best_ber_group_mean['method'].unique()
+    for method in methods:
+        df_mod_of_best_ber_group_mean_method = df_mod_of_best_ber_group_mean.query('method == @method')
+        df_mod_of_best_ber_group_mean_method.name = f'mod_of_best_ber_mean_values_{method}'
+        dfs.append(df_mod_of_best_ber_group_mean_method)
+
+        # df_mod_of_best_ber_group_mean_method.plot.bar(x='modification_mod', rot=45)
+        # plt.show()
+
     return dfs
 
 def main():
