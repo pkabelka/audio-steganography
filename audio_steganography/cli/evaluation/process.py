@@ -14,6 +14,7 @@ import uuid
 from typing import Tuple, Any, List
 from pathlib import Path
 import pandas as pd
+from matplotlib import pyplot as plt
 
 def parse_args() -> Tuple[Any, argparse.ArgumentParser]:
     parser = argparse.ArgumentParser()
@@ -51,6 +52,31 @@ def set_dtypes(df: pd.DataFrame) -> pd.DataFrame:
 
 def process_data(df: pd.DataFrame) -> List[pd.DataFrame]:
     dfs = []
+
+    df_useful_cols = df.query('time_to_encode != inf | time_to_decode != inf')
+    df_useful_cols = df_useful_cols.drop(['mse', 'rmsd', 'time_to_encode', 'time_to_decode'], axis=1)
+
+    # No method modifications, all params, min, max and mean values
+    df_no_mod_all_param = df_useful_cols[df_useful_cols['modification'].isna()]
+    df_no_mod_all_param_group = df_no_mod_all_param.groupby('method')
+    df_no_mod_all_param_group_min = df_no_mod_all_param_group.min(numeric_only=True).reset_index()
+    df_no_mod_all_param_group_max = df_no_mod_all_param_group.max(numeric_only=True).reset_index()
+    df_no_mod_all_param_group_mean = df_no_mod_all_param_group.mean(numeric_only=True).reset_index()
+    df_no_mod_all_param_group_min.name = 'no_modifications_all_params_min'
+    df_no_mod_all_param_group_max.name = 'no_modifications_all_params_max'
+    df_no_mod_all_param_group_mean.name = 'no_modifications_all_params_mean'
+
+    # df_no_mod_all_param_group_min.plot.bar(x='method', rot=45)
+    # plt.show()
+    # df_no_mod_all_param_group_max.plot.bar(x='method', rot=45)
+    # plt.show()
+    # df_no_mod_all_param_group_mean.plot.bar(x='method', rot=45)
+    # plt.show()
+
+    dfs.append(df_no_mod_all_param_group_min)
+    dfs.append(df_no_mod_all_param_group_max)
+    dfs.append(df_no_mod_all_param_group_mean)
+
     return dfs
 
 def main():
