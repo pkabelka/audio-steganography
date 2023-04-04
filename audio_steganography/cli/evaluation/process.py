@@ -37,6 +37,19 @@ def parse_args() -> Tuple[Any, argparse.ArgumentParser]:
     args = parser.parse_args()
     return args, parser
 
+def set_dtypes(df: pd.DataFrame) -> pd.DataFrame:
+    df['dataset'] = df['dataset'].astype('category')
+    df['category'] = df['category'].astype('category')
+    df['file'] = df['file'].astype('category')
+    df['method'] = df['method'].astype('category')
+    df['params'] = df['params'].astype('category')
+    df['secret_bits'] = df['secret_bits'].astype('category')
+    df['modification'] = df['modification'].astype('category')
+    return df
+
+def process_data(df: pd.DataFrame):
+    pass
+
 def main():
     """The main function of the evaluation data processing program.
     """
@@ -71,6 +84,8 @@ def main():
                 )
 
     df_all = pd.concat(file_dfs, ignore_index=True)
+    df_all = set_dtypes(df_all)
+    process_data(df_all)
 
 if __name__ == '__main__':
     main()
