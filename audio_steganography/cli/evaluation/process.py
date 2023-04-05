@@ -107,7 +107,7 @@ def process_data(df: pd.DataFrame) -> List[pd.DataFrame]:
         df_mod_of_best_ber_group_mean_method.name = f'mod_of_best_ber_mean_values_{method}'
         dfs.append(df_mod_of_best_ber_group_mean_method)
 
-        # df_mod_of_best_ber_group_mean_method.plot.bar(x='modification_mod', rot=45)
+        # df_mod_of_best_ber_group_mean_method.plot.bar(x='modification_mod', rot=45, title=method)
         # plt.show()
 
     return dfs
