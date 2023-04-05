@@ -99,6 +99,7 @@ def process_data(df: pd.DataFrame) -> List[pd.DataFrame]:
 
     df_mod_of_best_ber_group = df_mod_of_best_ber.groupby(['method', 'modification_mod'])
     df_mod_of_best_ber_group_mean = df_mod_of_best_ber_group.mean(numeric_only=True).reset_index()
+    df_mod_of_best_ber_group_mean = df_mod_of_best_ber_group_mean[df_mod_of_best_ber_group_mean['modification_mod'] != 'no_modification']
 
     methods = df_mod_of_best_ber_group_mean['method'].unique()
     for method in methods:
