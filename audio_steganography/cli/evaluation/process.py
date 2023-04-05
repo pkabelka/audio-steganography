@@ -57,7 +57,7 @@ def process_data(df: pd.DataFrame) -> List[pd.DataFrame]:
     df_useful_cols = df_useful_cols.drop(['mse', 'rmsd', 'time_to_encode', 'time_to_decode'], axis=1)
 
     # No method modifications, all params, min, max and mean values
-    df_no_mod_all_param = df_useful_cols[df_useful_cols['modification'].isna()]
+    df_no_mod_all_param = df_useful_cols[df_useful_cols['modification'] == 'no_modification']
     df_no_mod_all_param_group = df_no_mod_all_param.groupby('method')
     df_no_mod_all_param_group_min = df_no_mod_all_param_group.min(numeric_only=True).reset_index()
     df_no_mod_all_param_group_max = df_no_mod_all_param_group.max(numeric_only=True).reset_index()
@@ -80,7 +80,7 @@ def process_data(df: pd.DataFrame) -> List[pd.DataFrame]:
     # Method modifications on clean methods with best BER
     df_clean_best_ber = df_useful_cols[df_useful_cols['ber_percent'] == 0.0]
 
-    df_mod = df_useful_cols[~df_useful_cols['modification'].isna()]
+    df_mod = df_useful_cols[df_useful_cols['modification'] != 'no_modification']
 
     df_mod_of_best_ber = pd.merge(
         df_mod,
@@ -144,6 +144,7 @@ def main():
                 )
 
     df_all = pd.concat(file_dfs, ignore_index=True)
+    df_all.loc[df_all['modification'].isna(), 'modification'] = 'no_modification'
     df_all = set_dtypes(df_all)
 
     dataframes = process_data(df_all)
