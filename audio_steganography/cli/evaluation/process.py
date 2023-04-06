@@ -50,8 +50,12 @@ def set_dtypes(df: pd.DataFrame) -> pd.DataFrame:
     df['modification'] = df['modification'].astype('category')
     return df
 
-def process_data(df: pd.DataFrame) -> List[pd.DataFrame]:
+def process_data(df: pd.DataFrame) -> Tuple[List, List]:
     dfs = []
+    figures = []
+
+    # inches per centimeter
+    cm = 1/2.54
 
     df_useful_cols = df.query('time_to_encode != inf | time_to_decode != inf')
     df_useful_cols = df_useful_cols.drop(['mse', 'rmsd', 'time_to_encode', 'time_to_decode'], axis=1)
@@ -66,12 +70,19 @@ def process_data(df: pd.DataFrame) -> List[pd.DataFrame]:
     df_no_mod_all_param_group_max.name = 'no_modifications_all_params_max'
     df_no_mod_all_param_group_mean.name = 'no_modifications_all_params_mean'
 
-    # df_no_mod_all_param_group_min.plot.bar(x='method', rot=45)
-    # plt.show()
-    # df_no_mod_all_param_group_max.plot.bar(x='method', rot=45)
-    # plt.show()
-    # df_no_mod_all_param_group_mean.plot.bar(x='method', rot=45)
-    # plt.show()
+    for x in [
+        df_no_mod_all_param_group_min,
+        df_no_mod_all_param_group_max,
+        df_no_mod_all_param_group_mean
+    ]:
+        fig = x.plot.bar(
+            x='method',
+            rot=45,
+            figsize=(17*cm, 12*cm),
+            title=x.name,
+        ).get_figure()
+        fig.tight_layout()
+        figures.append(fig)
 
     dfs.append(df_no_mod_all_param_group_min)
     dfs.append(df_no_mod_all_param_group_max)
@@ -107,10 +118,16 @@ def process_data(df: pd.DataFrame) -> List[pd.DataFrame]:
         df_mod_of_best_ber_group_mean_method.name = f'mod_of_best_ber_mean_values_{method}'
         dfs.append(df_mod_of_best_ber_group_mean_method)
 
-        # df_mod_of_best_ber_group_mean_method.plot.bar(x='modification_mod', rot=45, title=method)
-        # plt.show()
+        fig = df_mod_of_best_ber_group_mean_method.plot.bar(
+            x='modification_mod',
+            rot=45,
+            figsize=(17*cm, 12*cm),
+            title=df_mod_of_best_ber_group_mean_method.name,
+        ).get_figure()
+        fig.tight_layout()
+        figures.append(fig)
 
-    return dfs
+    return dfs, figures
 
 def main():
     """The main function of the evaluation data processing program.
@@ -148,7 +165,7 @@ def main():
     df_all.loc[df_all['modification'].isna(), 'modification'] = 'no_modification'
     df_all = set_dtypes(df_all)
 
-    dataframes = process_data(df_all)
+    dataframes, figures = process_data(df_all)
 
     # write all DataFrames to CSVs
     for df in dataframes:
@@ -159,6 +176,12 @@ def main():
             sep=';',
             index=False,
         )
+
+    # write all figures to PDFs
+    for fig in figures:
+        fig_name = fig.axes[0].get_title()
+        fig_name = fig_name if fig_name != '' else str(uuid.uuid4())
+        fig.savefig(output_dir / f'{fig_name}.pdf')
 
 if __name__ == '__main__':
     main()
