@@ -51,6 +51,9 @@ def set_dtypes(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 def process_data(df: pd.DataFrame) -> Tuple[List, List]:
+    """This function filters the input DataFrame evaluation results and returns
+    the filtered tables and plots.
+    """
     dfs = []
     figures = []
 
