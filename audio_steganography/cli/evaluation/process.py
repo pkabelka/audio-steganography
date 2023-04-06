@@ -120,7 +120,7 @@ def main():
 
     file_dfs = []
 
-    dataset_root = Path(args.datasets)
+    dataset_root = Path(args.data)
     datasets = [
         x for x in dataset_root.iterdir()
         if x.is_dir() and not x.name.startswith('.')
