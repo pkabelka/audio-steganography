@@ -186,6 +186,18 @@ def main():
     for df in dataframes:
         df_name = get_attr(df, 'name')
         df_name = df_name if df_name is not None else str(uuid.uuid4())
+        df_name = df_name.replace('_', '-')
+
+        df.columns = df.columns.str.replace('_', ' ')
+
+        # replace underscores in method names with spaces
+        try:
+            methods = df['method'].unique()
+            mapping = {old: new for old, new in zip(methods, [x.replace('_', ' ') for x in methods])}
+            df['method'] = df['method'].cat.rename_categories(mapping)
+        except:
+            pass
+
         df.to_csv(
             output_dir / f'{df_name}.csv',
             sep=';',
