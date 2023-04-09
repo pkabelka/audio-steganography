@@ -15,6 +15,7 @@ from typing import Tuple, Any, List
 from pathlib import Path
 import pandas as pd
 from matplotlib import pyplot as plt
+import json
 
 def parse_args() -> Tuple[Any, argparse.ArgumentParser]:
     parser = argparse.ArgumentParser()
@@ -75,23 +76,31 @@ def process_data(df: pd.DataFrame) -> Tuple[List, List]:
     df_useful_cols = df.query('time_to_encode != inf | time_to_decode != inf')
     df_useful_cols = df_useful_cols.drop(['mse', 'rmsd', 'time_to_encode', 'time_to_decode'], axis=1)
 
-    # No method modifications, all params, min, max and mean values
+    # No method modifications, mean values grouped by method and params
     df_no_mod_all_param = df_useful_cols[df_useful_cols['modification'] == 'no_modification']
     df_no_mod_all_param_group = df_no_mod_all_param.groupby(['method', 'params'])
     df_no_mod_all_param_group_mean = df_no_mod_all_param_group.mean(numeric_only=True).reset_index()
     df_no_mod_all_param_group_mean = df_no_mod_all_param_group_mean.dropna()
     df_no_mod_all_param_group_mean.name = 'no_modifications_all_params_mean'
 
+    def params_compact(method, params):
+        params = json.loads(params)
+        if method.startswith('echo'):
+            params.pop('delay_search', None)
+            params.pop('decay_rate', None)
+        return ', '.join([f'{k}={v}' for k, v in params.items()])
+
     methods = df_no_mod_all_param_group_mean['method'].unique()
     for method in methods:
-        df_no_mod_all_param_group_mean_method = df_no_mod_all_param_group_mean.query('method == @method')
+        df_no_mod_all_param_group_mean_method = df_no_mod_all_param_group_mean.copy().query('method == @method')
+        df_no_mod_all_param_group_mean_method['params'] = df_no_mod_all_param_group_mean_method['params'].apply(lambda params: params_compact(method, params))
         df_no_mod_all_param_group_mean_method.name = f'no_mod_params_mean_values_{method}'
         dfs.append(df_no_mod_all_param_group_mean_method)
 
         fig = df_no_mod_all_param_group_mean_method.plot.bar(
             x='params',
             rot=90,
-            figsize=(17*cm, 20*cm),
+            figsize=(17*cm, 12*cm),
             title=df_no_mod_all_param_group_mean_method.name,
         ).get_figure()
         fig.tight_layout()
