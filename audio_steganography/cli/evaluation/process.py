@@ -77,31 +77,25 @@ def process_data(df: pd.DataFrame) -> Tuple[List, List]:
 
     # No method modifications, all params, min, max and mean values
     df_no_mod_all_param = df_useful_cols[df_useful_cols['modification'] == 'no_modification']
-    df_no_mod_all_param_group = df_no_mod_all_param.groupby('method')
-    df_no_mod_all_param_group_min = df_no_mod_all_param_group.min(numeric_only=True).reset_index()
-    df_no_mod_all_param_group_max = df_no_mod_all_param_group.max(numeric_only=True).reset_index()
+    df_no_mod_all_param_group = df_no_mod_all_param.groupby(['method', 'params'])
     df_no_mod_all_param_group_mean = df_no_mod_all_param_group.mean(numeric_only=True).reset_index()
-    df_no_mod_all_param_group_min.name = 'no_modifications_all_params_min'
-    df_no_mod_all_param_group_max.name = 'no_modifications_all_params_max'
+    df_no_mod_all_param_group_mean = df_no_mod_all_param_group_mean.dropna()
     df_no_mod_all_param_group_mean.name = 'no_modifications_all_params_mean'
 
-    for x in [
-        df_no_mod_all_param_group_min,
-        df_no_mod_all_param_group_max,
-        df_no_mod_all_param_group_mean
-    ]:
-        fig = x.plot.bar(
-            x='method',
-            rot=45,
-            figsize=(17*cm, 12*cm),
-            title=x.name,
+    methods = df_no_mod_all_param_group_mean['method'].unique()
+    for method in methods:
+        df_no_mod_all_param_group_mean_method = df_no_mod_all_param_group_mean.query('method == @method')
+        df_no_mod_all_param_group_mean_method.name = f'no_mod_params_mean_values_{method}'
+        dfs.append(df_no_mod_all_param_group_mean_method)
+
+        fig = df_no_mod_all_param_group_mean_method.plot.bar(
+            x='params',
+            rot=90,
+            figsize=(17*cm, 20*cm),
+            title=df_no_mod_all_param_group_mean_method.name,
         ).get_figure()
         fig.tight_layout()
         figures.append(fig)
-
-    dfs.append(df_no_mod_all_param_group_min)
-    dfs.append(df_no_mod_all_param_group_max)
-    dfs.append(df_no_mod_all_param_group_mean)
 
     # Method modifications on clean methods with best BER
     df_clean_best_ber = df_useful_cols[df_useful_cols['ber_percent'] == 0.0]
