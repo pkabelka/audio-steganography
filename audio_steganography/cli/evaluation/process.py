@@ -22,7 +22,8 @@ def parse_args() -> Tuple[Any, argparse.ArgumentParser]:
 
     parser.add_argument(
         '-d',
-        '--data', metavar='PATH',
+        '--data',
+        metavar='PATH',
         action='store',
         help='path to a directory containing dataset evaluation results; '+
             'expected structure is: <dataset root>/<datasets>/<categories>/<files>; '+
