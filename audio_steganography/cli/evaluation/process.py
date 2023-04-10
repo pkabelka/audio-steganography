@@ -88,7 +88,22 @@ def process_data(df: pd.DataFrame) -> Tuple[List, List]:
         if method.startswith('echo'):
             params.pop('delay_search', None)
             params.pop('decay_rate', None)
-        return ', '.join([f'{k}={v}' for k, v in params.items()])
+
+        params_str = []
+        for k, v in params.items():
+            key = str(k).replace('_', ' ')
+            val = str(v).replace('_', ' ')
+
+            if method == 'lsb' and key == 'only needed':
+                if v == False:
+                    params_str.append(f'{key}')
+                    continue
+                else:
+                    continue
+
+            params_str.append(f'{key}={val}')
+
+        return ', '.join(params_str)
 
     methods = df_no_mod_all_param_group_mean['method'].unique()
     for method in methods:
