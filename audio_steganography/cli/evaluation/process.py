@@ -109,6 +109,9 @@ def process_data(df: pd.DataFrame) -> Tuple[List, List]:
     for method in methods:
         df_no_mod_all_param_group_mean_method = df_no_mod_all_param_group_mean.copy().query('method == @method')
         df_no_mod_all_param_group_mean_method['params'] = df_no_mod_all_param_group_mean_method['params'].apply(lambda params: params_compact(method, params))
+        df_no_mod_all_param_group_mean_method = df_no_mod_all_param_group_mean_method.sort_values('psnr_db', ascending=False)
+        df_no_mod_all_param_group_mean_method = df_no_mod_all_param_group_mean_method.sort_values('snr_db', ascending=False)
+        df_no_mod_all_param_group_mean_method = df_no_mod_all_param_group_mean_method.sort_values('ber_percent')
         df_no_mod_all_param_group_mean_method.name = f'no_mod_params_mean_values_{method}'
         dfs.append(df_no_mod_all_param_group_mean_method)
 
