@@ -14,7 +14,6 @@ import uuid
 from typing import Tuple, Any, List
 from pathlib import Path
 import pandas as pd
-from matplotlib import pyplot as plt
 import json
 
 def parse_args() -> Tuple[Any, argparse.ArgumentParser]:
