@@ -38,6 +38,12 @@ def parse_args() -> Tuple[Any, argparse.ArgumentParser]:
         help='path to an output directory; EXISTING FILES WILL BE OVERWRITTEN',
         default=None)
 
+    parser.add_argument(
+        '--graphs',
+        action='store_true',
+        help='generate graphs of the output tables',
+        default=False)
+
     # Parse all args
     args = parser.parse_args()
     return args, parser
@@ -226,11 +232,12 @@ def main():
             index=False,
         )
 
-    # write all figures to PDFs
-    for fig in figures:
-        fig_name = fig.axes[0].get_title()
-        fig_name = fig_name if fig_name != '' else str(uuid.uuid4())
-        fig.savefig(output_dir / f'{fig_name}.pdf')
+    if args.graphs:
+        # write all figures to PDFs
+        for fig in figures:
+            fig_name = fig.axes[0].get_title()
+            fig_name = fig_name if fig_name != '' else str(uuid.uuid4())
+            fig.savefig(output_dir / f'{fig_name}.pdf')
 
 if __name__ == '__main__':
     main()
