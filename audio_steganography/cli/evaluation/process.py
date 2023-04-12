@@ -130,41 +130,44 @@ def process_data(df: pd.DataFrame) -> Tuple[List, List]:
         fig.tight_layout()
         figures.append(fig)
 
-    # Method modifications on clean methods with best BER
-    df_clean_best_ber = df_useful_cols[df_useful_cols['ber_percent'] == 0.0]
+    # Method modifications on clean methods with best params
+    def params_filter(method, params):
+        params = json.loads(params)
+        method_params = {
+            'echo_single': {'d0': 200, 'd1': 250, 'alpha': 0.5},
+            'echo_bipolar': {'d0': 200, 'd1': 250, 'alpha': 0.5},
+            'echo_bf': {'d0': 200, 'd1': 250, 'alpha': 0.5},
+            'echo_bipolar_bf': {'d0': 200, 'd1': 250, 'alpha': 0.5},
+            'lsb': {'depth': 1, 'only_needed': False},
+            'phase': {},
+            'dsss': {'alpha': 0.005},
+            'silence_interval': {'min_silence_len': 400},
+            'dsss_dft': {'alpha': 0.0025},
+            'tone_insertion': {'f0': 18757, 'f1': 21703},
+        }
 
-    df_mod = df_useful_cols[df_useful_cols['modification'] != 'no_modification']
+        for k, v in method_params.get(method, {}).items():
+            if v != params.get(k, None):
+                return False
+        return True
 
-    df_mod_of_best_ber = pd.merge(
-        df_mod,
-        df_clean_best_ber,
-        how='inner',
-        on=[
-            'dataset',
-            'category',
-            'file',
-            'method',
-            'params',
-            'secret_bits',
-        ],
-        suffixes=('_mod', '_clean'),
-    ).drop(['ber_percent_clean', 'snr_db_clean', 'psnr_db_clean'], axis=1)
-
-    df_mod_of_best_ber_group = df_mod_of_best_ber.groupby(['method', 'modification_mod'])
-    df_mod_of_best_ber_group_mean = df_mod_of_best_ber_group.mean(numeric_only=True).reset_index()
-    df_mod_of_best_ber_group_mean = df_mod_of_best_ber_group_mean[df_mod_of_best_ber_group_mean['modification_mod'] != 'no_modification']
-
-    methods = df_mod_of_best_ber_group_mean['method'].unique()
+    methods = df_useful_cols['method'].unique()
     for method in methods:
-        df_mod_of_best_ber_group_mean_method = df_mod_of_best_ber_group_mean.query('method == @method')
-        df_mod_of_best_ber_group_mean_method.name = f'mod_of_best_ber_mean_values_{method}'
-        dfs.append(df_mod_of_best_ber_group_mean_method)
+        df_mod = df_useful_cols.query('method == @method & modification != "no_modification"')
+        # df_mod = df_mod[df_mod['modification'] != 'no_modification']
+        df_mod = df_mod[df_mod['params'].apply(lambda params: params_filter(method, params))]
+        df_mod_group = df_mod.groupby(['method', 'modification'])
+        df_mod_group_mean = df_mod_group.mean(numeric_only=True).reset_index()
+        df_mod_group_mean = df_mod_group_mean.dropna()
+        df_mod_group_mean.name = f'modifications_mean_values_{method}'
 
-        fig = df_mod_of_best_ber_group_mean_method.plot.bar(
-            x='modification_mod',
+        dfs.append(df_mod_group_mean)
+
+        fig = df_mod_group_mean.plot.bar(
+            x='modification',
             rot=45,
             figsize=(17*cm, 12*cm),
-            title=df_mod_of_best_ber_group_mean_method.name,
+            title=df_mod_group_mean.name,
         ).get_figure()
         fig.tight_layout()
         figures.append(fig)
