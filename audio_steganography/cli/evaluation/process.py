@@ -101,7 +101,7 @@ def process_data(df: pd.DataFrame) -> Tuple[List, List]:
             val = str(v).replace('_', ' ')
 
             if method == 'lsb' and key == 'only needed':
-                if v == False:
+                if v == True:
                     params_str.append(f'{key}')
                     continue
                 else:
@@ -138,7 +138,7 @@ def process_data(df: pd.DataFrame) -> Tuple[List, List]:
             'echo_bipolar': {'d0': 200, 'd1': 250, 'alpha': 0.5},
             'echo_bf': {'d0': 200, 'd1': 250, 'alpha': 0.5},
             'echo_bipolar_bf': {'d0': 200, 'd1': 250, 'alpha': 0.5},
-            'lsb': {'depth': 1, 'only_needed': False},
+            'lsb': {'depth': 1, 'only_needed': True},
             'phase': {},
             'dsss': {'alpha': 0.005},
             'silence_interval': {'min_silence_len': 400},
