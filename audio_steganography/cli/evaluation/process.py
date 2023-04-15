@@ -106,6 +106,9 @@ def process_data(df: pd.DataFrame) -> Tuple[List, List]:
                     continue
                 else:
                     continue
+            elif method.startswith('echo'):
+                params_str.append(f'{val}')
+                continue
 
             params_str.append(f'{key}={val}')
 
