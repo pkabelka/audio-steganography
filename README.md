@@ -3,6 +3,8 @@
 This repository contains a Python library for coding and decoding arbitrary
 data into cover WAV audio files using the implemented steganography methods.
 
+Czech translation of this README can be found in [README-CZ.md](README-CZ.md).
+
 ## Prerequisites
 
 - Python 3.8 or *later*
